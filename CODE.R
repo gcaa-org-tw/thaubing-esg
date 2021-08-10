@@ -41,7 +41,7 @@ for (i in 0:3) {
 #抓取"各工廠空氣污染物排放資料"
 ems_p_08 <- list()
 for (i in 0:580) {
-  url08 <- paste0("https://data.epa.gov.tw/api/v1/ems_p_08?offset=" ,a[i], "000&limit=1000&api_key=8829d459-5d78-48c2-ad70-0da20335ddac")
+  url08 <- paste0("https://data.epa.gov.tw/api/v1/ems_p_08?offset=" ,a[i], "000&limit=1000&api_key=8829d459-5d78-48c2-ad70-0da20335ddac&sort=FacilityID")
   temp08a <- fromJSON(url08)
   ems_p08a <- as.data.frame(temp08a[["records"]])
   ems_p_08 <- rbind(ems_p_08, ems_p08a)
