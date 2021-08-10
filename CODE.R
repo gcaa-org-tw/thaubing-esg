@@ -7,42 +7,42 @@ library(RCurl)
 library(XML)
 library(httr)
 
-setwd("C:/Users/¬_°®±e/Documents/GCAA/thaubing/20210810Á`²Î¬×¸ê®Æ¹w§ì")
+setwd("C:/Users/æŸ¯ä¹¾åº¸/Documents/GCAA/thaubing/20210810ç¸½çµ±ç›ƒè³‡æ–™é æŠ“")
 
 a <- 0:1000
 
-#§ì¨ú"Àô¹Ò«OÅ@³\¥iºŞ²z¨t²Î(º[¸Ñ°£¦CºŞ)¹ï¶H°ò¥»¸ê®Æ"
+#æŠ“å–"ç’°å¢ƒä¿è­·è¨±å¯ç®¡ç†ç³»çµ±(æš¨è§£é™¤åˆ—ç®¡)å°è±¡åŸºæœ¬è³‡æ–™"
 ems_s_01 <- list()
 for (i in 0:325) {
   url01 <- paste0("https://data.epa.gov.tw/api/v1/ems_s_01?offset=" ,a[i], "000&limit=1000&api_key=8829d459-5d78-48c2-ad70-0da20335ddac&sort=EmsNo")
   temp01a <- fromJSON(url01)
-  ems_p01a <- as.data.frame(temp01a[["records"]])
-  ems_s_01 <- rbind(ems_s_01, ems_p01a)
+  ems_s01a <- as.data.frame(temp01a[["records"]])
+  ems_s_01 <- rbind(ems_s_01, ems_s01a)
 }
 
-#§ì¨ú"¦CºŞ¨Æ·~¦Ã¬V·½µô³B¸ê®Æ"
-ems_s_46 <- list()
+#æŠ“å–"åˆ—ç®¡äº‹æ¥­æ±¡æŸ“æºè£è™•è³‡æ–™"
+ems_p_46 <- list()
 for (i in 0:125) {
-  url46 <- paste0("https://data.epa.gov.tw/api/v1/ems_s_46?offset=" ,a[i], "000&limit=1000&api_key=8829d459-5d78-48c2-ad70-0da20335ddac&sort=EMS_NO")
+  url46 <- paste0("https://data.epa.gov.tw/api/v1/ems_p_46?offset=" ,a[i], "000&limit=1000&api_key=8829d459-5d78-48c2-ad70-0da20335ddac&sort=EMS_NO")
   temp46a <- fromJSON(url46)
   ems_p46a <- as.data.frame(temp46a[["records"]])
-  ems_s_46 <- rbind(ems_s_46, ems_p46a)
+  ems_p_46 <- rbind(ems_p_46, ems_p46a)
 }
 
-#§ì¨ú"·Å«Ç®ğÅé¦~±Æ©ñ¶q"
+#æŠ“å–"æº«å®¤æ°£é«”å¹´æ’æ”¾é‡"
 ghg_p_01 <- list()
 for (i in 0:3) {
   urlg01 <- paste0("https://data.epa.gov.tw/api/v1/ghg_p_01?offset=" ,a[i], "000&limit=1000&api_key=8829d459-5d78-48c2-ad70-0da20335ddac&sort=companyno")
   tempg01a <- fromJSON(urlg01)
-  ems_pg01a <- as.data.frame(tempg01a[["records"]])
-  ghg_p_01 <- rbind(ghg_p_01, ems_pg01a)
+  ems_g01a <- as.data.frame(tempg01a[["records"]])
+  ghg_p_01 <- rbind(ghg_p_01, ems_g01a)
 }
 
-#§ì¨ú"¦U¤u¼tªÅ®ğ¦Ã¬Vª«±Æ©ñ¸ê®Æ"
-ems_s_08 <- list()
-for (i in 0:800) {
-  url08 <- paste0("https://data.epa.gov.tw/api/v1/ems_s_08?offset=" ,a[i], "000&limit=1000&api_key=8829d459-5d78-48c2-ad70-0da20335ddac&sort=FacilityID")
+#æŠ“å–"å„å·¥å» ç©ºæ°£æ±¡æŸ“ç‰©æ’æ”¾è³‡æ–™"
+ems_p_08 <- list()
+for (i in 0:580) {
+  url08 <- paste0("https://data.epa.gov.tw/api/v1/ems_p_08?offset=" ,a[i], "000&limit=1000&api_key=8829d459-5d78-48c2-ad70-0da20335ddac")
   temp08a <- fromJSON(url08)
   ems_p08a <- as.data.frame(temp08a[["records"]])
-  ems_s_08 <- rbind(ems_s_08, ems_p08a)
+  ems_p_08 <- rbind(ems_p_08, ems_p08a)
 }
