@@ -6,6 +6,15 @@
 
 ## DEV Getting started
 
+### Crawler
+
+- Requirement: Python 3.7+ and [pipenv](https://pipenv.pypa.io/en/latest/)
+
+```bash
+pip install --user pipenv       # install pipenv
+pipenv install                  # install dependencies
+```
+
 ### Database setup
 
 - Requirement: [Postgresql](https://www.postgresql.org/) 13+
