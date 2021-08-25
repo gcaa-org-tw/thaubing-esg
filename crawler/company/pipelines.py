@@ -9,6 +9,15 @@ class CompanyPipeline:
         self.file = open(filepath, 'wb')
         self.exporter = CsvItemExporter(self.file)
 
+        # specifies exported fields and order
+        self.exporter.fields_to_export = [
+            'stock_id',
+            'name',
+            'name_abbr',
+            'tax_code',
+            'company_type',
+        ]
+
     def close_spider(self, spider):
         self.exporter.finish_exporting()
         self.file.close()

@@ -11,14 +11,6 @@ class CompanySpider(CSVFeedSpider):
         'https://mopsfin.twse.com.tw/opendata/t187ap03_P.csv', # 公開發行公司 https://data.gov.tw/dataset/28567
     ]
     custom_settings = {
-        # specifies exported fields and order
-        'FEED_EXPORT_FIELDS': [
-            'stock_id',
-            'name',
-            'name_abbr',
-            'tax_code',
-            'company_type',
-        ],
         'LOG_LEVEL': 'INFO'
     }
 
