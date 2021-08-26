@@ -37,7 +37,7 @@ class FinancialSpider(Spider):
         # check if the saved webpage comes with content, or if the payload is not applicable
         file_size_check = self._check_empty_webpage_by_filesize(filepath)
 
-        # Not applicable
+        # Not applicable - 97 bytes
         if file_size_check == 1:
             if response.meta['report_id'] == 'C':
                 self.logger.info('Cannot find financial report report_id=C for stock_id=%s. Try report report_id=A.', stock_id)
