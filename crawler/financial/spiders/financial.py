@@ -28,7 +28,7 @@ class FinancialSpider(Spider):
             )
 
     def parse(self, response):
-        self.logger.debug(response.url)
+        self.logger.debug('Parsing %s ...', response.url)
         stock_id = response.meta['stock_id']
         filepath = self._gen_financial_webpage_filepath(stock_id)
         with open(filepath, 'wb') as f:
@@ -48,10 +48,11 @@ class FinancialSpider(Spider):
                 )
             else:
                 self.logger.info("Cannot find financial report report_id=A for stock_id=%s", stock_id)
+                os.remove(filepath)
 
         # Overrun - 496 bytes
         elif file_size_check == 2:
-            self.logger.info("Scrapy overrun when scraping stock_id=%s, report_id=%s", stock_id, response.meta['report_id'])
+            self.logger.info("Scrapy overrun when scraping stock_id=%s, report_id=%s. Retry...", stock_id, response.meta['report_id'])
             yield Request(response.url, meta=response.meta, callback=self.parse, dont_filter=True)
 
     def _gen_request_url(self, stock_id: str, year=2020, report_id='C'):
