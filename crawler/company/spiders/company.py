@@ -4,7 +4,6 @@ from ..items import CompanyItem
 
 class CompanySpider(CSVFeedSpider):
     name = 'company'
-    allowed_domains = ['company.com']
     start_urls = [
         'https://mopsfin.twse.com.tw/opendata/t187ap03_L.csv', # 上市公司 https://data.gov.tw/dataset/18419
         'https://mopsfin.twse.com.tw/opendata/t187ap03_R.csv', # 興櫃公司 https://data.gov.tw/dataset/28568
