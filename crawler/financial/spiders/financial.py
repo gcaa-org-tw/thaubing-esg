@@ -23,18 +23,39 @@ class FinancialSpider(Spider):
 
             yield Request(
                 url=self._gen_request_url(stock_id),
-                meta={'stock_id': stock_id},
+                meta={'stock_id': stock_id, 'year': 2020, 'report_id': 'C'},
                 callback=self.parse,
             )
 
     def parse(self, response):
         self.logger.debug(response.url)
-        filepath = self._gen_financial_webpage_filepath(response.meta['stock_id'])
+        stock_id = response.meta['stock_id']
+        filepath = self._gen_financial_webpage_filepath(stock_id)
         with open(filepath, 'wb') as f:
             f.write(response.body)
 
-    def _gen_request_url(self, stock_id: str):
-        return '{}&{}'.format(URL_ENDPOINT, self._gen_payload(stock_id))
+        # check if the saved webpage comes with content, or if the payload is not applicable
+        file_size_check = self._check_empty_webpage_by_filesize(filepath)
+
+        # Not applicable
+        if file_size_check == 1:
+            if response.meta['report_id'] == 'C':
+                self.logger.info('Cannot find financial report report_id=C for stock_id=%s. Try report report_id=A.', stock_id)
+                yield Request(
+                    url=self._gen_request_url(stock_id, report_id='A'),
+                    meta={'stock_id': stock_id, 'year': 2020, 'report_id': 'A'},
+                    callback=self.parse,
+                )
+            else:
+                self.logger.info("Cannot find financial report report_id=A for stock_id=%s", stock_id)
+
+        # Overrun - 496 bytes
+        elif file_size_check == 2:
+            self.logger.info("Scrapy overrun when scraping stock_id=%s, report_id=%s", stock_id, response.meta['report_id'])
+            yield Request(response.url, meta=response.meta, callback=self.parse, dont_filter=True)
+
+    def _gen_request_url(self, stock_id: str, year=2020, report_id='C'):
+        return '{}&{}'.format(URL_ENDPOINT, self._gen_payload(stock_id, year, report_id))
 
     def _gen_payload(self, stock_id: str, year='2020', report_id='C'):
         return (
@@ -49,3 +70,20 @@ class FinancialSpider(Spider):
         filename = '{}.html'.format(stock_id)
         filepath = os.path.join(os.path.dirname(__file__), '../../../data/financial/webpages/{}'.format(filename))
         return filepath
+
+    def _check_empty_webpage_by_filesize(self, filepath: str):
+        '''Check if webpage is empty by accessing the saved webpage filesize: Not applicable - 97 bytes; Overrun - 496 bytes'''
+        file_size = os.path.getsize(filepath)
+
+        # Not applicable - 97 bytes
+        if file_size < 100:
+            return 1
+
+        # Overrun - 496 bytes
+        elif file_size < 1e5:
+            return 2
+
+        # Webpage looks file!
+        else:
+            return 0
+
