@@ -1,8 +1,10 @@
 # Crawler
 
-In `scrapy.cfg`, set the project name one'd like to run to default,
+In `scrapy.cfg`, set the project name one'd like to run to _default_,
 
 ```python
+# scrapy.cfg
+
 [settings]
 default = [project_name].settings
 company = company.settings
@@ -16,7 +18,9 @@ Then run,
 pipenv run scrapy crawl [spider_name]
 ```
 
-| project | spider | description |
+## Projects
+
+| Project | Spider | Description |
 | ------- | ------ | ----------- |
 | `company` | `company` | 公司基本資料 |
 | `financial` | `financial` | 合併財務報表重要會計科目資料 |
