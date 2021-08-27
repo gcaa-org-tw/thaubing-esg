@@ -35,7 +35,7 @@ pipenv run scrapy crawl [spider_name] -a year=[year]
 
 ## Projects
 
-| Project | Spider | Description |
-| ------- | ------ | ----------- |
-| `company` | `company` | 公司基本資料 |
-| `financial` | `financial` | 合併財務報表重要會計科目資料 |
+| Project | Spider | Description | Dependencies |
+| ------- | ------ | ----------- | ------------ |
+| `company` | `company` | 公司基本資料 | - |
+| `financial` | `financial` | 合併財務報表重要會計科目資料 | ./data/company.csv |
