@@ -7,11 +7,11 @@ from ..items import IncomeItem
 class IncomeSpider(Spider):
     name = 'income'
     data_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), '../../../data/financial/webpages'))
-    # custom_settings = {
-    #     'ITEM_PIPELINES': {
-    #         'thaubing_esg.IncomePipeline': 300
-    #     },
-    # }
+    custom_settings = {
+        'ITEM_PIPELINES': {
+            'thaubing_esg.IncomePipeline': 300
+        },
+    }
 
     def start_requests(self):
         year = getattr(self, 'year', None)
