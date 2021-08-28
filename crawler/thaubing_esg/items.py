@@ -9,6 +9,13 @@ class CompanyItem(Item):
     company_type = Field() # 上市, 興櫃, 或公開發行
 
 
-class FinancialItem(Item):
-    # name = Field()
-    pass
+class IncomeItem(Item):
+    stock_id = Field() # 公司代號(股票代號)
+    year     = Field() # 年度
+    total_operating_revenue    = Field() # 營業收入合計
+    total_operating_costs      = Field() # 營業成本合計
+    total_operating_expenses   = Field() # 營業費用合計
+    net_operating_income       = Field() # 營業利益（損失）
+    profit_or_loss             = Field() # 本期淨利（淨損）
+    total_comprehensive_income = Field() # 本期綜合損益總額
+    total_assets               = Field() # 資產總計
