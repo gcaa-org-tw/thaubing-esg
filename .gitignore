@@ -1,2 +1,5 @@
 # Python 3 byte code
 *.pyc
+
+# output raw data (saved in repo thaubing-esg-raw-data)
+data/**/*.html
