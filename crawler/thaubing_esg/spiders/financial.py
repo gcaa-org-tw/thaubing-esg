@@ -48,6 +48,7 @@ class FinancialSpider(Spider):
 
         # Not applicable - 97 bytes
         if file_size_check == 1:
+            os.remove(filepath)
             if response.meta['report_id'] == 'C':
                 self.logger.debug('Cannot find financial report report_id=C for stock_id=%s. Try report report_id=A.', stock_id)
                 yield Request(
@@ -57,10 +58,10 @@ class FinancialSpider(Spider):
                 )
             else:
                 self.logger.info("Cannot find financial report for stock_id=%s", stock_id)
-                os.remove(filepath)
 
         # Overrun - 496 bytes
         elif file_size_check == 2:
+            os.remove(filepath)
             self.logger.info("Scrapy overrun when scraping stock_id=%s, report_id=%s. Retry...", stock_id, response.meta['report_id'])
             yield Request(response.url, meta=response.meta, callback=self.parse, dont_filter=True)
 
