@@ -47,7 +47,17 @@ class IncomeSpider(Spider):
 
     def parse(self, response):
         item = IncomeItem()
-        pass
+        if int(response.meta['year']) <= 2018:
+            item = self._parse_xbrl_old_format(item, response)
+        else:
+            item = self._parse_xbrl(item, response)
+        return item
+
+    def _parse_xbrl(self, item, response):
+        return item
+
+    def _parse_xbrl_old_format(self, item, response):
+        return item
 
     def _format_filepath_to_datauri(self, filepath: str):
         return ('file:///' + os.path.normpath(filepath))
