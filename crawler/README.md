@@ -1,4 +1,4 @@
-# Crawler
+# thaubing-esg > crawler
 
 ## Requirement
 
@@ -13,19 +13,7 @@ pipenv install                  # install dependencies
 
 ## How to run
 
-In `scrapy.cfg`, set the project name one'd like to run to _default_,
-
-```python
-# scrapy.cfg
-
-[settings]
-default = [project_name].settings
-company = company.settings
-financial = financial.settings
-...
-```
-
-Then run,
+To scrape with specific spider, run,
 
 ```bash
 pipenv run scrapy crawl [spider_name] -a year=[year]
@@ -35,7 +23,7 @@ pipenv run scrapy crawl [spider_name] -a year=[year]
 
 ## Projects
 
-| Project | Spider | Description |
-| ------- | ------ | ----------- |
-| `company` | `company` | 公司基本資料 |
-| `financial` | `financial` | 合併財務報表重要會計科目資料 |
+| Spider      | Description | Dependencies |
+| ----------- | ----------- | ------------ |
+| `company`   | 公司基本資料  | - |
+| `financial` | 合併財務報表重要會計科目資料 | ./data/company.csv |
