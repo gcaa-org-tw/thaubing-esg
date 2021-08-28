@@ -18,9 +18,6 @@ latest_year = datetime.now().year - 1
 
 class FinancialSpider(Spider):
     name = 'financial'
-    custom_settings = {
-        'LOG_LEVEL': 'INFO'
-    }
 
     def start_requests(self):
         year = int(getattr(self, 'year', str(latest_year)))

@@ -1,4 +1,4 @@
-# Scrapy settings for financial project
+# Scrapy settings for thaubing_esg project
 #
 # For simplicity, this file contains only settings considered important or
 # commonly used. You can find more settings consulting the documentation:
@@ -7,14 +7,15 @@
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
-BOT_NAME = 'financial'
+BOT_NAME = 'thaubing_esg'
 
-SPIDER_MODULES = ['financial.spiders']
-NEWSPIDER_MODULE = 'financial.spiders'
+SPIDER_MODULES = ['thaubing_esg.spiders']
+NEWSPIDER_MODULE = 'thaubing_esg.spiders'
 
+LOG_LEVEL = 'INFO'
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-#USER_AGENT = 'financial (+http://www.yourdomain.com)'
+#USER_AGENT = 'thaubing_esg (+http://www.yourdomain.com)'
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
@@ -45,13 +46,13 @@ CONCURRENT_REQUESTS_PER_IP = 16
 # Enable or disable spider middlewares
 # See https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 #SPIDER_MIDDLEWARES = {
-#    'financial.middlewares.FinancialSpiderMiddleware': 543,
+#    'thaubing_esg.middlewares.ThaubingEsgSpiderMiddleware': 543,
 #}
 
 # Enable or disable downloader middlewares
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #DOWNLOADER_MIDDLEWARES = {
-#    'financial.middlewares.FinancialDownloaderMiddleware': 543,
+#    'thaubing_esg.middlewares.ThaubingEsgDownloaderMiddleware': 543,
 #}
 
 # Enable or disable extensions
@@ -63,7 +64,7 @@ CONCURRENT_REQUESTS_PER_IP = 16
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 #ITEM_PIPELINES = {
-#    'financial.pipelines.FinancialPipeline': 300,
+#    'thaubing_esg.pipelines.ThaubingEsgPipeline': 300,
 #}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
