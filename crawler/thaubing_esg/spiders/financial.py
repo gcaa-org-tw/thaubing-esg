@@ -9,7 +9,7 @@ FILENAME_COMPANY = 'company.csv'
 
 # load company codes scraped from spider "company"
 filepath_company = os.path.join(os.path.dirname(__file__), '../../../data/{}'.format(FILENAME_COMPANY))
-with open(filepath_company) as f:
+with open(filepath_company, 'r', encoding='utf-8') as f:
     csv_reader = DictReader(f)
     stock_ids = [row['stock_id'] for row in csv_reader]
 
