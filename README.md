@@ -8,7 +8,7 @@
 
 ### Crawler
 
-- Requirement: Python 3.7+ and [pipenv](https://pipenv.pypa.io/en/latest/)
+- Requirement: Python 3.9+ and [pipenv](https://pipenv.pypa.io/en/latest/)
 
 ```bash
 pip install --user pipenv       # install pipenv
