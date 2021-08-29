@@ -44,9 +44,9 @@ class FinancialSpider(Spider):
             f.write(response.body)
 
         # check if the saved webpage comes with content, or if the payload is not applicable
-        file_size_check = self._check_empty_webpage_by_filesize(filepath)
+        file_size_check = self._check_empty_webpage_by_filesize(year, filepath)
 
-        # Not applicable - 97 bytes
+        # n/a: the given stock_id + year has no income statement
         if file_size_check == 1:
             os.remove(filepath)
             if response.meta['report_id'] == 'C':
@@ -59,7 +59,7 @@ class FinancialSpider(Spider):
             else:
                 self.logger.info("Cannot find financial report for stock_id=%s", stock_id)
 
-        # Overrun - 496 bytes
+        # overrun
         elif file_size_check == 2:
             os.remove(filepath)
             self.logger.info("Scrapy overrun when scraping stock_id=%s, report_id=%s. Retry...", stock_id, response.meta['report_id'])
@@ -82,19 +82,31 @@ class FinancialSpider(Spider):
         filepath = os.path.join(os.path.dirname(__file__), '../../../data/financial/webpages/{}/{}'.format(year, filename))
         return filepath
 
-    def _check_empty_webpage_by_filesize(self, filepath: str):
-        '''Check if webpage is empty by accessing the saved webpage filesize: Not applicable - 97 bytes; Overrun - 496 bytes'''
-        file_size = os.path.getsize(filepath)
-
-        # Not applicable - 97 bytes
-        if file_size < 100:
-            return 1
-
-        # Overrun - 496 bytes
-        elif file_size < 1e5:
-            return 2
-
-        # Webpage looks file!
+    def _is_new_xbrl_format_statement(self, year: int):
+        if year <= 2018:
+            return False
         else:
-            return 0
+            return True
 
+    def _check_empty_webpage_by_filesize(self, year: int, filepath: str):
+        '''Check if webpage is empty by accessing the saved webpage filesize: 0=Ok; 1=N/A; 2=Overrun.'''
+        # new xbrl format: n/a=  97 bytes, overrun=496 bytes
+        # old xbrl format: n/a=2816 bytes, overrun=496 bytes
+        switch = {
+            1: { # n/a
+                True:  (lambda b: b < 100),
+                False: (lambda b: 1e3 < b < 1e5),
+            },
+            2: { # overrun
+                True:  (lambda b: 100 < b < 1e5),
+                False: (lambda b: b < 1e3),
+            },
+        }
+
+        file_size = os.path.getsize(filepath)
+        is_new_xbrl = self._is_new_xbrl_format_statement(year)
+
+        status = [ key for key, value in list(switch.items()) if value[is_new_xbrl](file_size) ]
+        [status] = [0] if len(status) == 0 else status
+
+        return status
