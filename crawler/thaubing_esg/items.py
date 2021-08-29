@@ -10,7 +10,7 @@ class CompanyItem(Item):
 
 
 class IncomeItem(Item):
-    stock_code                   = Field() # 公司代號(股票代號)
+    stock_code                 = Field() # 公司代號(股票代號)
     year                       = Field() # 財務報表會計年度
     total_operating_revenue    = Field() # 營業收入合計
     total_operating_costs      = Field() # 營業成本合計
