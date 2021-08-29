@@ -30,7 +30,7 @@ class FinancialSpider(Spider):
 
         for stock_id in stock_ids:
             yield Request(
-                url=self._gen_request_url(stock_id),
+                url=self._gen_request_url(stock_id, year=year),
                 meta={'stock_id': stock_id, 'year': year, 'report_id': 'C'},
                 callback=self.parse,
             )
