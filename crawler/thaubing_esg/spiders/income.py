@@ -1,7 +1,6 @@
 import os
 import locale
 import typing
-from thaubing_esg.pipelines import IncomePipeline
 from scrapy import Request
 from scrapy.spiders import Spider
 from ..items import IncomeItem
@@ -12,7 +11,7 @@ class IncomeSpider(Spider):
     data_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), '../../../data/financial/webpages'))
     custom_settings = {
         'ITEM_PIPELINES': {
-            'thaubing_esg.IncomePipeline': 300
+            'thaubing_esg.pipelines.IncomePipeline': 300
         },
     }
 
