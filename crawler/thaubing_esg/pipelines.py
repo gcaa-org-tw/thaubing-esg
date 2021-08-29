@@ -2,7 +2,11 @@ import os
 from scrapy.exporters import CsvItemExporter
 
 def gen_data_filepath(filename: str):
-    return os.path.normpath(os.path.join(os.path.dirname(__file__), '../../data/' + filename))
+    filepath = os.path.normpath(os.path.join(os.path.dirname(__file__), '../../data/' + filename))
+    filedir = os.path.dirname(filepath)
+    if not os.path.exists(filedir):
+        os.makedirs(filedir)
+    return filepath
 
 class CompanyPipeline:
     filepath = gen_data_filepath('company.csv')
@@ -30,10 +34,10 @@ class CompanyPipeline:
 
 
 class IncomePipeline:
-    filepath = gen_data_filepath('income.csv')
 
     def open_spider(self, spider):
-        self.file = open(self.filepath, 'wb')
+        filepath = gen_data_filepath('income/income-{}.csv'.format(spider.year))
+        self.file = open(filepath, 'wb')
         self.exporter = CsvItemExporter(self.file)
 
         # specifies exported fields and order
