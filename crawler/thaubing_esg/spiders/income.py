@@ -66,19 +66,25 @@ class IncomeSpider(Spider):
         # income values
         rows = response.css('tr')
         for subject in accounting_subjects:
-            trs = [rr for rr in rows
-                   if any([txt.strip() == subject['eng_name']
-                           for txt in rr.css('.en::text').getall()])]
 
-            if len(trs) == 0:
-                self.logger.info('Cannot parse subject \'%s\' for stock_id=%s, year=%d', subject['eng_name'], item['stock_id'], item['year'])
-            else:
-                for tr in trs:
-                    tds = [td.css('*::text').getall() for td in tr.css('td')]
-                    value_current_year = tds[2]
-                    if len(value_current_year) != 0:
-                        item[subject['key']] = self._parse_numerical_value(value_current_year)
-                        break
+            # income statement might be using alt names for the subject title
+            # e.g., subject_names = ["Total operating revenue", "Total revenue"]
+            subject_names = subject['eng_name'] if isinstance(subject['eng_name'], list) else [subject['eng_name']]
+            for subject_name in subject_names:
+                trs = [rr for rr in rows
+                    if any([txt.strip() == subject_name
+                            for txt in rr.css('.en::text').getall()])]
+
+                if (len(trs) == 0) & (subject_names.index(subject_name) == len(subject_names)-1):
+                    self.logger.info('For stock_id=%s, year=%d: Cannot parse subject \'%A\'.',
+                                    item['stock_id'], item['year'], subject_names)
+                else:
+                    for tr in trs:
+                        tds = [td.css('*::text').getall() for td in tr.css('td')]
+                        value_current_year = tds[2]
+                        if len(value_current_year) != 0:
+                            item[subject['key']] = self._parse_numerical_value(value_current_year)
+                            break
         return item
 
     def _parse_xbrl_old_format(self, item, response):
@@ -88,7 +94,8 @@ class IncomeSpider(Spider):
         return ('file:///' + os.path.normpath(filepath))
 
     def _parse_numerical_value(self, td: typing.Union[str, list[str]]):
-        if isinstance(td, str):
-            return locale.atoi(td)
+        str_values = td if isinstance(td, str) else ''.join(td).strip()
+        if str_values.startswith('('):
+            return (-locale.atoi(str_values.lstrip('(').rstrip(')')))
         else:
-            return locale.atoi(td[0])
+            return locale.atoi(str_values)
