@@ -76,7 +76,7 @@ class IncomeSpider(Spider):
                             for txt in rr.css('.en::text').getall()])]
 
                 if (len(trs) == 0) & (subject_names.index(subject_name) == len(subject_names)-1):
-                    self.logger.info('For stock_id=%s, year=%d: Cannot parse subject \'%A\'.',
+                    self.logger.info('For stock_id=%s, year=%d: Cannot parse subject \'%s\'.',
                                     item['stock_id'], item['year'], subject_names)
                 else:
                     for tr in trs:
