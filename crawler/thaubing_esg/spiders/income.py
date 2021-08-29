@@ -103,8 +103,8 @@ class IncomeSpider(Spider):
 
                 # no value found for all subject names
                 if alt_subject_names.index(name) == len(alt_subject_names)-1:
-                    self.logger.info('For stock_code=%s, year=%d: Cannot parse subject \'%s\'.',
-                                        item['stock_code'], item['year'], alt_subject_names)
+                    self.logger.debug('For stock_code=%s, year=%d: Cannot parse subject \'%s\'.',
+                                      item['stock_code'], item['year'], alt_subject_names)
 
         return item
 
