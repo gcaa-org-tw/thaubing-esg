@@ -31,7 +31,7 @@ class IncomeSpider(Spider):
                         filepath = os.path.join(data_dir_year, file)
                         yield Request(
                             url=self._format_filepath_to_datauri(filepath),
-                            meta={'stock_id': file, 'year': subdir_year},
+                            meta={'stock_code': file, 'year': subdir_year},
                             callback=self.parse,
                         )
                 self.logger.info('Completed parsing year=%s!', subdir_year)
@@ -45,7 +45,7 @@ class IncomeSpider(Spider):
                     filepath = os.path.join(data_dir_year, file)
                     yield Request(
                         url=self._format_filepath_to_datauri(filepath),
-                        meta={'stock_id': file.rstrip('.html'), 'year': self.year},
+                        meta={'stock_code': file.rstrip('.html'), 'year': self.year},
                         callback=self.parse,
                     )
 
@@ -60,12 +60,12 @@ class IncomeSpider(Spider):
     def _parse_xbrl(self, item, response):
         # general info
         header = response.css('.header .zh::text').getall()
-        item['stock_id'] = header[0].split()[0]
+        item['stock_code'] = header[0].split()[0]
         item['year'] = int(header[-1][:4])
 
         # check if meta aligns
-        if response.meta['stock_id'] != header[0].split()[0]:
-            self.logger.warning('STOCK_ID MISMATCH: meta=%s, webpage=%s', response.meta['stock_id'], header[0].split()[0])
+        if response.meta['stock_code'] != header[0].split()[0]:
+            self.logger.warning('stock_code MISMATCH: meta=%s, webpage=%s', response.meta['stock_code'], header[0].split()[0])
             return item
 
         if response.meta['year'] != int(header[-1][:4]):
@@ -97,8 +97,8 @@ class IncomeSpider(Spider):
 
                 # no value found for all subject names
                 if alt_subject_names.index(name) == len(alt_subject_names)-1:
-                    self.logger.info('For stock_id=%s, year=%d: Cannot parse subject \'%s\'.',
-                                        item['stock_id'], item['year'], alt_subject_names)
+                    self.logger.info('For stock_code=%s, year=%d: Cannot parse subject \'%s\'.',
+                                        item['stock_code'], item['year'], alt_subject_names)
 
         return item
 

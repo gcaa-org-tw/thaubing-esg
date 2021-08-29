@@ -17,7 +17,7 @@ class CompanyPipeline:
 
         # specifies exported fields and order
         self.exporter.fields_to_export = [
-            'stock_id',
+            'stock_code',
             'name',
             'name_abbr',
             'tax_code',
@@ -42,7 +42,7 @@ class IncomePipeline:
 
         # specifies exported fields and order
         self.exporter.fields_to_export = [
-            'stock_id',
+            'stock_code',
             'year',
             'total_operating_revenue',
             'total_operating_costs',
