@@ -69,6 +69,7 @@ class IncomeSpider(Spider):
 
             # income statement might be using alt names for the subject title
             # e.g., subject_names = ["Total operating revenue", "Total revenue"]
+            # see util.py for accounting_subjects
             subject_names = subject['eng_name'] if isinstance(subject['eng_name'], list) else [subject['eng_name']]
             for subject_name in subject_names:
                 trs = [rr for rr in rows
