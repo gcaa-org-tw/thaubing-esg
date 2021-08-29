@@ -6,6 +6,8 @@ from scrapy.spiders import Spider
 from ..items import IncomeItem
 from ..util import accounting_subjects
 
+locale.setlocale(locale.LC_ALL, 'en_US.UTF8')
+
 class IncomeSpider(Spider):
     name = 'income'
     data_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), '../../../data/financial/webpages'))
@@ -62,14 +64,21 @@ class IncomeSpider(Spider):
         item['year'] = int(header[-1][:4])
 
         # income values
-        rows = response.css("tr")
+        rows = response.css('tr')
         for subject in accounting_subjects:
-            [tr] = [rr for rr in rows
-                    if any([txt.strip() == subject["eng_name"]
-                            for txt in rr.css(".en::text").getall()])]
+            trs = [rr for rr in rows
+                   if any([txt.strip() == subject['eng_name']
+                           for txt in rr.css('.en::text').getall()])]
 
-            tds = [td.css("*::text").getall() for td in tr.css("td")]
-            item[subject['key']] = self._parse_numerical_value(tds[2])
+            if len(trs) == 0:
+                self.logger.info('Cannot parse subject \'%s\' for stock_id=%s, year=%d', subject['eng_name'], item['stock_id'], item['year'])
+            else:
+                for tr in trs:
+                    tds = [td.css('*::text').getall() for td in tr.css('td')]
+                    value_current_year = tds[2]
+                    if len(value_current_year) != 0:
+                        item[subject['key']] = self._parse_numerical_value(value_current_year)
+                        break
         return item
 
     def _parse_xbrl_old_format(self, item, response):
@@ -80,6 +89,6 @@ class IncomeSpider(Spider):
 
     def _parse_numerical_value(self, td: typing.Union[str, list[str]]):
         if isinstance(td, str):
-            return int(locale.atof(td))
+            return locale.atoi(td)
         else:
-            return int(locale.atof(td[0]))
+            return locale.atoi(td[0])
