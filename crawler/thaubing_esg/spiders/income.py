@@ -45,7 +45,7 @@ class IncomeSpider(Spider):
                     filepath = os.path.join(data_dir_year, file)
                     yield Request(
                         url=self._format_filepath_to_datauri(filepath),
-                        meta={'stock_id': file, 'year': self.year},
+                        meta={'stock_id': file.rstrip('.html'), 'year': self.year},
                         callback=self.parse,
                     )
 
@@ -63,29 +63,43 @@ class IncomeSpider(Spider):
         item['stock_id'] = header[0].split()[0]
         item['year'] = int(header[-1][:4])
 
-        # income values
+        # check if meta aligns
+        if response.meta['stock_id'] != header[0].split()[0]:
+            self.logger.warning('STOCK_ID MISMATCH: meta=%s, webpage=%s', response.meta['stock_id'], header[0].split()[0])
+            return item
+
+        if response.meta['year'] != int(header[-1][:4]):
+            self.logger.warning('YEAR MISMATCH: meta=%s, webpage=%s', response.meta['year'], header[0].split()[0])
+            return item
+
+        # parse income values
         rows = response.css('tr')
         for subject in accounting_subjects:
 
             # income statement might be using alt names for the subject title
             # e.g., subject_names = ["Total operating revenue", "Total revenue"]
             # see util.py for accounting_subjects
-            subject_names = subject['eng_name'] if isinstance(subject['eng_name'], list) else [subject['eng_name']]
-            for subject_name in subject_names:
+            alt_subject_names = subject['eng_name'] if isinstance(subject['eng_name'], list) else [subject['eng_name']]
+            for name in alt_subject_names:
                 trs = [rr for rr in rows
-                    if any([txt.strip() == subject_name
-                            for txt in rr.css('.en::text').getall()])]
-
-                if (len(trs) == 0) & (subject_names.index(subject_name) == len(subject_names)-1):
-                    self.logger.info('For stock_id=%s, year=%d: Cannot parse subject \'%s\'.',
-                                    item['stock_id'], item['year'], subject_names)
-                else:
+                       if any([txt.strip() == name for txt in rr.css('.en::text').getall()])]
+                if len(trs) != 0:
                     for tr in trs:
                         tds = [td.css('*::text').getall() for td in tr.css('td')]
                         value_current_year = tds[2]
                         if len(value_current_year) != 0:
                             item[subject['key']] = self._parse_numerical_value(value_current_year)
                             break
+
+                # break for loop if value found for the subject
+                if subject['key'] in item.keys():
+                    break
+
+                # no value found for all subject names
+                if alt_subject_names.index(name) == len(alt_subject_names)-1:
+                    self.logger.info('For stock_id=%s, year=%d: Cannot parse subject \'%s\'.',
+                                        item['stock_id'], item['year'], alt_subject_names)
+
         return item
 
     def _parse_xbrl_old_format(self, item, response):
