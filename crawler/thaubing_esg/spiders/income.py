@@ -1,5 +1,6 @@
 import os
 import locale
+import re
 import typing
 from scrapy import Request
 from scrapy.spiders import Spider
@@ -31,7 +32,7 @@ class IncomeSpider(Spider):
                         filepath = os.path.join(data_dir_year, file)
                         yield Request(
                             url=self._format_filepath_to_datauri(filepath),
-                            meta={'stock_code': file, 'year': subdir_year},
+                            meta={'stock_code': file, 'year': int(subdir_year)},
                             callback=self.parse,
                         )
                 self.logger.info('Completed parsing year=%s!', subdir_year)
@@ -45,7 +46,7 @@ class IncomeSpider(Spider):
                     filepath = os.path.join(data_dir_year, file)
                     yield Request(
                         url=self._format_filepath_to_datauri(filepath),
-                        meta={'stock_code': file.rstrip('.html'), 'year': self.year},
+                        meta={'stock_code': file.rstrip('.html'), 'year': int(self.year)},
                         callback=self.parse,
                     )
 
@@ -59,17 +60,22 @@ class IncomeSpider(Spider):
 
     def _parse_xbrl(self, item, response):
         # general info
-        header = response.css('.header .zh::text').getall()
-        item['stock_code'] = header[0].split()[0]
-        item['year'] = int(header[-1][:4])
+        title = response.css('title::text').get()
+        regex = r'\s*(\S+)\s([1-3][0-9]{3})Q.*'
+        match = re.search(regex, title)
+
+        item['stock_code'] = match.group(1)
+        item['year'] = int(match.group(2))
+        meta = response.meta
 
         # check if meta aligns
-        if response.meta['stock_code'] != header[0].split()[0]:
-            self.logger.warning('stock_code MISMATCH: meta=%s, webpage=%s', response.meta['stock_code'], header[0].split()[0])
+        if meta['stock_code'] != match.group(1):
+            self.logger.warning('STOCK_CODE MISMATCH: meta=%s, webpage=%s', meta['stock_code'], match.group(1))
             return item
 
-        if response.meta['year'] != int(header[-1][:4]):
-            self.logger.warning('YEAR MISMATCH: meta=%s, webpage=%s', response.meta['year'], header[0].split()[0])
+        if meta['year'] != int(match.group(2)):
+            self.logger.warning('YEAR MISMATCH for stock_code=%s: meta=%s, webpage=%s',
+                                meta['stock_code'], meta['year'], int(match.group(2)))
             return item
 
         # parse income values
