@@ -16,6 +16,9 @@ class IncomeSpider(Spider):
         'ITEM_PIPELINES': {
             'thaubing_esg.pipelines.IncomePipeline': 300
         },
+        'DOWNLOAD_DELAY': 0,
+        'CONCURRENT_REQUESTS': 32,
+        'AUTOTHROTTLE_ENABLED': False,
     }
 
     def start_requests(self):
