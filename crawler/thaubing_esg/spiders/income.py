@@ -79,7 +79,7 @@ class IncomeSpider(Spider):
                 alt_subject_names = subject['eng_name'] if isinstance(subject['eng_name'], list) else [subject['eng_name']]
                 for name in alt_subject_names:
                     trs = [rr for rr in rows
-                        if any([txt.strip() == name for txt in rr.css('.en::text').getall()])]
+                           if any([txt.strip() == name for txt in rr.css('.en::text').getall()])]
                     if len(trs) != 0:
                         for tr in trs:
                             tds = [td.css('*::text').getall() for td in tr.css('td')]
@@ -103,7 +103,35 @@ class IncomeSpider(Spider):
         webpage_info = self._get_metadata_from_webpage(is_new_xbrl=False, response=response)
         item['stock_code'] = webpage_info['stock_code']
         item['year'] = webpage_info['year']
-        return item
+        if self._check_metadata_mismatch(webpage_info, response.meta):
+            return item
+        else:
+            # parse income values
+            rows = response.css('tr')
+            for subject in accounting_subjects:
+                # income statement might be using alt names for the subject title
+                # e.g., subject_names = ["Total operating revenue", "Total revenue"]
+                # see util.py for accounting_subjects
+                alt_subject_names = subject['zh_name'] if isinstance(subject['zh_name'], list) else [subject['zh_name']]
+                for name in alt_subject_names:
+                    trs = [rr for rr in rows if rr.css('td::text').get() is not None]
+                    trs = [rr for rr in trs if rr.css('td::text').get().strip() == name]
+                    if len(trs) != 0:
+                        for tr in trs:
+                            value_current_year = tr.css('td::text').getall()[1]
+                            if len(value_current_year) != 0:
+                                item[subject['key']] = self._parse_numerical_value(value_current_year)
+                                break
+
+                    # break for loop if value found for the subject
+                    if subject['key'] in item.keys():
+                        break
+
+                    # no value found for all subject names
+                    if alt_subject_names.index(name) == len(alt_subject_names)-1:
+                        self.logger.debug('For stock_code=%s, year=%d: Cannot parse subject \'%s\'.',
+                                        item['stock_code'], item['year'], alt_subject_names)
+            return item
 
     def _get_metadata_from_webpage(self, is_new_xbrl: bool, response):
         if is_new_xbrl:
