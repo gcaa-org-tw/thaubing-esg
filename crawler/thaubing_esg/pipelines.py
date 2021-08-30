@@ -69,5 +69,5 @@ class IncomePipeline:
 
     def _csv_sorting_by_stock_id(self, filepath: str):
         data = pd.read_csv(filepath)
-        data.sort_values('stock_code')
+        data.sort_values(['year', 'stock_code'], ascending=[False, True], inplace=True)
         data.to_csv(filepath, index=False)
