@@ -63,53 +63,72 @@ class IncomeSpider(Spider):
         title = response.css('title::text').get()
         regex = r'\s*(\S+)\s([1-3][0-9]{3})Q.*'
         match = re.search(regex, title)
+        webpage_info = { 'stock_code': match.group(1), 'year': int(match.group(2)) }
 
         item['stock_code'] = match.group(1)
         item['year'] = int(match.group(2))
-        meta = response.meta
 
-        # check if meta aligns
-        if meta['stock_code'] != match.group(1):
-            self.logger.warning('STOCK_CODE MISMATCH: meta=%s, webpage=%s', meta['stock_code'], match.group(1))
+        if self._check_metadata_mismatch(webpage_info, response.meta):
             return item
+        else:
+            # parse income values
+            rows = response.css('tr')
+            for subject in accounting_subjects:
 
-        if meta['year'] != int(match.group(2)):
-            self.logger.warning('YEAR MISMATCH for stock_code=%s: meta=%s, webpage=%s',
-                                meta['stock_code'], meta['year'], int(match.group(2)))
+                # income statement might be using alt names for the subject title
+                # e.g., subject_names = ["Total operating revenue", "Total revenue"]
+                # see util.py for accounting_subjects
+                alt_subject_names = subject['eng_name'] if isinstance(subject['eng_name'], list) else [subject['eng_name']]
+                for name in alt_subject_names:
+                    trs = [rr for rr in rows
+                        if any([txt.strip() == name for txt in rr.css('.en::text').getall()])]
+                    if len(trs) != 0:
+                        for tr in trs:
+                            tds = [td.css('*::text').getall() for td in tr.css('td')]
+                            value_current_year = tds[2]
+                            if len(value_current_year) != 0:
+                                item[subject['key']] = self._parse_numerical_value(value_current_year)
+                                break
+
+                    # break for loop if value found for the subject
+                    if subject['key'] in item.keys():
+                        break
+
+                    # no value found for all subject names
+                    if alt_subject_names.index(name) == len(alt_subject_names)-1:
+                        self.logger.debug('For stock_code=%s, year=%d: Cannot parse subject \'%s\'.',
+                                        item['stock_code'], item['year'], alt_subject_names)
+
             return item
-
-        # parse income values
-        rows = response.css('tr')
-        for subject in accounting_subjects:
-
-            # income statement might be using alt names for the subject title
-            # e.g., subject_names = ["Total operating revenue", "Total revenue"]
-            # see util.py for accounting_subjects
-            alt_subject_names = subject['eng_name'] if isinstance(subject['eng_name'], list) else [subject['eng_name']]
-            for name in alt_subject_names:
-                trs = [rr for rr in rows
-                       if any([txt.strip() == name for txt in rr.css('.en::text').getall()])]
-                if len(trs) != 0:
-                    for tr in trs:
-                        tds = [td.css('*::text').getall() for td in tr.css('td')]
-                        value_current_year = tds[2]
-                        if len(value_current_year) != 0:
-                            item[subject['key']] = self._parse_numerical_value(value_current_year)
-                            break
-
-                # break for loop if value found for the subject
-                if subject['key'] in item.keys():
-                    break
-
-                # no value found for all subject names
-                if alt_subject_names.index(name) == len(alt_subject_names)-1:
-                    self.logger.debug('For stock_code=%s, year=%d: Cannot parse subject \'%s\'.',
-                                      item['stock_code'], item['year'], alt_subject_names)
-
-        return item
 
     def _parse_xbrl_old_format(self, item, response):
         return item
+
+    def _get_metadata_from_webpage(self, is_new_xbrl: bool, response):
+        if is_new_xbrl:
+            title = response.css('title::text').get()
+            regex = r'\s*(\S+)\s([1-3][0-9]{3})Q.*'
+            match = re.search(regex, title)
+            webpage_info = { 'stock_code': match.group(1), 'year': int(match.group(2)) }
+        else:
+            stock_code = response.css('input#CO_ID').css('*::attr(value)').get()
+            [year] = [op.css('*::attr(value)').get() for op in response.css('select#SYEAR > option') if op.css('*::attr(selected)').get() == 'selected']
+            webpage_info = { 'stock_code': stock_code, 'year': int(year) }
+        return webpage_info
+
+    def _check_metadata_mismatch(self, webpage_info: dict, meta: dict):
+        '''Double-check if there is mismatch between the general info on webpage and response metadata.'''
+        if meta['stock_code'] != webpage_info['stock_code']:
+            self.logger.warning('STOCK_CODE MISMATCH: meta=%s, webpage=%s', meta['stock_code'], webpage_info['stock_code'])
+            return True
+
+        elif meta['year'] != webpage_info['year']:
+            self.logger.warning('YEAR MISMATCH for stock_code=%s: meta=%s, webpage=%s',
+                                meta['stock_code'], meta['year'], webpage_info['year'])
+            return True
+
+        else:
+            return False
 
     def _format_filepath_to_datauri(self, filepath: str):
         return ('file:///' + os.path.normpath(filepath))
