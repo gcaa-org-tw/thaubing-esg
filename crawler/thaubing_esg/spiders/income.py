@@ -35,7 +35,7 @@ class IncomeSpider(Spider):
                         filepath = os.path.join(data_dir_year, file)
                         yield Request(
                             url=self._format_filepath_to_datauri(filepath),
-                            meta={'stock_code': file, 'year': int(subdir_year)},
+                            meta={'stock_code': file.rstrip('.html'), 'year': int(subdir_year)},
                             callback=self.parse,
                         )
                 self.logger.info('Completed parsing year=%s!', subdir_year)
