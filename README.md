@@ -15,6 +15,8 @@ pip install --user pipenv       # install pipenv
 pipenv install                  # install dependencies
 ```
 
+Further instuctions can be found in directory .\crawler.
+
 ### Database setup
 
 - Requirement: [Postgresql](https://www.postgresql.org/) 13+
