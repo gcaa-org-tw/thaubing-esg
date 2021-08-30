@@ -1,4 +1,4 @@
-stock_id,name,name_abbr,tax_code,company_type
+stock_code,name,name_abbr,tax_code,company_type
 1260,富味鄉食品股份有限公司,富味鄉,12467902,興櫃公司
 1269,乾杯股份有限公司,乾杯,70443909,興櫃公司
 1271,晨暉生物科技股份有限公司,晨暉生技,28708250,興櫃公司
