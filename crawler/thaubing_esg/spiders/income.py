@@ -115,7 +115,7 @@ class IncomeSpider(Spider):
                             item[subject['key']] = self._parse_numerical_value(value_current_year)
                             break
 
-                # break for loop if value found for the subject
+                # break the alt subject names for-loop if value found for the subject
                 if subject['key'] in item.keys():
                     break
 
