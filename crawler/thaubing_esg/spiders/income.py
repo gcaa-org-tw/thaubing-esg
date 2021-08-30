@@ -62,14 +62,9 @@ class IncomeSpider(Spider):
         return item
 
     def _parse_xbrl(self, item, response):
-        # general info
-        title = response.css('title::text').get()
-        regex = r'\s*(\S+)\s([1-3][0-9]{3})Q.*'
-        match = re.search(regex, title)
-        webpage_info = { 'stock_code': match.group(1), 'year': int(match.group(2)) }
-
-        item['stock_code'] = match.group(1)
-        item['year'] = int(match.group(2))
+        webpage_info = self._get_metadata_from_webpage(is_new_xbrl=True, response=response)
+        item['stock_code'] = webpage_info['stock_code']
+        item['year'] = webpage_info['year']
 
         if self._check_metadata_mismatch(webpage_info, response.meta):
             return item
@@ -105,6 +100,9 @@ class IncomeSpider(Spider):
             return item
 
     def _parse_xbrl_old_format(self, item, response):
+        webpage_info = self._get_metadata_from_webpage(is_new_xbrl=False, response=response)
+        item['stock_code'] = webpage_info['stock_code']
+        item['year'] = webpage_info['year']
         return item
 
     def _get_metadata_from_webpage(self, is_new_xbrl: bool, response):
