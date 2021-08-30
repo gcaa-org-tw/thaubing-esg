@@ -70,33 +70,9 @@ class IncomeSpider(Spider):
             return item
         else:
             # parse income values
-            rows = response.css('tr')
-            for subject in accounting_subjects:
-
-                # income statement might be using alt names for the subject title
-                # e.g., subject_names = ["Total operating revenue", "Total revenue"]
-                # see util.py for accounting_subjects
-                alt_subject_names = subject['eng_name'] if isinstance(subject['eng_name'], list) else [subject['eng_name']]
-                for name in alt_subject_names:
-                    trs = [rr for rr in rows
-                           if any([txt.strip() == name for txt in rr.css('.en::text').getall()])]
-                    if len(trs) != 0:
-                        for tr in trs:
-                            tds = [td.css('*::text').getall() for td in tr.css('td')]
-                            value_current_year = tds[2]
-                            if len(value_current_year) != 0:
-                                item[subject['key']] = self._parse_numerical_value(value_current_year)
-                                break
-
-                    # break for loop if value found for the subject
-                    if subject['key'] in item.keys():
-                        break
-
-                    # no value found for all subject names
-                    if alt_subject_names.index(name) == len(alt_subject_names)-1:
-                        self.logger.debug('For stock_code=%s, year=%d: Cannot parse subject \'%s\'.',
-                                        item['stock_code'], item['year'], alt_subject_names)
-
+            item = self._parse_income_values(is_new_xbrl=True,
+                                             item=item,
+                                             response=response)
             return item
 
     def _parse_xbrl_old_format(self, item, response):
@@ -107,31 +83,47 @@ class IncomeSpider(Spider):
             return item
         else:
             # parse income values
-            rows = response.css('tr')
-            for subject in accounting_subjects:
-                # income statement might be using alt names for the subject title
-                # e.g., subject_names = ["Total operating revenue", "Total revenue"]
-                # see util.py for accounting_subjects
-                alt_subject_names = subject['zh_name'] if isinstance(subject['zh_name'], list) else [subject['zh_name']]
-                for name in alt_subject_names:
-                    trs = [rr for rr in rows if rr.css('td::text').get() is not None]
-                    trs = [rr for rr in trs if rr.css('td::text').get().strip() == name]
-                    if len(trs) != 0:
-                        for tr in trs:
-                            value_current_year = tr.css('td::text').getall()[1]
-                            if len(value_current_year) != 0:
-                                item[subject['key']] = self._parse_numerical_value(value_current_year)
-                                break
-
-                    # break for loop if value found for the subject
-                    if subject['key'] in item.keys():
-                        break
-
-                    # no value found for all subject names
-                    if alt_subject_names.index(name) == len(alt_subject_names)-1:
-                        self.logger.debug('For stock_code=%s, year=%d: Cannot parse subject \'%s\'.',
-                                        item['stock_code'], item['year'], alt_subject_names)
+            item = self._parse_income_values(is_new_xbrl=False,
+                                             item=item,
+                                             response=response)
             return item
+
+    def _parse_income_values(self, is_new_xbrl: bool, item, response):
+        lambda_filter_trs = {
+            True:  (lambda rows, name: [rr for rr in rows if any([txt.strip() == name for txt in rr.css('.en::text').getall()])]),
+            False: (lambda rows, name: [r for r in [rr for rr in rows if rr.css('td::text').get() is not None]
+                                          if r.css('td::text').get().strip() == name]),
+        }
+        lambda_get_value_current_year = {
+            True:  (lambda tr: [td.css('*::text').getall() for td in tr.css('td')][2]),
+            False: (lambda tr: tr.css('td')[1].css('*::text').get() or ''),
+        }
+        key_alt_subject = 'en_name' if is_new_xbrl else 'zh_name'
+
+        rows = response.css('tr')
+        for subject in accounting_subjects:
+            # income statement might be using alt names for the subject title
+            # e.g., subject_names = ["Total operating revenue", "Total revenue"]
+            # see util.py for accounting_subjects
+            alt_subject_names = subject[key_alt_subject] if isinstance(subject[key_alt_subject], list) else [subject[key_alt_subject]]
+            for name in alt_subject_names:
+                trs = lambda_filter_trs[is_new_xbrl](rows, name)
+                if len(trs) != 0:
+                    for tr in trs:
+                        value_current_year = lambda_get_value_current_year[is_new_xbrl](tr)
+                        if len(value_current_year) != 0:
+                            item[subject['key']] = self._parse_numerical_value(value_current_year)
+                            break
+
+                # break for loop if value found for the subject
+                if subject['key'] in item.keys():
+                    break
+
+                # no value found for all subject names
+                if alt_subject_names.index(name) == len(alt_subject_names)-1:
+                    self.logger.debug('For stock_code=%s, year=%d: Cannot parse subject \'%s\'.',
+                                    item['stock_code'], item['year'], alt_subject_names)
+        return item
 
     def _get_metadata_from_webpage(self, is_new_xbrl: bool, response):
         if is_new_xbrl:
