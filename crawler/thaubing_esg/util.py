@@ -2,7 +2,7 @@ accounting_subjects = [
     {
       "key": "total_operating_revenue",
       "eng_name": ["Total operating revenue", "Total revenue"],
-      "zh_name": ["營業收入合計", "收入合計"],
+      "zh_name": ["營業收入合計", "收入合計", "收益合計"],
     },
     {
       "key": "total_operating_costs",
@@ -12,12 +12,12 @@ accounting_subjects = [
     {
       "key": "total_operating_expenses",
       "eng_name": ["Total operating expenses", "Total expenses", "Total expenditure and expense"],
-      "zh_name": "營業費用合計"
+      "zh_name": ["營業費用合計", "支出及費用合計"]
     },
     {
       "key": "net_operating_income",
       "eng_name": "Net operating income (loss)",
-      "zh_name": "營業利益（損失）"
+      "zh_name": ["營業利益（損失）", "營業利益"]
     },
     {
       "key": "profit_or_loss",
