@@ -4,7 +4,7 @@
 
 - Python 3.7+ and [pipenv](https://pipenv.pypa.io/en/latest/)
 
-Install the required dependencies by running,
+Install the required dependencies by running in the root directory,
 
 ```bash
 pip install --user pipenv       # install pipenv
@@ -16,6 +16,7 @@ pipenv install                  # install dependencies
 To scrape with specific spider, run,
 
 ```bash
+cd crawler # move to directory ./crawler
 pipenv run scrapy crawl [spider_name] -a year=[year]
 ```
 
