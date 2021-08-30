@@ -37,7 +37,10 @@ class CompanyPipeline:
 class IncomePipeline:
 
     def open_spider(self, spider):
-        self.filepath = gen_data_filepath('income/income-{}.csv'.format(spider.year))
+        try:
+            self.filepath = gen_data_filepath('income/income-{}.csv'.format(spider.year))
+        except:
+            self.filepath = gen_data_filepath('income.csv')
         self.file = open(self.filepath, 'wb')
         self.exporter = CsvItemExporter(self.file)
 
