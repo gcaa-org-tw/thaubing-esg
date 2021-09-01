@@ -49,7 +49,7 @@ class SalarySpider(Spider):
 
         # set year(s) to scrape for salary data
         if year is None:
-            self.years = reversed(list(range(oldest_year, int(year) + 1)))
+            self.years = reversed(list(range(oldest_year, latest_year + 1)))
         else:
             self.year = year
             self.years = [int(year)]
@@ -120,8 +120,8 @@ class SalarySpider(Spider):
         if dtype == bool:
             return None if len(raw_value) == 0 else True
         elif dtype == int:
-            return locale.atoi(raw_value)
+            return locale.atoi(raw_value) if not raw_value else None
         elif dtype == float:
-            return locale.atof(raw_value)
+            return locale.atof(raw_value) if not raw_value else None
         else:
             return raw_value
