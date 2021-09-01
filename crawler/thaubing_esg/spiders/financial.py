@@ -7,41 +7,43 @@ from scrapy import Request
 URL_ENDPOINT = 'https://mops.twse.com.tw/server-java/t164sb01?step=1'
 FILENAME_COMPANY = 'company.csv'
 
-# latest year available for financial report, i.e. the previous year
-latest_year = datetime.now().year - 1
 
 class FinancialSpider(Spider):
     name = 'financial'
-    
-    def __init__(self):
+
+    # latest year available for financial report, i.e. the previous year
+    latest_year = datetime.now().year - 1
+
+    def __init__(self, year=latest_year):
+        # set year to scrape for financial report
+        self.year = int(year)
+
         # load company codes scraped from spider "company"
         filepath_company = os.path.join(os.path.dirname(__file__), '../../../data/{}'.format(FILENAME_COMPANY))
         with open(filepath_company, 'r', encoding='utf-8') as f:
             csv_reader = DictReader(f)
             self.stock_codes = [row['stock_code'] for row in csv_reader]
-        
-        
+
     def start_requests(self):
-        year = int(getattr(self, 'year', str(latest_year)))
         stock_code = getattr(self, 'stock_code', None)
 
         # create directory for the year if not exists
-        self._make_webpage_dir_for_year(year)
+        self._make_webpage_dir_for_year(self.year)
 
         if stock_code is not None:
-            self.logger.info('Start scraping financial data for stock_code=%s, year=%d...', stock_code, year)
+            self.logger.info('Start scraping financial data for stock_code=%s, year=%d...', stock_code, self.year)
             yield Request(
-                url=self._gen_request_url(stock_code, year=year),
-                meta={'stock_code': stock_code, 'year': year, 'report_id': 'C'},
+                url=self._gen_request_url(stock_code, year=self.year),
+                meta={'stock_code': stock_code, 'year': self.year, 'report_id': 'C'},
                 callback=self.parse,
             )
 
         else:
-            self.logger.info('Start scraping financial data for year=%d...', year)
+            self.logger.info('Start scraping financial data for year=%d...', self.year)
             for stock_code in self.stock_codes:
                 yield Request(
-                    url=self._gen_request_url(stock_code, year=year),
-                    meta={'stock_code': stock_code, 'year': year, 'report_id': 'C'},
+                    url=self._gen_request_url(stock_code, year=self.year),
+                    meta={'stock_code': stock_code, 'year': self.year, 'report_id': 'C'},
                     callback=self.parse,
                 )
 
