@@ -17,11 +17,12 @@ class CompanySpider(CSVFeedSpider):
 
     def parse_row(self, response, row):
         item = CompanyItem()
-        item['stock_code']   = row['公司代號']
-        item['name']         = row['公司名稱']
-        item['name_abbr']    = row['公司簡稱']
-        item['tax_code']     = row['營利事業統一編號']
-        item['company_type'] = self._parse_company_type(response.url)
+        item['stock_code']    = row['公司代號']
+        item['name']          = row['公司名稱']
+        item['name_abbr']     = row['公司簡稱']
+        item['tax_code']      = row['營利事業統一編號']
+        item['industry_code'] = row['產業別']
+        item['company_type']  = self._parse_company_type(response.url)
         return item
 
     def _parse_company_type(self, response_url):

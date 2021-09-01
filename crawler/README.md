@@ -24,7 +24,14 @@ pipenv run scrapy crawl [spider_name] -a year=[year]
 
 ## Projects
 
-| Spider      | Description | Dependencies |
-| ----------- | ----------- | ------------ |
-| `company`   | 公司基本資料  | - |
-| `financial` | 合併財務報表重要會計科目資料 | ./data/company.csv |
+- Spider: name of the spider.
+- Description: brief description of the spider.
+- Ouput: scraped data or files, saved in directory `$ ./data/`.
+- Dependency: requirement for running the spider (output from the dependent spider(s) needed as spider input.)
+
+| Spider      | Description    | Output             | Dependency |
+| ----------- | -------------- | ------------------ | ---------- |
+| `company`   | 公司基本資料     | company.csv | - |
+| `financial` | 合併財務報表     | financial/webpages/[year]/*.html | `company` |
+| `income`    | 重要會計科目資料  | income.csv | `financial` |
+| `salary`    | 員工薪資資料     | salary.csv | - |
