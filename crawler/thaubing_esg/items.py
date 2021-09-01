@@ -23,6 +23,8 @@ class IncomeItem(Item):
 
 
 class SalaryItem(Item):
+    # 非擔任主管職務之全時員工資訊-2018年開始申報適用
+    # 員工薪資中位數-2019年開始申報適用
     year                  = Field() # 年度
     stock_code            = Field() # 公司代號
     industry_category     = Field() # 產業類別
