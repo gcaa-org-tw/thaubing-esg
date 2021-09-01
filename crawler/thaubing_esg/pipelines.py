@@ -22,6 +22,7 @@ class CompanyPipeline:
             'name',
             'name_abbr',
             'tax_code',
+            'industry_code',
             'company_type',
         ]
 
