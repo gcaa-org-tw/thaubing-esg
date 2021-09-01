@@ -7,18 +7,20 @@ from scrapy import Request
 URL_ENDPOINT = 'https://mops.twse.com.tw/server-java/t164sb01?step=1'
 FILENAME_COMPANY = 'company.csv'
 
-# load company codes scraped from spider "company"
-filepath_company = os.path.join(os.path.dirname(__file__), '../../../data/{}'.format(FILENAME_COMPANY))
-with open(filepath_company, 'r', encoding='utf-8') as f:
-    csv_reader = DictReader(f)
-    stock_codes = [row['stock_code'] for row in csv_reader]
-
 # latest year available for financial report, i.e. the previous year
 latest_year = datetime.now().year - 1
 
 class FinancialSpider(Spider):
     name = 'financial'
-
+    
+    def __init__(self):
+        # load company codes scraped from spider "company"
+        filepath_company = os.path.join(os.path.dirname(__file__), '../../../data/{}'.format(FILENAME_COMPANY))
+        with open(filepath_company, 'r', encoding='utf-8') as f:
+            csv_reader = DictReader(f)
+            self.stock_codes = [row['stock_code'] for row in csv_reader]
+        
+        
     def start_requests(self):
         year = int(getattr(self, 'year', str(latest_year)))
         stock_code = getattr(self, 'stock_code', None)
@@ -36,7 +38,7 @@ class FinancialSpider(Spider):
 
         else:
             self.logger.info('Start scraping financial data for year=%d...', year)
-            for stock_code in stock_codes:
+            for stock_code in self.stock_codes:
                 yield Request(
                     url=self._gen_request_url(stock_code, year=year),
                     meta={'stock_code': stock_code, 'year': year, 'report_id': 'C'},
