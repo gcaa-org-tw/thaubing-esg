@@ -2,6 +2,7 @@ import os
 from datetime import datetime
 from scrapy import FormRequest
 from scrapy.spiders import Spider
+from thaubing_esg.items import SalaryItem
 
 class SalarySpider(Spider):
     name = 'salary'
@@ -16,11 +17,18 @@ class SalarySpider(Spider):
         'otc', # 上櫃
     ]
 
+    custom_settings = {
+        'ITEM_PIPELINES': {
+            'thaubing_esg.pipelines.SalaryPipeline': 300
+        },
+    }
+
     def __init__(self, year=None):
         # set year(s) to scrape for salary data
         if year is None:
             self.years = reversed(list(range(self.oldest_year, int(year) + 1)))
         else:
+            self.year = year
             self.years = [int(year)]
 
     def start_requests(self):
@@ -55,11 +63,18 @@ class SalarySpider(Spider):
             f.write(response.body)
 
         # parse data from page
-        # item = self._parse_page(response)
-        # return item
+        trs = [rr for rr in response.css('table tr') if rr.css('th').get() is None]
+        for row in trs:
+            item = SalaryItem()
+            item['year'] = year
+            item = self._parse_row(item, row)
+            return item
 
-    def _parse_page(self, response):
-        pass
+    def _parse_row(self, item, row):
+        tds = [dd for dd in row.css("td")]
+        item['industry_code'] = tds[0].css("*::text").get()
+        item['stock_code']    = tds[1].css("*::text").get()
+        return item
 
     def _gen_webpage_filepath(self, year: int, typek: str) -> str:
         """Generate filepath for .html raw webpage scraped.
