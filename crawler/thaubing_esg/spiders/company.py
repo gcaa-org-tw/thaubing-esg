@@ -11,7 +11,7 @@ class CompanySpider(CSVFeedSpider):
     ]
     custom_settings = {
         'ITEM_PIPELINES': {
-            'thaubing_esg.pipielines.CompanyPipeline': 300
+            'thaubing_esg.pipelines.CompanyPipeline': 300
         },
     }
 
