@@ -7,8 +7,8 @@
 Install the required dependencies by running in the root directory,
 
 ```bash
-pip install --user pipenv       # install pipenv
-pipenv install                  # install dependencies
+pip install pipenv       # install pipenv
+pipenv install           # install dependencies
 ```
 
 ## How to run
