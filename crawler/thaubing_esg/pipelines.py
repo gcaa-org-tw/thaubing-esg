@@ -22,7 +22,7 @@ class CompanyPipeline:
             'name',
             'name_abbr',
             'tax_code',
-            'industry_code',
+            'industry_category',
             'company_type',
         ]
 
@@ -88,7 +88,7 @@ class SalaryPipeline:
         self.exporter.fields_to_export = [
             'year',
             'stock_code',
-            'industry_code',
+            'industry_category',
             'nr_employee',
             'em_salary_total',
             'em_salary_avg',

@@ -25,7 +25,7 @@ class IncomeItem(Item):
 class SalaryItem(Item):
     year                  = Field() # 年度
     stock_code            = Field() # 公司代號
-    industry_code         = Field() # 產業類別
+    industry_category     = Field() # 產業類別
     nr_employee           = Field() # 非擔任主管職務之全時員工資訊-員工人數年度平均(人)
     em_salary_total       = Field() # 非擔任主管職務之全時員工資訊-員工薪資總額(仟元)
     em_salary_avg         = Field() # 非擔任主管職務之全時員工資訊-員工薪資平均數(仟元/人)

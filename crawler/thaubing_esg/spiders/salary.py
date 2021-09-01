@@ -26,6 +26,22 @@ class SalarySpider(Spider):
             'sii', # 上市
             'otc', # 上櫃
         ]
+        self.key_mapping_td = {
+            # key : td index in tr
+            "stock_code"             : { "id":  1, "parse": None },
+            "industry_category"      : { "id":  0, "parse": None },
+            "nr_employee"            : { "id":  4, "parse": None },
+            "em_salary_total"        : { "id":  3, "parse": None },
+            "em_salary_avg"          : { "id":  5, "parse": None },
+            "em_salary_med"          : { "id":  7, "parse": None },
+            "eps"                    : { "id":  9, "parse": None },
+            "ind_avg_em_salary_avg"  : { "id": 10, "parse": None },
+            "ind_avg_eps"            : { "id": 11, "parse": None },
+            "note_a"                 : { "id": 12, "parse": None },
+            "note_b"                 : { "id": 13, "parse": None },
+            "note_c"                 : { "id": 14, "parse": None },
+            "notes"                  : { "id": 15, "parse": None },
+        }
 
         # set year(s) to scrape for salary data
         if year is None:
@@ -36,7 +52,7 @@ class SalarySpider(Spider):
 
     def start_requests(self):
         for year in self.years:
-            for typek in self.self.typeks:
+            for typek in self.typeks:
                 yield FormRequest(
                     url=self.URL_ENDPOINT,
                     formdata=self._gen_formrequest_param(year, typek),
@@ -58,7 +74,7 @@ class SalarySpider(Spider):
         year  = response.meta['year']
         typek = response.meta['typek']
 
-        self.logger.info('Start scraping salary data for year=%d...', year)
+        self.logger.debug('Start scraping salary data for year=%d...', year)
 
         # save .html raw webpage scraped
         filepath = self._gen_webpage_filepath(year, typek)
@@ -75,8 +91,8 @@ class SalarySpider(Spider):
 
     def parse_row(self, item, row):
         tds = [dd for dd in row.css("td")]
-        item['industry_code'] = tds[0].css("*::text").get()
-        item['stock_code']    = tds[1].css("*::text").get()
+        for key, value in self.key_mapping_td.items():
+            item[key] = tds[value["id"]].css("*::text").get()
         return item
 
     def _gen_webpage_filepath(self, year: int, typek: str) -> str:
