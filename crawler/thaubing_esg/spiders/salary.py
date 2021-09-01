@@ -16,9 +16,12 @@ class SalarySpider(Spider):
         'otc', # 上櫃
     ]
 
-    def __init__(self, year=latest_year):
-        # set year to scrape for salary data
-        self.years = reversed(list(range(self.oldest_year, int(year) + 1)))
+    def __init__(self, year=None):
+        # set year(s) to scrape for salary data
+        if year is None:
+            self.years = reversed(list(range(self.oldest_year, int(year) + 1)))
+        else:
+            self.years = [int(year)]
 
     def start_requests(self):
         for year in self.years:
