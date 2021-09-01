@@ -61,14 +61,14 @@ class IncomePipeline:
     def close_spider(self, spider):
         self.exporter.finish_exporting()
         self.file.close()
-        spider.logger.info('Sorting csv file by stock_id...')
-        self._csv_sorting_by_stock_id(self.filepath)
+        spider.logger.info('Sorting csv file by year and stock_id...')
+        self._csv_sorting(self.filepath)
 
     def process_item(self, item, spider):
         self.exporter.export_item(item)
         return item
 
-    def _csv_sorting_by_stock_id(self, filepath: str):
+    def _csv_sorting(self, filepath: str):
         data = pd.read_csv(filepath)
         data.sort_values(['year', 'stock_code'], ascending=[False, True], inplace=True)
         data.to_csv(filepath, index=False)
@@ -101,3 +101,18 @@ class SalaryPipeline:
             'note_c',
             'notes',
         ]
+
+    def close_spider(self, spider):
+        self.exporter.finish_exporting()
+        self.file.close()
+        spider.logger.info('Sorting csv file by year and stock_id...')
+        self._csv_sorting(self.filepath)
+
+    def process_item(self, item, spider):
+        self.exporter.export_item(item)
+        return item
+
+    def _csv_sorting(self, filepath: str):
+        data = pd.read_csv(filepath)
+        data.sort_values(['year', 'stock_code'], ascending=[False, True], inplace=True)
+        data.to_csv(filepath, index=False)
