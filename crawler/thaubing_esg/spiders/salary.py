@@ -1,9 +1,13 @@
 import os
+import locale
 from datetime import datetime
 from scrapy import FormRequest
 from scrapy.http.response.html import HtmlResponse
 from scrapy.spiders import Spider
+from six import class_types
 from thaubing_esg.items import SalaryItem
+
+locale.setlocale(locale.LC_ALL, 'en_US.UTF8')
 
 class SalarySpider(Spider):
     name = 'salary'
@@ -28,19 +32,19 @@ class SalarySpider(Spider):
         ]
         self.key_mapping_td = {
             # key : td index in tr
-            "stock_code"             : { "id":  1, "parse": None },
-            "industry_category"      : { "id":  0, "parse": None },
-            "nr_employee"            : { "id":  4, "parse": None },
-            "em_salary_total"        : { "id":  3, "parse": None },
-            "em_salary_avg"          : { "id":  5, "parse": None },
-            "em_salary_med"          : { "id":  7, "parse": None },
-            "eps"                    : { "id":  9, "parse": None },
-            "ind_avg_em_salary_avg"  : { "id": 10, "parse": None },
-            "ind_avg_eps"            : { "id": 11, "parse": None },
-            "note_a"                 : { "id": 12, "parse": None },
-            "note_b"                 : { "id": 13, "parse": None },
-            "note_c"                 : { "id": 14, "parse": None },
-            "notes"                  : { "id": 15, "parse": None },
+            "stock_code"             : { "id":  1, "dtype": None },
+            "industry_category"      : { "id":  0, "dtype": None },
+            "nr_employee"            : { "id":  4, "dtype": int },
+            "em_salary_total"        : { "id":  3, "dtype": int },
+            "em_salary_avg"          : { "id":  5, "dtype": int },
+            "em_salary_med"          : { "id":  7, "dtype": int },
+            "eps"                    : { "id":  9, "dtype": float },
+            "ind_avg_em_salary_avg"  : { "id": 10, "dtype": int },
+            "ind_avg_eps"            : { "id": 11, "dtype": float },
+            "note_a"                 : { "id": 12, "dtype": bool },
+            "note_b"                 : { "id": 13, "dtype": bool },
+            "note_c"                 : { "id": 14, "dtype": bool },
+            "notes"                  : { "id": 15, "dtype": None },
         }
 
         # set year(s) to scrape for salary data
@@ -90,9 +94,10 @@ class SalarySpider(Spider):
             yield self.parse_row(item, row)
 
     def parse_row(self, item, row):
-        tds = [dd for dd in row.css("td")]
+        tds = [dd for dd in row.css('td')]
         for key, value in self.key_mapping_td.items():
-            item[key] = tds[value["id"]].css("*::text").get()
+            raw_value = ''.join(tds[value['id']].css('*::text').getall())
+            item[key] = self._parse_scraped_value(value['dtype'], raw_value.strip())
         return item
 
     def _gen_webpage_filepath(self, year: int, typek: str) -> str:
@@ -110,3 +115,13 @@ class SalarySpider(Spider):
         if not os.path.exists(os.path.dirname(filepath)):
             os.makedirs(os.path.dirname(filepath))
         return filepath
+
+    def _parse_scraped_value(self, dtype, raw_value: str):
+        if dtype == bool:
+            return None if len(raw_value) == 0 else True
+        elif dtype == int:
+            return locale.atoi(raw_value)
+        elif dtype == float:
+            return locale.atof(raw_value)
+        else:
+            return raw_value
