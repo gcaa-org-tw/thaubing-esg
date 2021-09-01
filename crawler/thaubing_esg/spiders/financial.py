@@ -3,13 +3,12 @@ from csv import DictReader
 from datetime import datetime
 from scrapy.spiders import Spider
 from scrapy import Request
-
-URL_ENDPOINT = 'https://mops.twse.com.tw/server-java/t164sb01?step=1'
-FILENAME_COMPANY = 'company.csv'
+from thaubing_esg.util import FILENAME_COMPANY
 
 
 class FinancialSpider(Spider):
     name = 'financial'
+    URL_ENDPOINT = 'https://mops.twse.com.tw/server-java/t164sb01?step=1'
 
     # latest year available for financial report, i.e. the previous year
     latest_year = datetime.now().year - 1
@@ -84,7 +83,7 @@ class FinancialSpider(Spider):
             yield Request(response.url, meta=response.meta, callback=self.parse, dont_filter=True)
 
     def _gen_request_url(self, stock_code: str, year: int, report_id='C'):
-        return '{}&{}'.format(URL_ENDPOINT, self._gen_payload(stock_code, year, report_id))
+        return '{}&{}'.format(self.URL_ENDPOINT, self._gen_payload(stock_code, year, report_id))
 
     def _gen_payload(self, stock_code: str, year=latest_year, report_id='C'):
         return (
