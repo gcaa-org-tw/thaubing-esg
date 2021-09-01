@@ -30,21 +30,22 @@ class SalarySpider(Spider):
             'sii', # 上市
             'otc', # 上櫃
         ]
+        # mapping of item key to the data type (`dtype`) and index of the td within tr (`id`)
+        # In year 2019 onwards: 1. salary median value; 2. values of previous year are reported
         self.key_mapping_td = {
-            # key : td index in tr
-            "stock_code"             : { "id":  1, "dtype": None },
-            "industry_category"      : { "id":  0, "dtype": None },
-            "nr_employee"            : { "id":  4, "dtype": int },
-            "em_salary_total"        : { "id":  3, "dtype": int },
-            "em_salary_avg"          : { "id":  5, "dtype": int },
-            "em_salary_med"          : { "id":  7, "dtype": int },
-            "eps"                    : { "id":  9, "dtype": float },
-            "ind_avg_em_salary_avg"  : { "id": 10, "dtype": int },
-            "ind_avg_eps"            : { "id": 11, "dtype": float },
-            "note_a"                 : { "id": 12, "dtype": bool },
-            "note_b"                 : { "id": 13, "dtype": bool },
-            "note_c"                 : { "id": 14, "dtype": bool },
-            "notes"                  : { "id": 15, "dtype": None },
+            "stock_code"             : { "id": { "new":  1, "old":  1 }, "dtype": None },
+            "industry_category"      : { "id": { "new":  0, "old":  0 }, "dtype": None },
+            "nr_employee"            : { "id": { "new":  4, "old":  4 }, "dtype": int },
+            "em_salary_total"        : { "id": { "new":  3, "old":  3 }, "dtype": int },
+            "em_salary_avg"          : { "id": { "new":  5, "old":  5 }, "dtype": int },
+            "em_salary_med"          : { "id": { "new":  7, "old":  None }, "dtype": int },
+            "eps"                    : { "id": { "new":  9, "old":  6 }, "dtype": float },
+            "ind_avg_em_salary_avg"  : { "id": { "new": 10, "old":  7 }, "dtype": int },
+            "ind_avg_eps"            : { "id": { "new": 11, "old":  8 }, "dtype": float },
+            "note_a"                 : { "id": { "new": 12, "old":  9 }, "dtype": bool },
+            "note_b"                 : { "id": { "new": 13, "old": 10 }, "dtype": bool },
+            "note_c"                 : { "id": { "new": 14, "old": 11 }, "dtype": bool },
+            "notes"                  : { "id": { "new": 15, "old": 12 }, "dtype": None },
         }
 
         # set year(s) to scrape for salary data
@@ -91,13 +92,17 @@ class SalarySpider(Spider):
         for row in trs:
             item = SalaryItem()
             item['year'] = year
-            yield self.parse_row(item, row)
+            yield self.parse_row(item, row, year)
 
-    def parse_row(self, item, row):
+    def parse_row(self, item, row, year: int):
         tds = [dd for dd in row.css('td')]
+        key_id = 'new' if year >= 2019 else 'old'
         for key, value in self.key_mapping_td.items():
-            raw_value = ''.join(tds[value['id']].css('*::text').getall())
-            item[key] = self._parse_scraped_value(value['dtype'], raw_value.strip())
+            if value['id'][key_id] is None:
+                item[key] = None
+            else:
+                raw_value = ''.join(tds[value['id'][key_id]].css('*::text').getall())
+                item[key] = self._parse_scraped_value(value['dtype'], raw_value.strip())
         return item
 
     def _gen_webpage_filepath(self, year: int, typek: str) -> str:
@@ -120,8 +125,8 @@ class SalarySpider(Spider):
         if dtype == bool:
             return None if len(raw_value) == 0 else True
         elif dtype == int:
-            return locale.atoi(raw_value) if not raw_value else None
+            return locale.atoi(raw_value) if len(raw_value) != 0 else None
         elif dtype == float:
-            return locale.atof(raw_value) if not raw_value else None
+            return locale.atof(raw_value) if len(raw_value) != 0 else None
         else:
             return raw_value
