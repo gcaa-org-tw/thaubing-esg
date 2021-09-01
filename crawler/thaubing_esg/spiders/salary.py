@@ -18,14 +18,13 @@ class SalarySpider(Spider):
         },
     }
 
-    def __init__(self, year=None, NYEARS=5):
+    def __init__(self, year=None):
         """
         Args:
             year ([type], optional): Specific year to scrape data from. Defaults to None.
-            NYEARS (int, optional): Number of years to scrape data, dated from the latest year. Defaults to 5.
         """
         latest_year = datetime.now().year - 1 # latest year available for reporting, i.e. the previous year
-        oldest_year = latest_year - NYEARS
+        oldest_year = 2018
         self.typeks = [
             'sii', # 上市
             'otc', # 上櫃
@@ -52,8 +51,10 @@ class SalarySpider(Spider):
         if year is None:
             self.years = reversed(list(range(oldest_year, latest_year + 1)))
         else:
-            self.year = year
-            self.years = [int(year)]
+            if int(year) < oldest_year:
+                self.logger.warning('Specified year not available. Use oldest available year %s instead.', oldest_year)
+            self.year = int(year) if int(year) >= oldest_year else oldest_year
+            self.years = [self.year]
 
     def start_requests(self):
         for year in self.years:
