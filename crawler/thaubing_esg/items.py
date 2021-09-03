@@ -47,14 +47,14 @@ class FacilityItem(Item):
     UniformNo        = Field() # 營利事業統一編號
     County           = Field() # 縣市
     Township         = Field() # 鄉鎮市區
-    FacilityAddress  = Field() # 實際廠 = Field() #場)地址
+    FacilityAddress  = Field() # 實際廠(場)地址
     IndustryAreaName = Field() # 所在工業區名稱
     IndustryID       = Field() # 行業別代碼
     IndustryName     = Field() # 行業別名稱
-    TWD97TM2X        = Field() # 二度分帶X座標 = Field() #TWD97)
-    TWD97TM2Y        = Field() # 二度分帶Y座標 = Field() #TWD97)
-    WGS84Lon         = Field() # 經度 = Field() #WGS84)
-    WGS84Lat         = Field() # 緯度 = Field() #WGS84)
+    TWD97TM2X        = Field() # 二度分帶X座標(TWD97)
+    TWD97TM2Y        = Field() # 二度分帶Y座標(TWD97)
+    WGS84Lon         = Field() # 經度(WGS84)
+    WGS84Lat         = Field() # 緯度(WGS84)
     IsAir            = Field() # 是否空列管
     IsWater          = Field() # 是否水列管
     IsWaste          = Field() # 是否廢棄物列管
@@ -107,10 +107,10 @@ class ViolationItem(Item):
 
 
 class AirPollutantItem(Item):
-    FacilityID          = Field() # 管制編號
-    FacilityName        = Field() # 事業名稱
-    ReportPeriod        = Field() # 申報時段
-    Status              = Field() # 申報狀態
+    FacilityID          = Field(col_id=0) # 管制編號
+    FacilityName        = Field(col_id=1) # 事業名稱
+    ReportPeriod        = Field(col_id=2) # 申報時段
+    Status              = Field(col_id=3) # 申報狀態
     VOCs                = Field() # 揮發性有機化合物
     TSP                 = Field() # 粒狀污染物
     SOx                 = Field() # 硫氧化物
@@ -120,7 +120,7 @@ class AirPollutantItem(Item):
     Benzene             = Field() # 苯
     Ethylbenzene        = Field() # 乙苯
     Styrene             = Field() # 苯乙烯
-    Methylene           = Field() # chloride 二氯甲烷
+    Methylenechloride   = Field() # 二氯甲烷
     Dichloroethane11    = Field(colname='11Dichloroethane') # 1-1-二氯乙烷
     Dichloroethane12    = Field(colname='12Dichloroethane') # 1-2-二氯乙烷
     chloroform          = Field() # 三氯甲烷
@@ -128,6 +128,8 @@ class AirPollutantItem(Item):
     CarbonTetrachloride = Field() # 四氯化碳
     Trichloroethylene   = Field() # 三氯乙烯
     Tetrachloroethylene = Field() # 四氯乙烯
+    heavymetal          = Field() # 重金屬
+    Dioxin              = Field() # 戴奧辛
 
 class GhgItem(Item):
     App_year    = Field() # 監測年度
