@@ -16,7 +16,7 @@ class EpaSpider(Spider):
         self.dataset_id = dataset_id
         self.base_url = 'https://data.epa.gov.tw/api/v1/{}'.format(dataset_id)
         self.item_class = self._get_item_class_by_dataset_id(dataset_id)
-        self.fields_to_export = list(self.item_class().keys())
+        self.fields_to_export = self._get_item_fields_to_export(self.item_class)
 
     def start_requests(self):
         yield Request(
@@ -51,9 +51,15 @@ class EpaSpider(Spider):
                 self.LIMIT
             ))
 
+    def _get_item_fields_to_export(self, item_class):
+        fields = [{'key': key, 'order': para.get('col_id', 100)}
+                  for key, para in item_class.fields.items()]
+        fields_to_export = [field['key'] for field in sorted(fields, key=lambda field: field['order'])]
+        return fields_to_export
+
     def _get_item_key_val_mapping(self, item_class):
-        colnames = { key: key if para.get('colname') is None else para.get('colname')
-                     for key, para in item_class.fields.items()}
+        colnames = { key: para.get('colname', key)
+                     for key, para in item_class.fields.items() }
         return colnames
 
     def _get_item_class_by_dataset_id(self, dataset_id: str):
