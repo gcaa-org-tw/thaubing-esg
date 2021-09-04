@@ -121,8 +121,8 @@ class SalaryPipeline:
 class EpaPipeline:
 
     def open_spider(self, spider):
-        filepath = gen_data_filepath(spider.dataset_id + '.csv')
-        self.file = open(filepath, 'wb')
+        self.filepath = gen_data_filepath(spider.dataset_id + '.csv')
+        self.file = open(self.filepath, 'wb')
         self.exporter = CsvItemExporter(self.file)
 
         # specifies exported fields and order
