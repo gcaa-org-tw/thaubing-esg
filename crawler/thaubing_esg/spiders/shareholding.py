@@ -1,10 +1,14 @@
 import os
+import locale
 from csv import DictReader
 from datetime import datetime
 from scrapy import FormRequest
 from scrapy.spiders import Spider
 from scrapy.http.response.html import HtmlResponse
 from thaubing_esg.util import FILENAME_COMPANY
+from thaubing_esg.items import ShareholdingItem
+
+locale.setlocale(locale.LC_ALL, 'en_US.UTF8')
 
 class ShareholdingSpider(Spider):
     name = 'shareholding'
@@ -34,6 +38,17 @@ class ShareholdingSpider(Spider):
             self.year = int(year) if int(year) >= oldest_year else oldest_year
             self.years = [self.year]
 
+        self.key_mapping_td = {
+            'title':                     { 'id': 0, 'func': lambda v: v },
+            'shareholder':               { 'id': 1, 'func': lambda v: v },
+            'shareholding_initial':      { 'id': 2, 'func': self._parse_shareholding_nr },
+            'shareholding_current':      { 'id': 3, 'func': self._parse_shareholding_nr },
+            'pledge':                    { 'id': 4, 'func': self._parse_shareholding_nr },
+            'pledge_pp':                 { 'id': 5, 'func': self._parse_shareholding_pp },
+            'others_shareholding_total': { 'id': 6, 'func': self._parse_shareholding_nr },
+            'others_pledge':             { 'id': 7, 'func': self._parse_shareholding_nr },
+            'others_pledge_pp':          { 'id': 8, 'func': self._parse_shareholding_pp },
+        }
 
     def start_requests(self):
         for year in self.years:
@@ -74,14 +89,22 @@ class ShareholdingSpider(Spider):
         with open(filepath, 'wb') as f:
             f.write(response.body)
 
-        # # parse data from page
-        # trs = [rr for rr in response.css('#table01 table').css('tr')
-        #        if rr.css('th').get() is None]
-        # for row in trs:
-        #     item = SalaryItem()
-        #     item['year'] = year
-        #     yield self.parse_row(item, row, year)
+        # parse data from page
+        trs = [rr for rr in response.css('#table01 table.hasBorder').css('tr:not(.tblHead)')
+               if rr.css('th').get() is None]
+        for row in trs:
+            item = ShareholdingItem()
+            item['year'] = year
+            item['stock_code'] = stock_code
+            yield self.parse_row(item, row)
 
+    def parse_row(self, item, row):
+        tds = [dd for dd in row.css('td')]
+        for key, value in self.key_mapping_td.items():
+            raw_value = ''.join(tds[value['id']].css('*::text').getall())
+            parse_func = value['func']
+            item[key] = parse_func(raw_value.strip())
+        return item
 
     def _gen_webpage_filepath(self, year: int, stock_code: str) -> str:
         """Generate filepath for .html raw webpage scraped.
@@ -93,8 +116,14 @@ class ShareholdingSpider(Spider):
         Returns:
             str: Normalized filepath.
         """
-        rel_filepath = lambda year, stock_code: '../../../data/shareholding/webpages/{}-{}.html'.format(year, stock_code)
+        rel_filepath = lambda year, stock_code: '../../../data/shareholding/webpages/{}/{}.html'.format(year, stock_code)
         filepath = os.path.normpath(os.path.join(os.path.dirname(__file__), rel_filepath(year, stock_code)))
         if not os.path.exists(os.path.dirname(filepath)):
             os.makedirs(os.path.dirname(filepath))
         return filepath
+
+    def _parse_shareholding_nr(self, raw_value: str):
+        return locale.atoi(raw_value) if len(raw_value) != 0 else None
+
+    def _parse_shareholding_pp(self, raw_value: str):
+        return (locale.atof(raw_value.strip('%'))/100.) if len(raw_value) != 0 else None
