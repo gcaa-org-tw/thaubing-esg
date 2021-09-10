@@ -94,14 +94,18 @@ class ShareholdingSpider(Spider):
         with open(filepath, 'wb') as f:
             f.write(response.body)
 
-        # parse data from page
-        trs = [rr for rr in response.css('#table01 table.hasBorder').css('tr:not(.tblHead)')
-               if rr.css('th').get() is None]
-        for row in trs:
-            item = ShareholdingItem()
-            item['year'] = year
-            item['stock_code'] = stock_code
-            yield self.parse_row(item, row)
+        if self._is_empty_webpage_by_filesize(filepath):
+            self.logger.debug("Cannot find shareholding webpage for year=%s, stock_code=%s", year, stock_code)
+            os.remove(filepath) # delete the file
+        else:
+            # parse data from page
+            trs = [rr for rr in response.css('#table01 table.hasBorder').css('tr:not(.tblHead)')
+                if rr.css('th').get() is None]
+            for row in trs:
+                item = ShareholdingItem()
+                item['year'] = year
+                item['stock_code'] = stock_code
+                yield self.parse_row(item, row)
 
     def parse_row(self, item, row):
         tds = [dd for dd in row.css('td')]
@@ -126,6 +130,14 @@ class ShareholdingSpider(Spider):
         if not os.path.exists(os.path.dirname(filepath)):
             os.makedirs(os.path.dirname(filepath))
         return filepath
+
+    def _is_empty_webpage_by_filesize(self, filepath: str):
+        '''Check if webpage is empty by accessing the saved webpage filesize: Not available = 41,046 bytes.'''
+        file_size = os.path.getsize(filepath)
+        if file_size < 50000:
+            return True
+        else:
+            return False
 
     def _parse_shareholding_nr(self, raw_value: str):
         return locale.atoi(raw_value) if len(raw_value) != 0 else None
