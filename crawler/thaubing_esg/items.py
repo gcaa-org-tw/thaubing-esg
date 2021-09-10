@@ -49,8 +49,7 @@ class ShareholdingItem(Item):
     shareholding_initial      = Field() # 選任時持股
     shareholding_current      = Field() # 目前持股
     pledge                    = Field() # 設質股數
-    pledge_pp                 = Field() # 設質股數佔
-    shareholding_pp           = Field() # 持股比例
+    pledge_pp                 = Field() # 設質股數佔持股比例
     others_shareholding_total = Field() # 配偶、未成年子女及利用他人名義持有部份 / 內部人關係人目前持股合計
     others_pledge             = Field() # 配偶、未成年子女及利用他人名義持有部份 / 設質股數
     others_pledge_pp          = Field() # 配偶、未成年子女及利用他人名義持有部份 / 設質比例
