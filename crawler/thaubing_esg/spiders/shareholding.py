@@ -74,6 +74,13 @@ class ShareholdingSpider(Spider):
         with open(filepath, 'wb') as f:
             f.write(response.body)
 
+        # # parse data from page
+        # trs = [rr for rr in response.css('#table01 table').css('tr')
+        #        if rr.css('th').get() is None]
+        # for row in trs:
+        #     item = SalaryItem()
+        #     item['year'] = year
+        #     yield self.parse_row(item, row, year)
 
 
     def _gen_webpage_filepath(self, year: int, stock_code: str) -> str:
