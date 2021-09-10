@@ -13,6 +13,11 @@ locale.setlocale(locale.LC_ALL, 'en_US.UTF8')
 class ShareholdingSpider(Spider):
     name = 'shareholding'
     URL_ENDPOINT = 'https://mops.twse.com.tw/mops/web/stapap1'
+    custom_settings = {
+        'ITEM_PIPELINES': {
+            'thaubing_esg.pipelines.ShareholdingPipeline': 300
+        },
+    }
 
     def __init__(self, year=None):
         """
