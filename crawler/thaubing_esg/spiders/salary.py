@@ -4,7 +4,6 @@ from datetime import datetime
 from scrapy import FormRequest
 from scrapy.http.response.html import HtmlResponse
 from scrapy.spiders import Spider
-from six import class_types
 from thaubing_esg.items import SalaryItem
 
 locale.setlocale(locale.LC_ALL, 'en_US.UTF8')
