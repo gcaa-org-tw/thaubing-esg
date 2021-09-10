@@ -29,9 +29,10 @@ pipenv run scrapy crawl [spider_name] -a year=[year]
 - Ouput: scraped data or files, saved in directory `$ ./data/`.
 - Dependency: requirement for running the spider (output from the dependent spider(s) needed as spider input.)
 
-| Spider      | Description    | Output             | Dependency |
-| ----------- | -------------- | ------------------ | ---------- |
-| `company`   | 公司基本資料     | company.csv | - |
-| `financial` | 合併財務報表     | financial/webpages/[year]/*.html | `company` |
-| `income`    | 重要會計科目資料  | income.csv | `financial` |
-| `salary`    | 員工薪資資料     | salary.csv | - |
+| Spider         | Description    | Output             | Dependency |
+| -------------- | -------------- | ------------------ | ---------- |
+| `company`      | 公司基本資料          | company.csv | - |
+| `financial`    | 合併財務報表          | financial/webpages/[year]/*.html | `company` |
+| `income`       | 重要會計科目資料       | income.csv | `financial` |
+| `salary`       | 員工薪資資料          | salary.csv<br>salary/webpages/*.html | - |
+| `shareholding` | 董監事持股餘額明細資料  | shareholding.csv<br>shareholding/webpages/[year]/[stock_code].html | `company` |
