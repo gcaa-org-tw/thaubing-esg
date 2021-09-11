@@ -116,3 +116,44 @@ class SalaryPipeline:
         data = pd.read_csv(filepath)
         data.sort_values(['year', 'stock_code'], ascending=[False, True], inplace=True)
         data.to_csv(filepath, index=False)
+
+
+class ShareholdingPipeline:
+
+    def open_spider(self, spider):
+        try:
+            self.filepath = gen_data_filepath('shareholding/shareholding-{}.csv'.format(spider.year))
+        except:
+            self.filepath = gen_data_filepath('shareholding.csv')
+        self.file = open(self.filepath, 'wb')
+        self.exporter = CsvItemExporter(self.file)
+
+        # specifies exported fields and order
+        self.exporter.fields_to_export = [
+            'year',
+            'stock_code',
+            'title',
+            'shareholder',
+            'shareholding_initial',
+            'shareholding_current',
+            'pledge',
+            'pledge_pp',
+            'others_shareholding_total',
+            'others_pledge',
+            'others_pledge_pp'
+        ]
+
+    def close_spider(self, spider):
+        self.exporter.finish_exporting()
+        self.file.close()
+        spider.logger.info('Sorting csv file by year and stock_code...')
+        self._csv_sorting(self.filepath)
+
+    def process_item(self, item, spider):
+        self.exporter.export_item(item)
+        return item
+
+    def _csv_sorting(self, filepath: str):
+        data = pd.read_csv(filepath)
+        data.sort_values(['year', 'stock_code'], ascending=[False, True], inplace=True)
+        data.to_csv(filepath, index=False)
