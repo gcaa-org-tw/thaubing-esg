@@ -22,7 +22,7 @@ class CompanyPipeline:
             'name',
             'name_abbr',
             'tax_code',
-            'industry_category',
+            'industry_code',
             'company_type',
         ]
 
@@ -118,29 +118,44 @@ class SalaryPipeline:
         data.to_csv(filepath, index=False)
 
 
-class EpaPipeline:
+class ShareholdingPipeline:
 
     def open_spider(self, spider):
-        self.filepath = gen_data_filepath(spider.dataset_id + '.csv')
+        try:
+            self.filepath = gen_data_filepath('shareholding/shareholding-{}.csv'.format(spider.year))
+        except:
+            self.filepath = gen_data_filepath('shareholding.csv')
         self.file = open(self.filepath, 'wb')
-        self.exporter = CsvItemExporter(self.file, encoding='utf-8-sig')
+        self.exporter = CsvItemExporter(self.file)
 
-        # # specifies exported fields and order
-        # self.exporter.fields_to_export = spider.fields_to_export
+        # specifies exported fields and order
+        self.exporter.fields_to_export = [
+            'year',
+            'stock_code',
+            'title',
+            'shareholder',
+            'shareholding_initial',
+            'shareholding_current',
+            'pledge',
+            'pledge_pp',
+            'others_shareholding_total',
+            'others_pledge',
+            'others_pledge_pp'
+        ]
 
     def close_spider(self, spider):
         self.exporter.finish_exporting()
         self.file.close()
-        # spider.logger.info('Drop dulicated rows...')
-        # self._csv_drop_duplicates(spider, self.filepath)
+        spider.logger.info('Sorting csv file by year and stock_code...')
+        self._csv_sorting(self.filepath)
 
     def process_item(self, item, spider):
         self.exporter.export_item(item)
         return item
 
-    # def _csv_drop_duplicates(self, spider, filepath: str):
-    #     data = pd.read_csv(filepath)
-    #     spider.logger.debug('Before dropping: total number of rows = %s', len(data))
-    #     data.drop_duplicates(inplace=True)
-    #     spider.logger.debug('After dropping: total number of rows = %s', len(data))
-    #     data.to_csv(filepath, index=False)
+    def _csv_sorting(self, filepath: str):
+        data = pd.read_csv(filepath)
+        data.sort_values(['year', 'stock_code'], ascending=[False, True], inplace=True)
+        data.to_csv(filepath, index=False)
+
+
