@@ -7,7 +7,7 @@ export default {
 
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    title: 'ESG檢測儀：我們與永續轉型的距離',
+    title: 'ESG 檢測儀：我們與永續轉型的距離',
     htmlAttrs: {
       lang: 'en'
     },
@@ -45,14 +45,16 @@ export default {
     // https://go.nuxtjs.dev/axios
     '@nuxtjs/axios',
     // https://go.nuxtjs.dev/content
-    '@nuxt/content',
+    '@nuxt/content'
   ],
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {},
 
   // Content module configuration: https://go.nuxtjs.dev/config-content
-  content: {},
+  content: {
+    dir: 'static/content'
+  },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
