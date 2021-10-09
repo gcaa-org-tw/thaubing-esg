@@ -7,7 +7,7 @@ export default {
 
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    title: 'esg-ui',
+    title: 'ESG檢測儀：我們與永續轉型的距離',
     htmlAttrs: {
       lang: 'en'
     },
