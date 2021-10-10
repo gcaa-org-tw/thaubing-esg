@@ -8,6 +8,7 @@ class CompanyMap {
     this.byId = {}
     this.byName = {}
     this.byAbbr = {}
+    this.byStock = {}
 
     this.finished = this.init()
   }
@@ -22,6 +23,7 @@ class CompanyMap {
           this.byId[data.統編] = data
           this.byName[data.公司名稱] = data
           this.byAbbr[data.公司簡稱] = data
+          this.byStock[data.股票代碼] = data
         })
         .on('end', () => {
           resolve(this.list)
@@ -39,6 +41,10 @@ class CompanyMap {
 
   findByAbbr (abbr) {
     return this.byAbbr[abbr]
+  }
+
+  findByStock (stock) {
+    return this.byStock[stock]
   }
 }
 

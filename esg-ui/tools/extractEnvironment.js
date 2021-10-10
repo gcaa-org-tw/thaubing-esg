@@ -2,17 +2,9 @@ const fs = require('fs')
 const path = require('path')
 const csv = require('csv-parser')
 const { companyMap } = require('./utils')
-const { appendCompany, appendIndustry, finished } = require('./csvLogger')
+const { appendToBoth, finished } = require('./csvLogger')
 
 const DATA_DIR = path.join(__dirname, '../../data')
-
-function appendToBoth (company, row) {
-  appendIndustry(company.自訂產業別, {
-    ...row,
-    id: company.統編
-  })
-  appendCompany(company.公司簡稱, row)
-}
 
 function extractAirPollution () {
   // 污染管理

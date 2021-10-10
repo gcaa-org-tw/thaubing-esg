@@ -43,10 +43,21 @@ const WRITERS = { companyList: null, industry: {}, company: {} }
 
 class CsvWriter {
   constructor (header, filePath) {
-    this.stream = fs.createWriteStream(path.join(CONTENT_PATH, filePath))
+    const targetPath = path.join(CONTENT_PATH, filePath)
+    let isExisted = false
+    try {
+      fs.accessSync(targetPath, fs.constants.W_OK)
+      isExisted = true
+    } catch {
+      isExisted = false
+    }
+    this.stream = fs.createWriteStream(targetPath, { flags: 'a' })
     this.csvWriter = createObjectCsvStringifier({ header })
     this.lineCount = 0
-    this.stream.write(this.csvWriter.getHeaderString())
+
+    if (!isExisted) {
+      this.stream.write(this.csvWriter.getHeaderString())
+    }
   }
 
   append (row) {
@@ -127,9 +138,18 @@ function waitAllFinished () {
   return Promise.all(promises)
 }
 
+function appendToBoth (company, row) {
+  appendIndustry(company.自訂產業別, {
+    ...row,
+    id: company.統編
+  })
+  appendCompany(company.公司簡稱, row)
+}
+
 module.exports = {
   appendCompanyList,
   appendIndustry,
   appendCompany,
+  appendToBoth,
   finished: waitAllFinished
 }
