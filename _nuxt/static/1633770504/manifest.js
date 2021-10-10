@@ -1,1 +1,0 @@
-__NUXT_JSONP__("manifest.js", {routes:["\u002Fabout","\u002Findustry\u002F石化業","\u002Fcompany\u002F台積電"]})

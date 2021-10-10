@@ -1,0 +1,1 @@
+window.__NUXT__=(function(a){return {staticAssetsBase:"\u002Fthaubing-esg\u002F_nuxt\u002Fstatic\u002F1633858567",layout:"default",error:a,serverRendered:true,routePath:"\u002Fcompany\u002F%E5%8F%B0%E5%A1%91",config:{_app:{basePath:"\u002Fthaubing-esg\u002F",assetsPath:"\u002Fthaubing-esg\u002F_nuxt\u002F",cdnURL:a},content:{dbHash:"6cb5a3db"}}}}(null));
