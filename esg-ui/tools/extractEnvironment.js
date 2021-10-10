@@ -85,7 +85,7 @@ function extractGhGas () {
             appendToBoth(company, {
               ...ctx,
               measure: '範疇二（間接排放）',
-              value: companySum[id].tot
+              value: companySum[id].tot2
             })
           }
         }

@@ -1,3 +1,5 @@
+const fs = require('fs')
+const path = require('path')
 const axios = require('axios')
 const resumer = require('resumer')
 const csv = require('csv-parser')
@@ -17,13 +19,14 @@ async function main () {
     console.error(`Failed to download company list because: ${error}`)
     return
   }
-
+  const industries = new Set()
   const stream = resumer()
   stream
     .queue(resp.data)
     .pipe(csv())
     .on('data', (data) => {
       const normalizedIndustry = INDUSTRY_MAP[data.industry] || data.industry
+      industries.add(normalizedIndustry)
       appendCompanyList({
         name: data.name,
         abbr: data.name_abbr,
@@ -36,6 +39,10 @@ async function main () {
 
   setTimeout(async () => {
     const resp = await finished()
+    fs.writeFileSync(
+      path.join(__dirname, '../assets/industries.json'),
+      JSON.stringify(Array.from(industries))
+    )
     // eslint-disable-next-line no-console
     console.log(`${resp[0]} company list extracted.`)
   })

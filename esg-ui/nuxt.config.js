@@ -1,3 +1,5 @@
+import industries from './assets/industries.json'
+
 export default {
   // Disable server-side rendering: https://go.nuxtjs.dev/ssr-mode
   // ssr: false,
@@ -61,7 +63,7 @@ export default {
   },
 
   generate: {
-    routes: ['/industry/石化業']
+    routes: industries.map(industry => `/industry/${industry}`)
   },
 
   router: {
