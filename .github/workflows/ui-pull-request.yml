@@ -5,10 +5,6 @@ defaults:
     working-directory: esg-ui
 
 on:
-  push:
-    branches:
-      - main
-      - master
   pull_request:
     branches:
       - main
