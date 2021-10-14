@@ -34,7 +34,13 @@
           ) {{column.subCat}}
         thead.stats__header.stats__header--sub
           th 公司名稱
-          th(v-for="column in esgColumns" :key="column.key") {{column.measure}}
+          th.pointer(
+            v-for="column in esgColumns"
+            :key="column.key"
+            @click="toggleSort(column)"
+          )
+            | {{column.measure}} ({{column.unit}})
+            i.fas.ml2(:class="thClass(column)")
         tbody.stats__body
           tr(v-for="row in visibleStats" :key="row.company.統編")
             th
@@ -47,6 +53,7 @@
       ) 下載此頁資料
 </template>
 <script>
+import { get } from 'lodash'
 import { friendlyHeader } from '~/libs/crawlerFriendly'
 import industries from '~/assets/industries.json'
 import esgColumns from '~/assets/esgColumns'
@@ -84,7 +91,7 @@ export default {
   data () {
     return {
       industry: this.$route.params.industry,
-      order: '溫室氣體排放-範疇一（直接排放）',
+      order: `${esgColumns.environment[0].subCat}-${esgColumns.environment[0].measure}`,
       isAsc: false
     }
   },
@@ -103,7 +110,7 @@ export default {
     esgColumns () {
       return [
         ...enrichColumns('environment'),
-        ...enrichColumns('society'),
+        ...enrichColumns('social'),
         ...enrichColumns('governance')
       ]
     },
@@ -130,10 +137,18 @@ export default {
     },
     visibleStats () {
       return [...this.companyStats].sort((a, b) => {
-        if (this.isAsc) {
-          return a.stats[this.order] - b.stats[this.order]
+        const aVal = get(a.stats, `${this.order}.數值`)
+        const bVal = get(b.stats, `${this.order}.數值`)
+        if (aVal === undefined) {
+          return 1
         }
-        return b.stats[this.order] - a.stats[this.order]
+        if (bVal === undefined) {
+          return -1
+        }
+        if (this.isAsc) {
+          return aVal - bVal
+        }
+        return bVal - aVal
       })
     }
   },
@@ -143,6 +158,23 @@ export default {
     }
   },
   methods: {
+    toggleSort (column) {
+      if (column.key === this.order) {
+        this.isAsc = !this.isAsc
+      } else {
+        this.order = column.key
+        this.isAsc = true
+      }
+    },
+    thClass (column) {
+      if (column.key !== this.order) {
+        return ['fa-sort']
+      }
+      if (this.isAsc) {
+        return ['fa-sort-up']
+      }
+      return ['fa-sort-down']
+    },
     companyUrl (company) {
       return `/company/${company.公司簡稱}`
     },
@@ -154,7 +186,7 @@ export default {
       if (!isNaN(field.value)) {
         const value = Math.round(field.value * 100) / 100
         // return `${value.toLocaleString()} (${field.單位})`
-        return `${value.toLocaleString()}`
+        return `${value.toLocaleString(undefined, { minimumFractionDigits: 2 })}`
       }
       return `${field.數值} (${field.單位})`
     }
@@ -163,8 +195,6 @@ export default {
 </script>
 <style lang="scss" scoped>
 $container-space: 8.125rem;
-$banner-height: 24rem;
-$footer-height: 7rem;
 
 .container {
   padding-left: $container-space;
@@ -193,11 +223,14 @@ $footer-height: 7rem;
     bottom: 1rem;
   }
 
+  // $banner-height: 24rem;
+  $banner-height: 24rem;
+  $footer-height: 7rem;
   &__scroller {
     position: relative;
     margin-left: $container-space;
-    min-width: calc(100vw - #{$container-space} * 2);
     max-width: calc(100vw - #{$container-space});
+    // width: 80rem;
     z-index: 1;
     overflow: auto;
     max-height: calc(100vh - #{$banner-height} - #{$footer-height});
@@ -230,9 +263,10 @@ $footer-height: 7rem;
   &__footer {
     margin-top: 1.5rem;
     margin-bottom: 3rem;
+    padding-right: 1.5rem;
   }
   &__cta {
-    background: #49591C;
+    background: $green-primary;
     &:hover {
       background: #35811C;
     }
@@ -265,8 +299,14 @@ $row-height: 3.5rem;
       white-space: nowrap;
       color: #fff;
       text-align: left;
+      font-weight: 400;
       &:first-child {
         z-index: 5;
+        font-weight: 500;
+      }
+
+      .fa-sort {
+        opacity: 0.5;
       }
     }
     &--pri {
@@ -278,7 +318,7 @@ $row-height: 3.5rem;
     &--sub {
       th {
         top: $row-height;
-        background: #49591C;
+        background: $green-primary;
       }
     }
   }
@@ -292,7 +332,7 @@ $row-height: 3.5rem;
       text-align: left;
       background: #fff;
       a {
-        color: #49591C;
+        color: $green-primary;
         text-decoration: underline;
       }
     }

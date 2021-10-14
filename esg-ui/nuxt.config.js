@@ -23,7 +23,13 @@ export default {
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
       { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
       { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: true },
-      { href: 'https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600&display=swap', rel: 'stylesheet' }
+      { href: 'https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600&display=swap', rel: 'stylesheet' }
+    ]
+  },
+
+  styleResources: {
+    scss: [
+      '~/assets/variables.scss'
     ]
   },
 
@@ -31,6 +37,7 @@ export default {
   css: [
     'tachyons/css/tachyons.css',
     '@fortawesome/fontawesome-free/css/all.min.css',
+    'c3/c3.min.css',
     '~/assets/global'
   ],
 
@@ -51,6 +58,7 @@ export default {
   modules: [
     // https://go.nuxtjs.dev/axios
     '@nuxtjs/axios',
+    '@nuxtjs/style-resources',
     // https://go.nuxtjs.dev/content
     '@nuxt/content'
   ],
