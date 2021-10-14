@@ -46,6 +46,7 @@ function extractSalary () {
 }
 
 async function main () {
+  console.warn('[Social] start')
   await companyMap.finished
   // 員工數
   //   性別比 TODO
@@ -60,6 +61,7 @@ async function main () {
   //   職業健康與安全-重大職災 TODO
   //   職業健康與安全-工安事故 TODO
   await finished()
+  console.warn('[Social] done')
 }
 
 main()

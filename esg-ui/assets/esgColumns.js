@@ -1,6 +1,7 @@
 const environment = [
   { subCat: '溫室氣體排放', measure: '範疇一（直接排放）', unit: '公噸CO2e' },
-  { subCat: '溫室氣體排放', measure: '範疇二（間接排放）', unit: '公噸CO2e' }
+  { subCat: '溫室氣體排放', measure: '範疇二（間接排放）', unit: '公噸CO2e' },
+  { subCat: '溫室氣體排放', measure: '每單位營收排放量', unit: '公噸CO2e/億元' }
 ]
 
 const social = [
