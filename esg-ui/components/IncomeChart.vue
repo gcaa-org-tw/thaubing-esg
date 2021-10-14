@@ -1,16 +1,16 @@
 <template lang="pug">
   chart-panel(
-    title="溫室氣體排放"
-    :unit="['公噸CO2e', '公噸/仟元']"
+    title="收入、成本與淨利"
+    unit="仟元"
     :c3-config="c3Config"
   )
 </template>
 <script>
-import { environment } from '~/assets/esgColumns'
+import { governance } from '~/assets/esgColumns'
 import { chartMixin } from '~/libs/mixins'
 
 export default {
-  mixins: [chartMixin(environment, '溫室氣體排放')],
+  mixins: [chartMixin(governance, '收入、成本與淨利')],
   computed: {
     c3Config () {
       return {
@@ -19,15 +19,16 @@ export default {
           columns: this.dumpSubCatStats(),
           type: 'bar',
           groups: [
-            ['範疇一（直接排放）', '範疇二（間接排放）']
+            ['營業成本', '營業費用']
           ],
           types: {
-            每單位營收排放量: 'line'
+            淨利: 'line'
           },
           axes: {
-            '範疇一（直接排放）': 'y',
-            '範疇二（間接排放）': 'y',
-            每單位營收排放量: 'y2'
+            營業成本: 'y',
+            營業費用: 'y',
+            營業收入: 'y',
+            淨利: 'y2'
           },
           colors: {
             每單位營收排放量: '#555'
@@ -44,16 +45,16 @@ export default {
             }
           },
           y: {
-            label: this.measureMap['範疇二（間接排放）'].unit,
+            label: this.measureMap.營業收入.unit,
             tick: {
-              format: this.genYFormatter()
+              format: this.genYFormatter(true)
             }
           },
           y2: {
             show: true,
-            label: this.measureMap.每單位營收排放量.unit,
+            label: this.measureMap.淨利.unit,
             tick: {
-              format: this.genYFormatter()
+              format: this.genYFormatter(true)
             }
           }
         }
