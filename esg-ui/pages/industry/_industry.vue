@@ -34,7 +34,13 @@
           ) {{column.subCat}}
         thead.stats__header.stats__header--sub
           th 公司名稱
-          th(v-for="column in esgColumns" :key="column.key") {{column.measure}} ({{column.unit}})
+          th.pointer(
+            v-for="column in esgColumns"
+            :key="column.key"
+            @click="toggleSort(column)"
+          )
+            | {{column.measure}} ({{column.unit}})
+            i.fas.ml2(:class="thClass(column)")
         tbody.stats__body
           tr(v-for="row in visibleStats" :key="row.company.統編")
             th
@@ -134,10 +140,10 @@ export default {
         const aVal = get(a.stats, `${this.order}.數值`)
         const bVal = get(b.stats, `${this.order}.數值`)
         if (aVal === undefined) {
-          return this.isAsc ? -1 : 1
+          return 1
         }
         if (bVal === undefined) {
-          return this.isAsc ? 1 : -1
+          return -1
         }
         if (this.isAsc) {
           return aVal - bVal
@@ -152,6 +158,23 @@ export default {
     }
   },
   methods: {
+    toggleSort (column) {
+      if (column.key === this.order) {
+        this.isAsc = !this.isAsc
+      } else {
+        this.order = column.key
+        this.isAsc = true
+      }
+    },
+    thClass (column) {
+      if (column.key !== this.order) {
+        return ['fa-sort']
+      }
+      if (this.isAsc) {
+        return ['fa-sort-up']
+      }
+      return ['fa-sort-down']
+    },
     companyUrl (company) {
       return `/company/${company.公司簡稱}`
     },
@@ -276,8 +299,14 @@ $row-height: 3.5rem;
       white-space: nowrap;
       color: #fff;
       text-align: left;
+      font-weight: 400;
       &:first-child {
         z-index: 5;
+        font-weight: 500;
+      }
+
+      .fa-sort {
+        opacity: 0.5;
       }
     }
     &--pri {
