@@ -8,7 +8,7 @@
       h1.green.fw5.f3 {{company.公司名稱}}
       .green {{company.自訂產業別}} · 資本額 {{capital}}
       .company__subtitle Environment 環境保護相關數據
-      gh-gas-chart(:stats="stats")
+      gh-gas-chart(:stats="stats.body")
       .company__subtitle Social 社會責任相關數據
       .company__subtitle Governance 治理相關數據
 </template>

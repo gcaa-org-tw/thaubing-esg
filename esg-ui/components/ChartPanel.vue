@@ -5,7 +5,7 @@
       .chartPanel__audit(v-if="isSrcAudited") 來自政府、官方報告
       .chartPanel__audit(v-else) 來自企業 CSR 報告
     .mb3.pb2 單位：{{unitStr}}
-    slot
+    chart-content(:config="c3Config")
     .chartPanel__tips.mt2(v-if="tips") {{tips}}
 </template>
 <script>
@@ -26,6 +26,12 @@ export default {
     tips: {
       type: String,
       default: ''
+    },
+    c3Config: {
+      type: Object,
+      default () {
+        return {}
+      }
     }
   },
   computed: {
