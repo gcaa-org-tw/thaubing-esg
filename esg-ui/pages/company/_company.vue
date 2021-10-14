@@ -1,9 +1,16 @@
 <template lang="pug">
-  .company.mv5.mw8.center
-    h1.b.f1 {{$route.params.company}} ({{company.公司名稱}})
-    .pa3.ba.mv3
-      .pv1.mb1.bb.b--moon-gray(v-for="(row, i) in stats.body" :key="i")
-        | {{row.年份}} - {{row.項目}}: {{row.數值}} {{row.單位}}
+  .company
+    .company__nav.pv3.no-repeat.cover
+      .mw8.flex.justify-between.center
+        nuxt-link.f3.fw6.white(to="/") ESG 檢測儀
+        nuxt-link.white.dim(to="/about") 關於計畫
+    .mw8.center.mt4
+      h1.green.fw5.f3 {{company.公司名稱}}
+      .green {{company.自訂產業別}} · 資本額 {{capital}}
+      .company__subtitle Environment 環境保護相關數據
+      gh-gas-chart(:stats="stats")
+      .company__subtitle Social 社會責任相關數據
+      .company__subtitle Governance 治理相關數據
 </template>
 <script>
 import { friendlyHeader } from '~/libs/crawlerFriendly'
@@ -29,6 +36,28 @@ export default {
     title () {
       return this.$route.params.company
     }
-  })
+  }),
+  computed: {
+    capital () {
+      const latestCapital = this.stats.body.reduce((latest, row) => {
+        if (row.項目 === '資本額' && row.年份 > latest.年份) {
+          return row
+        }
+        return latest
+      }, { 年份: '1970' })
+      return Number.parseInt(latestCapital.數值).toLocaleString() || '？'
+    }
+  }
 }
 </script>
+<style lang="scss" scoped>
+.company {
+  &__nav {
+    background-image: url('~/assets/tree-bg.png');
+  }
+  &__subtitle {
+    margin: 3.25rem 0 1rem;
+    color: #373737;
+  }
+}
+</style>

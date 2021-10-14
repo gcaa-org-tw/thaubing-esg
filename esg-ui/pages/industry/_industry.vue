@@ -34,7 +34,7 @@
           ) {{column.subCat}}
         thead.stats__header.stats__header--sub
           th 公司名稱
-          th(v-for="column in esgColumns" :key="column.key") {{column.measure}}
+          th(v-for="column in esgColumns" :key="column.key") {{column.measure}} ({{column.unit}})
         tbody.stats__body
           tr(v-for="row in visibleStats" :key="row.company.統編")
             th
@@ -85,7 +85,7 @@ export default {
   data () {
     return {
       industry: this.$route.params.industry,
-      order: '溫室氣體排放-範疇一（直接排放）',
+      order: `${esgColumns.environment[0].subCat}-${esgColumns.environment[0].measure}`,
       isAsc: false
     }
   },
@@ -104,7 +104,7 @@ export default {
     esgColumns () {
       return [
         ...enrichColumns('environment'),
-        ...enrichColumns('society'),
+        ...enrichColumns('social'),
         ...enrichColumns('governance')
       ]
     },
@@ -201,14 +201,13 @@ $container-space: 8.125rem;
   }
 
   // $banner-height: 24rem;
-  $banner-height: 7rem;
+  $banner-height: 24rem;
   $footer-height: 7rem;
   &__scroller {
     position: relative;
     margin-left: $container-space;
-    // min-width: calc(100vw - #{$container-space} * 2);
     max-width: calc(100vw - #{$container-space});
-    width: 80rem;
+    // width: 80rem;
     z-index: 1;
     overflow: auto;
     max-height: calc(100vh - #{$banner-height} - #{$footer-height});
@@ -244,7 +243,7 @@ $container-space: 8.125rem;
     padding-right: 1.5rem;
   }
   &__cta {
-    background: #49591C;
+    background: $green-primary;
     &:hover {
       background: #35811C;
     }
@@ -290,7 +289,7 @@ $row-height: 3.5rem;
     &--sub {
       th {
         top: $row-height;
-        background: #49591C;
+        background: $green-primary;
       }
     }
   }
@@ -304,7 +303,7 @@ $row-height: 3.5rem;
       text-align: left;
       background: #fff;
       a {
-        color: #49591C;
+        color: $green-primary;
         text-decoration: underline;
       }
     }
