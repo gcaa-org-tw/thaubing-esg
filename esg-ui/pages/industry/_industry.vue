@@ -47,6 +47,7 @@
       ) 下載此頁資料
 </template>
 <script>
+import { get } from 'lodash'
 import { friendlyHeader } from '~/libs/crawlerFriendly'
 import industries from '~/assets/industries.json'
 import esgColumns from '~/assets/esgColumns'
@@ -130,10 +131,18 @@ export default {
     },
     visibleStats () {
       return [...this.companyStats].sort((a, b) => {
-        if (this.isAsc) {
-          return a.stats[this.order] - b.stats[this.order]
+        const aVal = get(a.stats, `${this.order}.數值`)
+        const bVal = get(b.stats, `${this.order}.數值`)
+        if (aVal === undefined) {
+          return this.isAsc ? -1 : 1
         }
-        return b.stats[this.order] - a.stats[this.order]
+        if (bVal === undefined) {
+          return this.isAsc ? 1 : -1
+        }
+        if (this.isAsc) {
+          return aVal - bVal
+        }
+        return bVal - aVal
       })
     }
   },
@@ -154,7 +163,7 @@ export default {
       if (!isNaN(field.value)) {
         const value = Math.round(field.value * 100) / 100
         // return `${value.toLocaleString()} (${field.單位})`
-        return `${value.toLocaleString()}`
+        return `${value.toLocaleString(undefined, { minimumFractionDigits: 2 })}`
       }
       return `${field.數值} (${field.單位})`
     }
@@ -163,8 +172,6 @@ export default {
 </script>
 <style lang="scss" scoped>
 $container-space: 8.125rem;
-$banner-height: 24rem;
-$footer-height: 7rem;
 
 .container {
   padding-left: $container-space;
@@ -193,11 +200,15 @@ $footer-height: 7rem;
     bottom: 1rem;
   }
 
+  // $banner-height: 24rem;
+  $banner-height: 7rem;
+  $footer-height: 7rem;
   &__scroller {
     position: relative;
     margin-left: $container-space;
-    min-width: calc(100vw - #{$container-space} * 2);
+    // min-width: calc(100vw - #{$container-space} * 2);
     max-width: calc(100vw - #{$container-space});
+    width: 80rem;
     z-index: 1;
     overflow: auto;
     max-height: calc(100vh - #{$banner-height} - #{$footer-height});
@@ -230,6 +241,7 @@ $footer-height: 7rem;
   &__footer {
     margin-top: 1.5rem;
     margin-bottom: 3rem;
+    padding-right: 1.5rem;
   }
   &__cta {
     background: #49591C;
