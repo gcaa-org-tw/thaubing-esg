@@ -1,8 +1,10 @@
 const fs = require('fs')
 const path = require('path')
+const { get } = require('lodash')
 const csv = require('csv-parser')
 const { companyMap } = require('./utils')
 const { appendToBoth, finished } = require('./csvLogger')
+const { extractFinance } = require('./extractGov')
 
 const DATA_DIR = path.join(__dirname, '../../data')
 
@@ -35,12 +37,25 @@ function extractAirPollution () {
   return targetMeasures
 }
 
-function extractGhGas () {
+async function extractGhGas () {
   // 溫室氣體排放
   //   範疇一（直接排放）data/ghg_p_01.csv#tot
   //   範疇二（間接排放）data/ghg_p_01.csv#tot2
+  const financialStatsRaw = await extractFinance(false)
+  const financialStats = financialStatsRaw.reduce((stats, row) => {
+    if (row.data.measure !== '營業收入') {
+      return stats
+    }
+    const companyId = row.company.統編
+    if (!stats[companyId]) {
+      stats[companyId] = {}
+    }
+    stats[companyId][row.data.year] = row.data.value
+    return stats
+  }, {})
+
   const annualSum = {}
-  return new Promise((resolve, reject) => {
+  await new Promise((resolve, reject) => {
     fs
       .createReadStream(path.join(DATA_DIR, 'ghg_p_01.csv'))
       .pipe(csv())
@@ -87,6 +102,17 @@ function extractGhGas () {
               measure: '範疇二（間接排放）',
               value: companySum[id].tot2
             })
+
+            const income = get(financialStats, `${id}.${year}`)
+            if (income) {
+              const totSum = companySum[id].tot + companySum[id].tot2
+              appendToBoth(company, {
+                ...ctx,
+                unit: '公噸CO2e/億元',
+                measure: '每單位營收排放量',
+                value: totSum * 10 ** 5 / income
+              })
+            }
           }
         }
         resolve()
@@ -95,6 +121,7 @@ function extractGhGas () {
 }
 
 async function main () {
+  console.warn('[Environment] start')
   await companyMap.finished
   // 溫室氣體排放
   await extractGhGas()
@@ -112,6 +139,7 @@ async function main () {
   //   違反環境法規紀錄 TODO
   //   違反環境法規紀錄 TODO
   await finished()
+  console.warn('[Environment] done')
 }
 
 main()

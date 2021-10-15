@@ -1,32 +1,79 @@
 <template lang="pug">
-  .industry.mv5.center
-    select(v-model="industry")
-      option(v-for="opt in industries" :key="opt") {{opt}}
-    table.mv3.ba.b--moon-gray
-      thead
-        th 公司名稱
-        th(v-for="column in perEsgColumns.ALL" :key="column.key") {{column.key}}
-      tr.striped--light-gray(v-for="row in visibleStats" :key="row.company.統編")
-        td
-          nuxt-link(:to="companyUrl(row.company)") {{row.company.公司簡稱}}
-        td(v-for="column in perEsgColumns.ALL" :key="column.key")
-          span {{beautyValue(row, column)}}
+  .industry
+    .industry__header.container.pv3.relative.no-repeat.cover
+      .industry__about.tr
+        nuxt-link.dim(to="/about") 關於計畫
+      nuxt-link(to="/")
+        h1.industry__title.fw6 ESG 檢測儀
+      p.industry__desp
+        | 我們與永續轉型的距離有多遠？
+        br
+        | 透過環境、社會和公司治理（ESG）分數來...綠色金融（請大改）
+      .industry__year.f6.o-70 資料年份：{{year}}
+      a.industry__officialSite.absolute(href="https://thaubing.gcaa.org.tw/")
+        img(src="~/assets/logo.png")
+    .industry__nav.container.flex.items-end
+      .mr5
+        .f6.o-60.mb1 產業
+        label.flex.items-center
+          select.industry__typeSelector(v-model="industry")
+            option(v-for="opt in industries" :key="opt") {{opt}}
+          i.fas.fa-sort
+      .industry__catNav E 環境
+      .industry__catNav S 社會
+      .industry__catNav G 治理
+    .industry__scroller
+      table.industry__stats.stats.mv3.ba.b--moon-gray
+        thead.stats__header.stats__header--pri
+          th
+          th(
+            v-for="column in esgColumns"
+            :key="column.key"
+            v-if="column.span"
+            :colspan="column.span"
+          ) {{column.subCat}}
+        thead.stats__header.stats__header--sub
+          th 公司名稱
+          th.pointer(
+            v-for="column in esgColumns"
+            :key="column.key"
+            @click="toggleSort(column)"
+          )
+            | {{column.measure}} ({{column.unit}})
+            i.fas.ml2(:class="thClass(column)")
+        tbody.stats__body
+          tr(v-for="row in visibleStats" :key="row.company.統編")
+            th
+              nuxt-link.dim(:to="companyUrl(row.company)") {{row.company.公司簡稱}}
+            td(v-for="column in esgColumns" :key="column.key")
+              span {{beautyValue(row, column)}}
+    .industry__footer.flex.items-center.justify-end.container
+      a.industry__cta.db.br2.pv2.ph3.fw6.white(
+        :href="`/content/industry/${industry}.csv`"
+      ) 下載此頁資料
 </template>
 <script>
+import { get } from 'lodash'
 import { friendlyHeader } from '~/libs/crawlerFriendly'
 import industries from '~/assets/industries.json'
+import esgColumns from '~/assets/esgColumns'
 
-const COLUMNS = [
-  { cat: 'E', subCat: '溫室氣體排放', measure: '範疇一（直接排放）' },
-  { cat: 'E', subCat: '溫室氣體排放', measure: '範疇二（間接排放）' },
-  { cat: 'S', subCat: '員工薪資', measure: '平均薪資' },
-  { cat: 'S', subCat: '員工薪資', measure: '薪資中位數' },
-  { cat: 'G', subCat: '', measure: '資本額' },
-  { cat: 'G', subCat: '收入、成本與淨利', measure: '營業收入' },
-  { cat: 'G', subCat: '收入、成本與淨利', measure: '營業成本' },
-  { cat: 'G', subCat: '收入、成本與淨利', measure: '營業費用' },
-  { cat: 'G', subCat: '收入、成本與淨利', measure: '淨利' }
-]
+function enrichColumns (category) {
+  let spanCursor
+  return esgColumns[category].map((column) => {
+    const richColumn = {
+      ...column,
+      key: `${column.subCat}-${column.measure}`,
+      cat: category,
+      span: 0
+    }
+    if (!spanCursor || richColumn.subCat !== spanCursor.subCat) {
+      spanCursor = richColumn
+    }
+    spanCursor.span += 1
+    return richColumn
+  })
+}
 
 export default {
   async asyncData ({ $content, params, redirect }) {
@@ -44,7 +91,7 @@ export default {
   data () {
     return {
       industry: this.$route.params.industry,
-      order: '溫室氣體排放-範疇一（直接排放）',
+      order: `${esgColumns.environment[0].subCat}-${esgColumns.environment[0].measure}`,
       isAsc: false
     }
   },
@@ -60,18 +107,12 @@ export default {
     industries () {
       return industries
     },
-    perEsgColumns () {
-      const columnMap = { E: [], S: [], G: [] }
-      COLUMNS.forEach((column) => {
-        columnMap[column.cat].push({
-          key: `${column.subCat}-${column.measure}`,
-          meta: column
-        })
-      })
-      return {
-        ...columnMap,
-        ALL: [...columnMap.E, ...columnMap.S, ...columnMap.G]
-      }
+    esgColumns () {
+      return [
+        ...enrichColumns('environment'),
+        ...enrichColumns('social'),
+        ...enrichColumns('governance')
+      ]
     },
     companyStats () {
       const companyMap = this.companyList.body.reduce((map, company) => {
@@ -96,10 +137,18 @@ export default {
     },
     visibleStats () {
       return [...this.companyStats].sort((a, b) => {
-        if (this.isAsc) {
-          return a.stats[this.order] - b.stats[this.order]
+        const aVal = get(a.stats, `${this.order}.數值`)
+        const bVal = get(b.stats, `${this.order}.數值`)
+        if (aVal === undefined) {
+          return 1
         }
-        return b.stats[this.order] - a.stats[this.order]
+        if (bVal === undefined) {
+          return -1
+        }
+        if (this.isAsc) {
+          return aVal - bVal
+        }
+        return bVal - aVal
       })
     }
   },
@@ -109,6 +158,23 @@ export default {
     }
   },
   methods: {
+    toggleSort (column) {
+      if (column.key === this.order) {
+        this.isAsc = !this.isAsc
+      } else {
+        this.order = column.key
+        this.isAsc = true
+      }
+    },
+    thClass (column) {
+      if (column.key !== this.order) {
+        return ['fa-sort']
+      }
+      if (this.isAsc) {
+        return ['fa-sort-up']
+      }
+      return ['fa-sort-down']
+    },
     companyUrl (company) {
       return `/company/${company.公司簡稱}`
     },
@@ -119,7 +185,8 @@ export default {
       const field = row.stats[column.key]
       if (!isNaN(field.value)) {
         const value = Math.round(field.value * 100) / 100
-        return `${value.toLocaleString()} (${field.單位})`
+        // return `${value.toLocaleString()} (${field.單位})`
+        return `${value.toLocaleString(undefined, { minimumFractionDigits: 2 })}`
       }
       return `${field.數值} (${field.單位})`
     }
@@ -127,7 +194,159 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+$container-space: 8.125rem;
+
+.container {
+  padding-left: $container-space;
+  padding-right: $container-space;
+}
 .industry {
-  max-width: calc(100vw - 10rem);
+  &__header {
+    background-image: url('~/assets/tree-bg.png');
+    color: white;
+    line-height: 1.4;
+    a {
+      color: white;
+    }
+  }
+  &__title {
+    font-size: 3rem;
+    margin-top: 1rem;
+    margin-bottom: 0;
+  }
+  &__desp {
+    font-size: 1.5rem;
+    margin: 1rem 0 1.75rem;
+  }
+  &__officialSite {
+    right: 1.5rem;
+    bottom: 1rem;
+  }
+
+  // $banner-height: 24rem;
+  $banner-height: 24rem;
+  $footer-height: 7rem;
+  &__scroller {
+    position: relative;
+    margin-left: $container-space;
+    max-width: calc(100vw - #{$container-space});
+    // width: 80rem;
+    z-index: 1;
+    overflow: auto;
+    max-height: calc(100vh - #{$banner-height} - #{$footer-height});
+  }
+  &__nav {
+    margin-top: 2.25rem;
+    margin-bottom: 1.125rem;
+  }
+  &__typeSelector {
+    appearance: none;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 1.5rem;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+  }
+  &__catNav {
+    margin-right: 2.5rem;
+    font-weight: 600;
+    color: #35811C;
+    opacity: 50%;
+    font-size: 1.5rem;
+    line-height: 1.25;
+    &--active {
+      opacity: 100%;
+    }
+  }
+  &__footer {
+    margin-top: 1.5rem;
+    margin-bottom: 3rem;
+    padding-right: 1.5rem;
+  }
+  &__cta {
+    background: $green-primary;
+    &:hover {
+      background: #35811C;
+    }
+  }
+}
+
+$row-height: 3.5rem;
+
+.stats {
+  margin: auto;
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+
+  th:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+  }
+
+  th, td {
+    padding: 0.75rem 0.5rem;
+  }
+
+  &__header {
+    th {
+      position: sticky;
+      height: $row-height;
+      vertical-align: center;
+      white-space: nowrap;
+      color: #fff;
+      text-align: left;
+      font-weight: 400;
+      &:first-child {
+        z-index: 5;
+        font-weight: 500;
+      }
+
+      .fa-sort {
+        opacity: 0.5;
+      }
+    }
+    &--pri {
+      th {
+        top: 0;
+        background: #0D0E09;
+      }
+    }
+    &--sub {
+      th {
+        top: $row-height;
+        background: $green-primary;
+      }
+    }
+  }
+  &__body {
+    td {
+      background: #fff;
+      vertical-align: center;
+      text-align: right;
+    }
+    th {
+      text-align: left;
+      background: #fff;
+      a {
+        color: $green-primary;
+        text-decoration: underline;
+      }
+    }
+    tr:hover {
+      td {
+        background: #f4f4f4;
+      }
+      th {
+        background: #f4f4f4;
+        a {
+          color: #35811C;
+        }
+      }
+    }
+  }
 }
 </style>

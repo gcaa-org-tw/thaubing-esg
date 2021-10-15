@@ -1,8 +1,14 @@
+import fs from 'fs'
+import path from 'path'
 import industries from './assets/industries.json'
+
+const companies = fs
+  .readdirSync(path.join(__dirname, 'static/content/company'))
+  .map(filename => filename.slice(0, -4))
 
 export default {
   // Disable server-side rendering: https://go.nuxtjs.dev/ssr-mode
-  // ssr: false,
+  ssr: false,
 
   // Target: https://go.nuxtjs.dev/config-target
   target: 'static',
@@ -20,13 +26,25 @@ export default {
       { name: 'format-detection', content: 'telephone=no' }
     ],
     link: [
-      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+      { rel: 'icon', type: 'image/x-icon', href: '/thaubing-esg/favicon.ico' },
+      { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+      { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: true },
+      { href: 'https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600&display=swap', rel: 'stylesheet' }
+    ]
+  },
+
+  styleResources: {
+    scss: [
+      '~/assets/variables.scss'
     ]
   },
 
   // Global CSS: https://go.nuxtjs.dev/config-css
   css: [
-    'tachyons/css/tachyons.css'
+    'tachyons/css/tachyons.css',
+    '@fortawesome/fontawesome-free/css/all.min.css',
+    'c3/c3.min.css',
+    '~/assets/global'
   ],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
@@ -46,6 +64,7 @@ export default {
   modules: [
     // https://go.nuxtjs.dev/axios
     '@nuxtjs/axios',
+    '@nuxtjs/style-resources',
     // https://go.nuxtjs.dev/content
     '@nuxt/content'
   ],
@@ -55,7 +74,8 @@ export default {
 
   // Content module configuration: https://go.nuxtjs.dev/config-content
   content: {
-    dir: 'static/content'
+    dir: 'static/content',
+    liveEdit: false
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
@@ -63,7 +83,10 @@ export default {
   },
 
   generate: {
-    routes: industries.map(industry => `/industry/${industry}`)
+    routes: [
+      ...industries.map(industry => `/industry/${industry}`),
+      ...companies.map(company => `/company/${company}`)
+    ]
   },
 
   router: {

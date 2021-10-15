@@ -1,4 +1,4 @@
-name: ci
+name: ui-pull-request
 
 defaults:
   run:

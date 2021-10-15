@@ -1,4 +1,4 @@
-name: cd
+name: ui-deploy
 
 defaults:
   run:
@@ -45,7 +45,7 @@ jobs:
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3.8.0
-        env:
-          ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+        with:
+          DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
           PUBLISH_BRANCH: gh-pages
           PUBLISH_DIR: ./esg-ui/dist

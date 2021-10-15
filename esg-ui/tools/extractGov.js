@@ -40,9 +40,10 @@ function extractCap () {
   })
 }
 
-function extractFinance () {
+function extractFinance (toFile = true) {
   // 收入、成本與淨利 data/income.csv#total_operating_revenue 2016-2020
   return new Promise((resolve, reject) => {
+    const stats = []
     fs
       .createReadStream(path.join(DATA_DIR, 'income.csv'))
       .pipe(csv())
@@ -67,19 +68,25 @@ function extractFinance () {
           year
         }
         measures.forEach((item) => {
-          appendToBoth(company, {
+          const data = {
             ...ctx,
             ...item
-          })
+          }
+          if (toFile) {
+            appendToBoth(company, data)
+          } else {
+            stats.push({ company, data })
+          }
         })
       })
       .on('end', () => {
-        resolve()
+        resolve(stats)
       })
   })
 }
 
 async function main () {
+  console.warn('[Gov] start')
   await companyMap.finished
   // 資本額
   await extractCap()
@@ -89,6 +96,14 @@ async function main () {
   // 稅務透明度-租稅減免 TODO
   // 稅務透明度-補助、補貼 TODO
   await finished()
+  console.warn('[Gov] done')
 }
 
-main()
+if (require.main === module) {
+  main()
+}
+
+module.exports = {
+  extractCap,
+  extractFinance
+}
