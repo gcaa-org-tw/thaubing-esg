@@ -4,7 +4,8 @@
       .chartPanel__title.fw6 {{title}}
       .chartPanel__audit(v-if="isSrcAudited") 來自政府、官方報告
       .chartPanel__audit(v-else) 來自企業 CSR 報告
-    .mb3.pb2 單位：{{unitStr}}
+    .mb3.pb2
+      span(v-if="unit") 單位：{{unitStr}}
     chart-content(:config="c3Config")
     .chartPanel__tips.mt2(v-if="tips") {{tips}}
 </template>
@@ -17,7 +18,7 @@ export default {
     },
     unit: {
       type: [String, Array],
-      required: true
+      default: ''
     },
     isSrcAudited: {
       type: Boolean,
@@ -57,6 +58,10 @@ export default {
 
   &__audit {
     color: #49591C;
+  }
+
+  & + .chartPanel {
+    margin-top: 1.5rem;
   }
 }
 </style>

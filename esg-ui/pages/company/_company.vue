@@ -9,6 +9,8 @@
       .green {{company.自訂產業別}} · 資本額 {{capital}}
       .company__subtitle Environment 環境保護相關數據
       gh-gas-chart(:stats="stats.body")
+      penalty-chart(:stats="stats.body")
+      air-pollution-chart(:stats="stats.body")
       .company__subtitle Social 社會責任相關數據
       salary-chart(:stats="stats.body")
       .company__subtitle Governance 治理相關數據

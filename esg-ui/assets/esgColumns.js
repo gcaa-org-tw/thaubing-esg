@@ -12,7 +12,8 @@ const environment = [
     return {
       subCat: '污染管理',
       measure: column.label,
-      toFixed: 2
+      toFixed: 2,
+      isAirPollution: true
     }
   }),
   { subCat: '污染管理', measure: '排放水量', isFake: true },

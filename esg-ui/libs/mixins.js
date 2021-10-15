@@ -1,6 +1,13 @@
 import { format } from 'd3'
 
-export function chartMixin (esgColumns, subCat) {
+export function chartMixin (esgColumns, measureFilter) {
+  if (typeof measureFilter === 'string') {
+    // filter by subCat
+    const subCat = measureFilter
+    measureFilter = function (row) {
+      return row.subCat === subCat
+    }
+  }
   return {
     props: {
       stats: {
@@ -10,8 +17,7 @@ export function chartMixin (esgColumns, subCat) {
     },
     computed: {
       measureMap () {
-        const list = esgColumns
-          .filter(row => row.subCat === subCat)
+        const list = esgColumns.filter(measureFilter)
         return list.reduce((map, row) => {
           map[row.measure] = row
           return map
@@ -33,7 +39,7 @@ export function chartMixin (esgColumns, subCat) {
 
         const annualStats = {}
         this.stats.forEach((row) => {
-          if (row.子分類 !== subCat) {
+          if (!(row.項目 in this.measureMap)) {
             return
           }
           const year = row.年份
