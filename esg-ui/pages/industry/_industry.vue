@@ -17,44 +17,68 @@
           select.industry__typeSelector(v-model="industry")
             option(v-for="opt in industries" :key="opt") {{opt}}
           i.fas.fa-sort
-      .industry__catNav E 環境
-      .industry__catNav S 社會
-      .industry__catNav G 治理
-    .industry__scroller
-      table.industry__stats.stats.mv3.ba.b--moon-gray
-        thead.stats__header.stats__header--pri
-          th
-          th(
-            v-for="column in esgColumns"
-            :key="column.key"
-            v-if="column.span"
-            :colspan="column.span"
-          ) {{column.subCat}}
-        thead.stats__header.stats__header--sub
-          th 公司名稱
-          th.pointer(
-            v-for="column in esgColumns"
-            :key="column.key"
-            @click="toggleSort(column)"
-          )
-            | {{column.measure}} ({{column.unit}})
-            i.fas.ml2(:class="thClass(column)")
-        tbody.stats__body
-          tr(v-for="row in visibleStats" :key="row.company.統編")
+      .industry__catNav.dim(
+        v-for="cat in catList"
+        :key="cat.type"
+        :class="{'industry__catNav--active': activeCat === cat.type}"
+        @click="visitCat(cat)"
+      ) {{cat.label}}
+    .container
+      .industry__scroller(@scroll="checkTablePosition")
+        table.industry__stats.stats.mv3.ba.b--moon-gray(:class="{'stats--float': !isFirstColumnVisible}")
+          thead.stats__header.stats__header--pri
             th
-              nuxt-link.dim(:to="companyUrl(row.company)") {{row.company.公司簡稱}}
-            td(v-for="column in esgColumns" :key="column.key")
-              span {{beautyValue(row, column)}}
+            th.stats__value.stats__value--begin(
+              v-for="column in esgColumns"
+              :key="column.key"
+              v-if="column.span"
+              :colspan="column.span"
+            ) {{column.subCat}}
+          thead.stats__header.stats__header--sub
+            th(ref="company-column") 公司名稱
+            th.pointer.stats__value(
+              v-for="column in esgColumns"
+              :key="column.key"
+              @click="toggleSort(column)"
+              :class="{'stats__value--begin': column.isSubCatBegin}"
+              :ref="catAnchor(column)"
+            )
+              intersect(@enter="enterColumn(column)")
+                .flex.items-start.justify-end
+                  div
+                    .pre.overflow-hidden {{beautyMeasure(column)}}
+                    .f6(v-if="column.unit") ({{column.unit}})
+                  i.fr.fas.ml2.mt1(:class="thClass(column)")
+          tbody.stats__body
+            tr(v-for="row in visibleStats" :key="row.company.統編")
+              th
+                nuxt-link.dim(:to="companyUrl(row.company)") {{row.company.公司簡稱}}
+              td.stats__value(
+                v-for="column in esgColumns"
+                :key="column.key"
+                :class="{'stats__value--begin': column.isSubCatBegin}"
+              )
+                span(:class="{'light-silver': column.isFake}") {{beautyValue(row, column)}}
     .industry__footer.flex.items-center.justify-end.container
       a.industry__cta.db.br2.pv2.ph3.fw6.white(
         :href="`/content/industry/${industry}.csv`"
       ) 下載此頁資料
 </template>
 <script>
-import { get } from 'lodash'
+import Intersect from 'vue-intersect'
+import { get, throttle } from 'lodash'
 import { friendlyHeader } from '~/libs/crawlerFriendly'
 import industries from '~/assets/industries.json'
 import esgColumns from '~/assets/esgColumns'
+
+const CAT_LIST = [
+  { type: 'environment', label: 'E 環境' },
+  { type: 'social', label: 'S 社會' },
+  { type: 'governance', label: 'G 治理' }
+]
+
+const MAX_CHART_PER_COLUMN = 5
+const REFRESH_PERIOD = 100
 
 function enrichColumns (category) {
   let spanCursor
@@ -63,9 +87,14 @@ function enrichColumns (category) {
       ...column,
       key: `${column.subCat}-${column.measure}`,
       cat: category,
+      isSubCatBegin: false,
       span: 0
     }
     if (!spanCursor || richColumn.subCat !== spanCursor.subCat) {
+      richColumn.isSubCatBegin = true
+      if (!spanCursor) {
+        richColumn.isCatBegin = true
+      }
       spanCursor = richColumn
     }
     spanCursor.span += 1
@@ -74,6 +103,9 @@ function enrichColumns (category) {
 }
 
 export default {
+  components: {
+    Intersect
+  },
   async asyncData ({ $content, params, redirect }) {
     try {
       const stats = await $content('industry', params.industry).fetch()
@@ -90,7 +122,11 @@ export default {
     return {
       industry: this.$route.params.industry,
       order: `${esgColumns.environment[0].subCat}-${esgColumns.environment[0].measure}`,
-      isAsc: false
+      isAsc: false,
+
+      activeCat: 'environment',
+      isFirstRowVisible: true,
+      isFirstColumnVisible: true
     }
   },
   head: friendlyHeader({
@@ -104,6 +140,9 @@ export default {
     },
     industries () {
       return industries
+    },
+    catList () {
+      return CAT_LIST
     },
     esgColumns () {
       return [
@@ -156,6 +195,15 @@ export default {
     }
   },
   methods: {
+    enterColumn (column) {
+      // TODO: make intersection more robust in table
+      // this.activeCat = column.cat
+    },
+    checkTablePosition: throttle(function (ev) {
+      const target = ev.target
+      this.isFirstRowVisible = target.scrollTop === 0
+      this.isFirstColumnVisible = target.scrollLeft === 0
+    }, REFRESH_PERIOD),
     toggleSort (column) {
       if (column.key === this.order) {
         this.isAsc = !this.isAsc
@@ -176,27 +224,73 @@ export default {
     companyUrl (company) {
       return `/company/${company.公司簡稱}`
     },
+    visitCat (cat) {
+      const ref = this.$refs[`cat-${cat.type}`]
+      if (!ref || ref.length < 1) {
+        return
+      }
+      const companyTh = this.$refs['company-column']
+      const th = ref[0]
+      const scroller = th.offsetParent
+      scroller.scroll({
+        left: th.offsetLeft - companyTh.clientWidth - 1,
+        top: scroller.scrollTop,
+        behavior: 'smooth'
+      })
+      this.activeCat = cat.type
+    },
+    catAnchor (column) {
+      if (column.isCatBegin) {
+        return `cat-${column.cat}`
+      }
+      return ''
+    },
+    beautyMeasure (column) {
+      const measure = column.measure
+      if (measure.length <= MAX_CHART_PER_COLUMN) {
+        return measure
+      }
+      const line1Len = Math.floor(measure.length / 2)
+      return `${measure.slice(0, line1Len)}\n${measure.slice(line1Len)}`
+    },
     beautyValue (row, column) {
+      if (column.isFake) {
+        return '待解鎖'
+      }
       if (!(column.key in row.stats)) {
         return '-'
       }
       const field = row.stats[column.key]
       if (!isNaN(field.value)) {
         const value = Math.round(field.value * 100) / 100
-        // return `${value.toLocaleString()} (${field.單位})`
         return `${value.toLocaleString(undefined, { minimumFractionDigits: 2 })}`
       }
-      return `${field.數值} (${field.單位})`
+      return `${field.數值}`
     }
   }
 }
 </script>
 <style lang="scss" scoped>
-$container-space: 8.125rem;
+$xxl-space: 8.125rem;
+$xl-space: 5rem;
+$l-space: 2rem;
+$nl-space: 1rem;
 
 .container {
-  padding-left: $container-space;
-  padding-right: $container-space;
+  padding-left: $nl-space;
+  padding-right: $nl-space;
+  @include xxl-screen {
+    padding-left: $xxl-space;
+    padding-right: $xxl-space;
+  }
+  @include xl-screen {
+    padding-left: $xl-space;
+    padding-right: $xl-space;
+  }
+  @include l-screen {
+    padding-left: $l-space;
+    padding-right: $l-space;
+  }
 }
 .industry {
   &__header {
@@ -222,13 +316,10 @@ $container-space: 8.125rem;
   }
 
   // $banner-height: 24rem;
-  $banner-height: 24rem;
+  $banner-height: 7rem;
   $footer-height: 7rem;
   &__scroller {
     position: relative;
-    margin-left: $container-space;
-    max-width: calc(100vw - #{$container-space});
-    // width: 80rem;
     z-index: 1;
     overflow: auto;
     max-height: calc(100vh - #{$banner-height} - #{$footer-height});
@@ -251,17 +342,17 @@ $container-space: 8.125rem;
     margin-right: 2.5rem;
     font-weight: 600;
     color: #35811C;
-    opacity: 50%;
+    // opacity: 50%;
     font-size: 1.5rem;
     line-height: 1.25;
-    &--active {
-      opacity: 100%;
-    }
+    cursor: pointer;
+    // &--active {
+    //   opacity: 100%;
+    // }
   }
   &__footer {
     margin-top: 1.5rem;
     margin-bottom: 3rem;
-    padding-right: 1.5rem;
   }
   &__cta {
     background: $green-primary;
@@ -283,12 +374,17 @@ $row-height: 3.5rem;
     position: sticky;
     left: 0;
     z-index: 2;
+    transition: filter 100ms ease-in;
   }
 
   th, td {
-    padding: 0.75rem 0.5rem;
+    padding: 0.375rem 0.5rem;
   }
-
+  &__value {
+    &--begin:not(:nth-child(2)) {
+      border-left: 2px solid #00000026;
+    }
+  }
   &__header {
     th {
       position: sticky;
@@ -296,7 +392,6 @@ $row-height: 3.5rem;
       vertical-align: center;
       white-space: nowrap;
       color: #fff;
-      text-align: left;
       font-weight: 400;
       &:first-child {
         z-index: 5;
@@ -311,12 +406,18 @@ $row-height: 3.5rem;
       th {
         top: 0;
         background: #0D0E09;
+        text-align: left;
+
+        &.stats__value--begin {
+          border-color: #ffffff26;
+        }
       }
     }
     &--sub {
       th {
         top: $row-height;
         background: $green-primary;
+        text-align: right;
       }
     }
   }
@@ -334,16 +435,25 @@ $row-height: 3.5rem;
         text-decoration: underline;
       }
     }
-    tr:hover {
-      td {
-        background: #f4f4f4;
-      }
-      th {
-        background: #f4f4f4;
-        a {
-          color: #35811C;
+    tr {
+      &:not(:last-child) {
+        td, th {
+          border-bottom: 2px solid #EBEDEB;
         }
       }
+      &:hover {
+        td, th {
+          background: #f4f4f4;
+          a {
+            color: #35811C;
+          }
+        }
+      }
+    }
+  }
+  &--float {
+    th:first-child {
+      filter: drop-shadow(4px 0px 5px rgba(0, 0, 0, 0.1));
     }
   }
 }
