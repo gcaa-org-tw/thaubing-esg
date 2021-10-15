@@ -1,3 +1,21 @@
 export default [
-  { subCat: '污染管理', measure: '空氣污染物', unit: '' }
+  { column: 'Benzene', label: '苯' },
+  { column: 'CarbonTetrachloride', label: '四氯化碳' },
+  { column: 'Dichloroethane11', label: '1-1-二氯乙烷' },
+  { column: 'Dichloroethane12', label: '1-2-二氯乙烷' },
+  { column: 'Dioxin', label: '戴奧辛' },
+  { column: 'Ethylbenzene', label: '乙苯' },
+  { column: 'Methylenechloride', label: '二氯甲烷' },
+  { column: 'NOx', label: '氮氧化物' },
+  { column: 'SOx', label: '硫氧化物' },
+  { column: 'Styrene', label: '苯乙烯' },
+  { column: 'TSP', label: '粒狀污染物' },
+  { column: 'Tetrachloroethylene', label: '四氯乙烯' },
+  { column: 'Toluene', label: '甲苯' },
+  { column: 'Trichloroethane', label: '三氯乙烷' },
+  { column: 'Trichloroethylene', label: '三氯乙烯' },
+  { column: 'VOCs', label: '揮發性有機化合物' },
+  { column: 'Xylene', label: '二甲苯' },
+  { column: 'chloroform', label: '三氯甲烷' },
+  { column: 'heavymetal', label: '重金屬' }
 ]

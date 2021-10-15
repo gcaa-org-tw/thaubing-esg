@@ -32,9 +32,115 @@ function extractAirPollution () {
     { column: 'chloroform', label: '三氯甲烷' },
     { column: 'heavymetal', label: '重金屬' }
   ]
-  // TODO: unable to map FacilityID to company no
-  // TODO: no unit in dataset
-  return targetMeasures
+
+  const annualSum = {}
+  return new Promise((resolve, reject) => {
+    fs
+      .createReadStream(path.join(DATA_DIR, 'ems_p_08.csv'))
+      .pipe(csv())
+      .on('data', (data) => {
+        const company = companyMap.findByEmsId(data[Object.keys(data)[0]])
+        if (!company) {
+          return
+        }
+        const year = Number.parseInt(data.ReportPeriod.slice(0, 4))
+
+        if (!annualSum[year]) {
+          annualSum[year] = {}
+        }
+        if (!annualSum[year][company.統編]) {
+          annualSum[year][company.統編] = {}
+        }
+        const sum = annualSum[year][company.統編]
+        targetMeasures.forEach((measure) => {
+          const value = data[measure.column]
+          if (!value) {
+            return
+          }
+          if (!sum[measure.label]) {
+            sum[measure.label] = 0
+          }
+          sum[measure.label] += Number.parseFloat(value)
+        })
+      })
+      .on('end', () => {
+        for (const year in annualSum) {
+          const companySum = annualSum[year]
+          for (const id in companySum) {
+            const company = companyMap.find(id)
+            const ctx = {
+              esgCategory: 'E',
+              category: '污染管理',
+              year
+            }
+            const sum = companySum[id]
+            Object.keys(sum).forEach((measure) => {
+              appendToBoth(company, {
+                ...ctx,
+                measure,
+                value: sum[measure]
+              })
+            })
+          }
+        }
+        resolve()
+      })
+  })
+}
+
+
+function extractPenalty () {
+  const annualSum = {}
+  return new Promise((resolve, reject) => {
+    fs
+      .createReadStream(path.join(DATA_DIR, 'ems_p_46_20211015.csv'))
+      .pipe(csv())
+      .on('data', (data) => {
+        const company = companyMap.findByEmsId(data[Object.keys(data)[0]])
+        if (!company) {
+          return
+        }
+        const year = (new Date(data.PENALTY_DATE)).getFullYear()
+        const penalty = Number.parseFloat(data.PENALTY_MONEY)
+
+        if (!annualSum[year]) {
+          annualSum[year] = {}
+        }
+        if (!annualSum[year][company.統編]) {
+          annualSum[year][company.統編] = { penalty: 0, count: 0 }
+        }
+        const sum = annualSum[year][company.統編]
+        sum.penalty += penalty
+        sum.count += 1
+      })
+      .on('end', () => {
+        for (const year in annualSum) {
+          const companySum = annualSum[year]
+          for (const id in companySum) {
+            const company = companyMap.find(id)
+            const ctx = {
+              esgCategory: 'E',
+              category: '污染管理',
+              year
+            }
+            appendToBoth(company, {
+              ...ctx,
+              measure: '違反環境法規金額',
+              value: companySum[id].penalty,
+              unit: '元'
+            })
+
+            appendToBoth(company, {
+              ...ctx,
+              measure: '違反環境法規次數',
+              value: companySum[id].count,
+              unit: '次'
+            })
+          }
+        }
+        resolve()
+      })
+  })
 }
 
 async function extractGhGas () {
@@ -134,9 +240,10 @@ async function main () {
   // 廢棄物管理 TODO
   //   廢棄物項目及量
   // 污染管理
-  extractAirPollution()
+  await extractAirPollution()
   //   排放水量 TODO
-  //   違反環境法規紀錄 TODO
+  //   違反環境法規紀錄
+  await extractPenalty()
   //   違反環境法規紀錄 TODO
   await finished()
   console.warn('[Environment] done')

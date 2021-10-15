@@ -1,5 +1,5 @@
 #!/bin/bash
 
 cd "`dirname $0`"/../static/content
-rm industry/*
-rm company/*
+rm -f industry/*
+rm -f company/*
