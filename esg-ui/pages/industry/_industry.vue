@@ -37,14 +37,17 @@
             :key="column.key"
             @click="toggleSort(column)"
           )
-            | {{column.measure}} ({{column.unit}})
-            i.fas.ml2(:class="thClass(column)")
+            .flex.items-start.justify-end
+              div
+                .pre.overflow-hidden {{beautyMeasure(column)}}
+                .f6(v-if="column.unit") ({{column.unit}})
+              i.fr.fas.ml2.mt1(:class="thClass(column)")
         tbody.stats__body
           tr(v-for="row in visibleStats" :key="row.company.統編")
             th
               nuxt-link.dim(:to="companyUrl(row.company)") {{row.company.公司簡稱}}
             td(v-for="column in esgColumns" :key="column.key")
-              span {{beautyValue(row, column)}}
+              span(:class="{'light-silver': column.isFake}") {{beautyValue(row, column)}}
     .industry__footer.flex.items-center.justify-end.container
       a.industry__cta.db.br2.pv2.ph3.fw6.white(
         :href="`/content/industry/${industry}.csv`"
@@ -55,6 +58,8 @@ import { get } from 'lodash'
 import { friendlyHeader } from '~/libs/crawlerFriendly'
 import industries from '~/assets/industries.json'
 import esgColumns from '~/assets/esgColumns'
+
+const MAX_CHART_PER_COLUMN = 5
 
 function enrichColumns (category) {
   let spanCursor
@@ -176,17 +181,27 @@ export default {
     companyUrl (company) {
       return `/company/${company.公司簡稱}`
     },
+    beautyMeasure (column) {
+      const measure = column.measure
+      if (measure.length <= MAX_CHART_PER_COLUMN) {
+        return measure
+      }
+      const line1Len = Math.floor(measure.length / 2)
+      return `${measure.slice(0, line1Len)}\n${measure.slice(line1Len)}`
+    },
     beautyValue (row, column) {
+      if (column.isFake) {
+        return '待解鎖'
+      }
       if (!(column.key in row.stats)) {
         return '-'
       }
       const field = row.stats[column.key]
       if (!isNaN(field.value)) {
         const value = Math.round(field.value * 100) / 100
-        // return `${value.toLocaleString()} (${field.單位})`
         return `${value.toLocaleString(undefined, { minimumFractionDigits: 2 })}`
       }
-      return `${field.數值} (${field.單位})`
+      return `${field.數值}`
     }
   }
 }
@@ -222,7 +237,7 @@ $container-space: 8.125rem;
   }
 
   // $banner-height: 24rem;
-  $banner-height: 24rem;
+  $banner-height: 7rem;
   $footer-height: 7rem;
   &__scroller {
     position: relative;
@@ -286,7 +301,7 @@ $row-height: 3.5rem;
   }
 
   th, td {
-    padding: 0.75rem 0.5rem;
+    padding: 0.375rem 0.5rem;
   }
 
   &__header {
@@ -296,7 +311,6 @@ $row-height: 3.5rem;
       vertical-align: center;
       white-space: nowrap;
       color: #fff;
-      text-align: left;
       font-weight: 400;
       &:first-child {
         z-index: 5;
@@ -311,12 +325,14 @@ $row-height: 3.5rem;
       th {
         top: 0;
         background: #0D0E09;
+        text-align: left;
       }
     }
     &--sub {
       th {
         top: $row-height;
         background: $green-primary;
+        text-align: right;
       }
     }
   }

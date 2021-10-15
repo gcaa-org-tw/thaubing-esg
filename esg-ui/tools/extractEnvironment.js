@@ -39,8 +39,8 @@ function extractAirPollution () {
 
 async function extractGhGas () {
   // 溫室氣體排放
-  //   範疇一（直接排放）data/ghg_p_01.csv#tot
-  //   範疇二（間接排放）data/ghg_p_01.csv#tot2
+  //   範疇一直接排放data/ghg_p_01.csv#tot
+  //   範疇二間接排放data/ghg_p_01.csv#tot2
   const financialStatsRaw = await extractFinance(false)
   const financialStats = financialStatsRaw.reduce((stats, row) => {
     if (row.data.measure !== '營業收入') {
@@ -93,13 +93,13 @@ async function extractGhGas () {
             }
             appendToBoth(company, {
               ...ctx,
-              measure: '範疇一（直接排放）',
+              measure: '範疇一直接排放',
               value: companySum[id].tot
             })
 
             appendToBoth(company, {
               ...ctx,
-              measure: '範疇二（間接排放）',
+              measure: '範疇二間接排放',
               value: companySum[id].tot2
             })
 
