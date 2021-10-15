@@ -88,7 +88,6 @@ function extractAirPollution () {
   })
 }
 
-
 function extractPenalty () {
   const annualSum = {}
   return new Promise((resolve, reject) => {
