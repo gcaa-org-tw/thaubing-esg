@@ -8,10 +8,15 @@ const environment = [
   { subCat: '能源使用', measure: '再生能源用電量', isFake: true },
   { subCat: '用水', measure: '用水量取水量', isFake: true },
   { subCat: '廢棄物管理', measure: '廢棄物項目及量', isFake: true },
-  ...emsP08Columns,
+  ...emsP08Columns.map((column) => {
+    return {
+      subCat: '污染管理',
+      measure: column.label
+    }
+  }),
   { subCat: '污染管理', measure: '排放水量', isFake: true },
-  { subCat: '污染管理', measure: '違反環境法規金額', isFake: true },
-  { subCat: '污染管理', measure: '違反環境法規次數', isFake: true }
+  { subCat: '污染管理', measure: '違反環境法規金額', unit: '元' },
+  { subCat: '污染管理', measure: '違反環境法規次數', unit: '次' }
 ]
 
 const social = [

@@ -9,12 +9,13 @@ class CompanyMap {
     this.byName = {}
     this.byAbbr = {}
     this.byStock = {}
+    this.byEmsId = {}
 
     this.finished = this.init()
   }
 
-  init () {
-    return new Promise((resolve, reject) => {
+  async init () {
+    await new Promise((resolve, reject) => {
       fs
         .createReadStream(path.join(__dirname, '../static/content/companyList.csv'))
         .pipe(csv())
@@ -24,6 +25,20 @@ class CompanyMap {
           this.byName[data.公司名稱] = data
           this.byAbbr[data.公司簡稱] = data
           this.byStock[data.股票代碼] = data
+        })
+        .on('end', () => {
+          resolve(this.list)
+        })
+    })
+    await new Promise((resolve, reject) => {
+      fs
+        .createReadStream(path.join(__dirname, '../../data/data_MonitorFactories.csv'))
+        .pipe(csv())
+        .on('data', (data) => {
+          const company = this.find(data.TaxidNo)
+          if (company) {
+            this.byEmsId[data.RegistrationNo] = company
+          }
         })
         .on('end', () => {
           resolve(this.list)
@@ -45,6 +60,10 @@ class CompanyMap {
 
   findByStock (stock) {
     return this.byStock[stock]
+  }
+
+  findByEmsId (emsId) {
+    return this.byEmsId[emsId]
   }
 }
 
