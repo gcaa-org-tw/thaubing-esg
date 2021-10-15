@@ -3,7 +3,7 @@ import emsP08Columns from './emsP08Columns'
 const environment = [
   { subCat: '溫室氣體排放', measure: '範疇一直接排放', unit: '公噸CO2e' },
   { subCat: '溫室氣體排放', measure: '範疇二間接排放', unit: '公噸CO2e' },
-  { subCat: '溫室氣體排放', measure: '每單位營收排放量', unit: '公噸CO2e/億元' },
+  { subCat: '溫室氣體排放', measure: '碳密集度', unit: '公噸CO2e/億元' },
   { subCat: '能源使用', measure: '總用電量', isFake: true },
   { subCat: '能源使用', measure: '再生能源用電量', isFake: true },
   { subCat: '用水', measure: '用水量取水量', isFake: true },

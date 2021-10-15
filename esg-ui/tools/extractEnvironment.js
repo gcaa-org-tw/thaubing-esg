@@ -109,7 +109,7 @@ async function extractGhGas () {
               appendToBoth(company, {
                 ...ctx,
                 unit: '公噸CO2e/億元',
-                measure: '每單位營收排放量',
+                measure: '碳密集度',
                 value: totSum * 10 ** 5 / income
               })
             }

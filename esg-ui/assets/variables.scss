@@ -1,2 +1,19 @@
 $green-primary: #49591C;
 
+@mixin xxl-screen {
+  @media screen and (min-width: 120em) {
+    @content
+  }
+};
+
+@mixin xl-screen {
+  @media screen and (min-width: 90em) and (max-width: 120em) {
+    @content
+  }
+};
+
+@mixin l-screen {
+  @media screen and (min-width: 60em) and (max-width: 90em) {
+    @content
+  }
+};

@@ -22,15 +22,15 @@ export default {
             ['範疇一直接排放', '範疇二間接排放']
           ],
           types: {
-            每單位營收排放量: 'line'
+            碳密集度: 'line'
           },
           axes: {
             範疇一直接排放: 'y',
             範疇二間接排放: 'y',
-            每單位營收排放量: 'y2'
+            碳密集度: 'y2'
           },
           colors: {
-            每單位營收排放量: '#555'
+            碳密集度: '#555'
           }
         },
         point: {
@@ -51,7 +51,7 @@ export default {
           },
           y2: {
             show: true,
-            label: this.measureMap.每單位營收排放量.unit,
+            label: this.measureMap.碳密集度.unit,
             tick: {
               format: this.genYFormatter()
             }

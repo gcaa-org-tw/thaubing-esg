@@ -20,34 +20,35 @@
       .industry__catNav E 環境
       .industry__catNav S 社會
       .industry__catNav G 治理
-    .industry__scroller
-      table.industry__stats.stats.mv3.ba.b--moon-gray
-        thead.stats__header.stats__header--pri
-          th
-          th(
-            v-for="column in esgColumns"
-            :key="column.key"
-            v-if="column.span"
-            :colspan="column.span"
-          ) {{column.subCat}}
-        thead.stats__header.stats__header--sub
-          th 公司名稱
-          th.pointer(
-            v-for="column in esgColumns"
-            :key="column.key"
-            @click="toggleSort(column)"
-          )
-            .flex.items-start.justify-end
-              div
-                .pre.overflow-hidden {{beautyMeasure(column)}}
-                .f6(v-if="column.unit") ({{column.unit}})
-              i.fr.fas.ml2.mt1(:class="thClass(column)")
-        tbody.stats__body
-          tr(v-for="row in visibleStats" :key="row.company.統編")
+    .container
+      .industry__scroller
+        table.industry__stats.stats.mv3.ba.b--moon-gray
+          thead.stats__header.stats__header--pri
             th
-              nuxt-link.dim(:to="companyUrl(row.company)") {{row.company.公司簡稱}}
-            td(v-for="column in esgColumns" :key="column.key")
-              span(:class="{'light-silver': column.isFake}") {{beautyValue(row, column)}}
+            th(
+              v-for="column in esgColumns"
+              :key="column.key"
+              v-if="column.span"
+              :colspan="column.span"
+            ) {{column.subCat}}
+          thead.stats__header.stats__header--sub
+            th 公司名稱
+            th.pointer(
+              v-for="column in esgColumns"
+              :key="column.key"
+              @click="toggleSort(column)"
+            )
+              .flex.items-start.justify-end
+                div
+                  .pre.overflow-hidden {{beautyMeasure(column)}}
+                  .f6(v-if="column.unit") ({{column.unit}})
+                i.fr.fas.ml2.mt1(:class="thClass(column)")
+          tbody.stats__body
+            tr(v-for="row in visibleStats" :key="row.company.統編")
+              th
+                nuxt-link.dim(:to="companyUrl(row.company)") {{row.company.公司簡稱}}
+              td(v-for="column in esgColumns" :key="column.key")
+                span(:class="{'light-silver': column.isFake}") {{beautyValue(row, column)}}
     .industry__footer.flex.items-center.justify-end.container
       a.industry__cta.db.br2.pv2.ph3.fw6.white(
         :href="`/content/industry/${industry}.csv`"
@@ -207,11 +208,26 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-$container-space: 8.125rem;
+$xxl-space: 8.125rem;
+$xl-space: 5rem;
+$l-space: 2rem;
+$nl-space: 1rem;
 
 .container {
-  padding-left: $container-space;
-  padding-right: $container-space;
+  padding-left: $nl-space;
+  padding-right: $nl-space;
+  @include xxl-screen {
+    padding-left: $xxl-space;
+    padding-right: $xxl-space;
+  }
+  @include xl-screen {
+    padding-left: $xl-space;
+    padding-right: $xl-space;
+  }
+  @include l-screen {
+    padding-left: $l-space;
+    padding-right: $l-space;
+  }
 }
 .industry {
   &__header {
@@ -241,9 +257,6 @@ $container-space: 8.125rem;
   $footer-height: 7rem;
   &__scroller {
     position: relative;
-    margin-left: $container-space;
-    max-width: calc(100vw - #{$container-space});
-    // width: 80rem;
     z-index: 1;
     overflow: auto;
     max-height: calc(100vh - #{$banner-height} - #{$footer-height});
@@ -276,7 +289,6 @@ $container-space: 8.125rem;
   &__footer {
     margin-top: 1.5rem;
     margin-bottom: 3rem;
-    padding-right: 1.5rem;
   }
   &__cta {
     background: $green-primary;
