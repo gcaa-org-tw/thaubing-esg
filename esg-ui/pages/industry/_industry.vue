@@ -4,7 +4,7 @@
       .industry__about.tr
         nuxt-link.dim(to="/about") 關於計畫
       nuxt-link(to="/")
-        h1.industry__title.fw6 ESG 檢測儀
+        h1.industry__title.fw7 ESG 檢測儀
       p.industry__desp
         | 打造永續環境資料庫，推動企業永續發展。
       .industry__year.f6.o-70 資料年份：{{year}}
@@ -60,7 +60,7 @@
               )
                 span(:class="{'light-silver': column.isFake}") {{beautyValue(row, column)}}
     .industry__footer.flex.items-center.justify-end.container
-      a.industry__cta.db.br2.pv2.ph3.fw6.white(
+      a.industry__cta.db.br2.pv2.ph3.fw7.white(
         :href="`/content/industry/${industry}.csv`"
       ) 下載此頁資料
 </template>
@@ -340,7 +340,7 @@ $nl-space: 1rem;
   }
   &__catNav {
     margin-right: 2.5rem;
-    font-weight: 600;
+    font-weight: 700;
     color: #35811C;
     // opacity: 50%;
     font-size: 1.5rem;

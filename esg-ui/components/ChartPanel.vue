@@ -1,7 +1,7 @@
 <template lang="pug">
   .chartPanel.bg-white
     .flex.justify-between.items-start.mb1
-      .chartPanel__title.fw6 {{title}}
+      .chartPanel__title.fw5 {{title}}
       .chartPanel__audit(v-if="isSrcAudited") 來自政府、官方報告
       .chartPanel__audit(v-else) 來自企業 CSR 報告
     .mb3.pb2

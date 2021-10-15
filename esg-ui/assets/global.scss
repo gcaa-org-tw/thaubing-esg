@@ -2,8 +2,10 @@
 
 html,
 body {
-  font-family: 'Noto Sans TC', sans-serif;
+  font-family: 'Lato', 'Noto Sans TC', sans-serif;
   line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 a {
