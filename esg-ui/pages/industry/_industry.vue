@@ -263,7 +263,7 @@ export default {
       const field = row.stats[column.key]
       if (!isNaN(field.value)) {
         const value = Math.round(field.value * 100) / 100
-        return `${value.toLocaleString(undefined, { minimumFractionDigits: 2 })}`
+        return `${value.toLocaleString(undefined, { minimumFractionDigits: column.toFixed || 0 })}`
       }
       return `${field.數值}`
     }
