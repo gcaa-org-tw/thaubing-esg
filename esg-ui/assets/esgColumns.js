@@ -51,10 +51,10 @@ const governance = [
   { subCat: '是否產製CSR報告', measure: '是否揭露負面資訊', isFake: true },
   { subCat: '稅務透明度', measure: '營利事業所得稅稅額', isFake: true },
   { subCat: '稅務透明度', measure: '政府補助、補貼金額', isFake: true },
-  { subCat: 'ISO認證', measure: 'ISO9001', isFake: true },
-  { subCat: 'ISO認證', measure: 'ISO14001', isFake: true },
-  { subCat: 'ISO認證', measure: 'ISO45001', isFake: true },
-  { subCat: 'ISO認證', measure: 'ISO50001', isFake: true }
+  { subCat: 'ISO認證', measure: 'ISO 9001', isFake: true },
+  { subCat: 'ISO認證', measure: 'ISO 14001', isFake: true },
+  { subCat: 'ISO認證', measure: 'ISO 45001', isFake: true },
+  { subCat: 'ISO認證', measure: 'ISO 50001', isFake: true }
 ]
 
 export {

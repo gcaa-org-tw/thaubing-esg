@@ -175,8 +175,7 @@ async function extractGhGas () {
           // console.warn(`Company not found, ID: ${data.companyno}, name: ${data.companyname}`)
           return
         }
-        // data.App_year doesn't works as there are some unseen char
-        const year = Number.parseInt(data[Object.keys(data)[0]]) + 1911
+        const year = Number.parseInt(data.App_year) + 1911
         const tot = Number.parseFloat(data.tot)
         const tot2 = Number.parseFloat(data.Tot2)
 

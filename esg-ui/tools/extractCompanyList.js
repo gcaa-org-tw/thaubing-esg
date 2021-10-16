@@ -2,7 +2,8 @@ const fs = require('fs')
 const path = require('path')
 const axios = require('axios')
 const resumer = require('resumer')
-const csv = require('csv-parser')
+const CsvReadableStream = require('csv-reader')
+const AutoDetectDecoderStream = require('autodetect-decoder-stream')
 const { appendCompanyList, finished } = require('./csvLogger')
 
 const LIST_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRzr0lFprPJzQvjsEHhbaCrxjwYsNqwd53iUzkf3A9kSHSxoJFiQ5Lt1ukSuREu8A/pub?gid=1322020199&single=true&output=csv'
@@ -23,7 +24,8 @@ async function main () {
   const stream = resumer()
   stream
     .queue(resp.data)
-    .pipe(csv())
+    .pipe(new AutoDetectDecoderStream())
+    .pipe(new CsvReadableStream({ asObject: true }))
     .on('data', (data) => {
       const normalizedIndustry = INDUSTRY_MAP[data.industry] || data.industry
       industries.add(normalizedIndustry)
