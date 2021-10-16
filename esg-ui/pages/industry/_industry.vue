@@ -10,19 +10,20 @@
       .industry__year.f6.o-70 資料年份：{{year}}
       a.industry__officialSite.absolute(href="https://thaubing.gcaa.org.tw/")
         img(src="~/assets/logo.png")
-    .industry__nav.container.flex.items-end
+    .industry__nav.container.flex-ns.items-end
       .mr5
         .f6.o-60.mb1 產業
         label.flex.items-center
           select.industry__typeSelector(v-model="industry")
             option(v-for="opt in industries" :key="opt") {{opt}}
           i.fas.fa-sort
-      .industry__catNav.dim(
-        v-for="cat in catList"
-        :key="cat.type"
-        :class="{'industry__catNav--active': activeCat === cat.type}"
-        @click="visitCat(cat)"
-      ) {{cat.label}}
+      .flex.mt3.mt0-ns
+        .industry__catNav.dim(
+          v-for="cat in catList"
+          :key="cat.type"
+          :class="{'industry__catNav--active': activeCat === cat.type}"
+          @click="visitCat(cat)"
+        ) {{cat.label}}
     .container
       .industry__scroller(@scroll="checkTablePosition")
         table.industry__stats.stats.mv3.ba.b--moon-gray(:class="{'stats--float': !isFirstColumnVisible}")

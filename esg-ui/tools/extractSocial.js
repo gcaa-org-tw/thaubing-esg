@@ -1,6 +1,7 @@
 const fs = require('fs')
 const path = require('path')
-const csv = require('csv-parser')
+const CsvReadableStream = require('csv-reader')
+const AutoDetectDecoderStream = require('autodetect-decoder-stream')
 const { companyMap } = require('./utils')
 const { appendToBoth, finished } = require('./csvLogger')
 
@@ -11,7 +12,8 @@ function extractSalary () {
   return new Promise((resolve, reject) => {
     fs
       .createReadStream(path.join(DATA_DIR, 'salary.csv'))
-      .pipe(csv())
+      .pipe(new AutoDetectDecoderStream())
+      .pipe(new CsvReadableStream({ asObject: true }))
       .on('data', (data) => {
         const company = companyMap.findByStock(data.stock_code)
         if (!company) {
