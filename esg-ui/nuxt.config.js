@@ -1,6 +1,10 @@
 import fs from 'fs'
 import path from 'path'
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
 import industries from './assets/industries.json'
+
+dayjs.extend(utc)
 
 const companies = fs
   .readdirSync(path.join(__dirname, 'static/content/company'))
@@ -80,6 +84,10 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
+  },
+
+  env: {
+    buildTime: dayjs.utc().format()
   },
 
   generate: {

@@ -8,6 +8,7 @@
       h1.fw7.white.tc.f2 關於計畫
     .mw7.center.mv5.ph3
       nuxt-content(:document="page")
+      gcaa-footer
 </template>
 <script>
 import { friendlyHeader } from '~/libs/crawlerFriendly'
@@ -27,6 +28,18 @@ export default {
 .about {
   &__nav {
     background-image: url('~/assets/tree-bg.png');
+  }
+  .nuxt-content {
+    line-height: 1.75;
+    ::v-deep {
+      p + p {
+        margin-top: 2rem;
+      }
+      a {
+        color: $green-primary;
+        text-decoration: underline;
+      }
+    }
   }
 }
 </style>

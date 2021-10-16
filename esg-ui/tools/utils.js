@@ -34,13 +34,13 @@ class CompanyMap {
     })
     await new Promise((resolve, reject) => {
       fs
-        .createReadStream(path.join(__dirname, '../../data/石化業工廠_公司登記稅籍列管.csv'))
+        .createReadStream(path.join(__dirname, '../../data/ems_id_map.csv'))
         .pipe(new AutoDetectDecoderStream())
         .pipe(new CsvReadableStream({ asObject: true }))
         .on('data', (data) => {
           const company = this.find(data.統一編號)
           if (company) {
-            this.byEmsId[data.RegistrationNo] = company
+            this.byEmsId[data.事業單位編號] = company
           }
         })
         .on('end', () => {

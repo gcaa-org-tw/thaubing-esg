@@ -64,6 +64,8 @@
       a.industry__cta.db.br2.pv2.ph3.fw7.white(
         :href="`/content/industry/${industry}.csv`"
       ) 下載此頁資料
+    .container
+      gcaa-footer
 </template>
 <script>
 import Intersect from 'vue-intersect'
@@ -320,7 +322,7 @@ $nl-space: 1rem;
   }
 
   // $banner-height: 24rem;
-  $banner-height: 7rem;
+  $banner-height: 10rem;
   $footer-height: 7rem;
   &__scroller {
     position: relative;
@@ -355,8 +357,7 @@ $nl-space: 1rem;
     // }
   }
   &__footer {
-    margin-top: 1.5rem;
-    margin-bottom: 3rem;
+    margin: 1.5rem 0;
   }
   &__cta {
     background: $green-primary;
