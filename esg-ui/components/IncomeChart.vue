@@ -1,6 +1,6 @@
 <template lang="pug">
   chart-panel(
-    title="收入、成本與淨利"
+    title="營運狀況"
     unit="仟元"
     :c3-config="c3Config"
   )
@@ -10,7 +10,7 @@ import { governance } from '~/assets/esgColumns'
 import { chartMixin } from '~/libs/mixins'
 
 export default {
-  mixins: [chartMixin(governance, '收入、成本與淨利')],
+  mixins: [chartMixin(governance, '營運狀況')],
   computed: {
     c3Config () {
       return {

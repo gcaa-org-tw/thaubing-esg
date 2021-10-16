@@ -248,6 +248,9 @@ export default {
     },
     beautyMeasure (column) {
       const measure = column.measure
+      if (measure.includes(' ')) {
+        return measure.replace(/ /g, '\n')
+      }
       if (measure.length <= MAX_CHART_PER_COLUMN) {
         return measure
       }

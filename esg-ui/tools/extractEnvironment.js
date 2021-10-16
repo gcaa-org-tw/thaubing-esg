@@ -10,7 +10,7 @@ const { extractFinance } = require('./extractGov')
 const DATA_DIR = path.join(__dirname, '../../data')
 
 function extractAirPollution () {
-  // 污染管理
+  // 空氣污染物申報
   //   空氣污染物 data/ems_p_08.csv
   const targetMeasures = [
     { column: 'Benzene', label: '苯' },
@@ -72,7 +72,7 @@ function extractAirPollution () {
             const company = companyMap.find(id)
             const ctx = {
               esgCategory: 'E',
-              category: '污染管理',
+              category: '空氣污染物申報',
               year
             }
             const sum = companySum[id]
@@ -123,7 +123,7 @@ function extractPenalty () {
             const company = companyMap.find(id)
             const ctx = {
               esgCategory: 'E',
-              category: '污染管理',
+              category: '環境違規',
               year
             }
             appendToBoth(company, {
@@ -175,8 +175,7 @@ async function extractGhGas () {
           // console.warn(`Company not found, ID: ${data.companyno}, name: ${data.companyname}`)
           return
         }
-        // data.App_year doesn't works as there are some unseen char
-        const year = Number.parseInt(data[Object.keys(data)[0]]) + 1911
+        const year = Number.parseInt(data.App_year) + 1911
         const tot = Number.parseFloat(data.tot)
         const tot2 = Number.parseFloat(data.Tot2)
 
@@ -236,14 +235,14 @@ async function main () {
   // 溫室氣體排放
   await extractGhGas()
 
-  // 能源使用 TODO
+  // 能源使用狀況 TODO
   //   總用電量 TODO
   //   再生能源用電量 TODO
-  // 用水 TODO
-  //   用水量（取水量）
+  // 水資源 TODO
+  //   水資源量（取水量）
   // 廢棄物管理 TODO
   //   廢棄物項目及量
-  // 污染管理
+  // 空氣污染物申報
   await extractAirPollution()
   //   排放水量 TODO
   //   違反環境法規紀錄

@@ -50,7 +50,7 @@ function extractSalary () {
 async function main () {
   console.warn('[Social] start')
   await companyMap.finished
-  // 員工數
+  // 員工組成
   //   性別比 TODO
   //   本外勞比 TODO
   //   新進率／離職率 TODO

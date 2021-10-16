@@ -8,12 +8,8 @@
 import { environment } from '~/assets/esgColumns'
 import { chartMixin } from '~/libs/mixins'
 
-function filterPenaltyMeasure (measure) {
-  return measure.subCat === '污染管理' && measure.isAirPollution
-}
-
 export default {
-  mixins: [chartMixin(environment, filterPenaltyMeasure)],
+  mixins: [chartMixin(environment, '空氣污染物申報')],
   computed: {
     c3Config () {
       return {
