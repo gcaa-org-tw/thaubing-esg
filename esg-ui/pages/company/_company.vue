@@ -15,6 +15,7 @@
       salary-chart(:stats="stats.body")
       .company__subtitle Governance 治理相關數據
       income-chart(:stats="stats.body")
+      gcaa-footer
 </template>
 <script>
 import { friendlyHeader } from '~/libs/crawlerFriendly'
