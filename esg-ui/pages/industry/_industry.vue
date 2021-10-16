@@ -61,9 +61,7 @@
               )
                 span(:class="{'light-silver': column.isFake}") {{beautyValue(row, column)}}
     .industry__footer.flex.items-center.justify-end.container
-      a.industry__cta.db.br2.pv2.ph3.fw7.white(
-        :href="`/content/industry/${industry}.csv`"
-      ) 下載此頁資料
+      a.industry__cta.db.br2.pv2.ph3.fw7.white(:href="downloadLink") 下載此頁資料
     .container
       gcaa-footer
 </template>
@@ -140,6 +138,9 @@ export default {
   computed: {
     year () {
       return this.$route.query.year || '2019'
+    },
+    downloadLink () {
+      return `${this.$router.options.base}content/industry/${this.industry}.csv`
     },
     industries () {
       return industries
