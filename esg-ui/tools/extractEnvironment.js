@@ -1,7 +1,8 @@
 const fs = require('fs')
 const path = require('path')
 const { get } = require('lodash')
-const csv = require('csv-parser')
+const CsvReadableStream = require('csv-reader');
+const AutoDetectDecoderStream = require('autodetect-decoder-stream')
 const { companyMap } = require('./utils')
 const { appendToBoth, finished } = require('./csvLogger')
 const { extractFinance } = require('./extractGov')
@@ -37,7 +38,8 @@ function extractAirPollution () {
   return new Promise((resolve, reject) => {
     fs
       .createReadStream(path.join(DATA_DIR, 'ems_p_08.csv'))
-      .pipe(csv())
+      .pipe(new AutoDetectDecoderStream())
+      .pipe(new CsvReadableStream({ asObject: true }))
       .on('data', (data) => {
         const company = companyMap.findByEmsId(data[Object.keys(data)[0]])
         if (!company) {
@@ -93,12 +95,14 @@ function extractPenalty () {
   return new Promise((resolve, reject) => {
     fs
       .createReadStream(path.join(DATA_DIR, 'ems_p_46_20211015.csv'))
-      .pipe(csv())
+      .pipe(new AutoDetectDecoderStream())
+      .pipe(new CsvReadableStream({ asObject: true }))
       .on('data', (data) => {
-        const company = companyMap.findByEmsId(data[Object.keys(data)[0]])
+        const company = companyMap.findByEmsId(data.EMS_NO)
         if (!company) {
           return
         }
+
         const year = (new Date(data.PENALTY_DATE)).getFullYear()
         const penalty = Number.parseFloat(data.PENALTY_MONEY)
 
@@ -163,7 +167,8 @@ async function extractGhGas () {
   await new Promise((resolve, reject) => {
     fs
       .createReadStream(path.join(DATA_DIR, 'ghg_p_01.csv'))
-      .pipe(csv())
+      .pipe(new AutoDetectDecoderStream())
+      .pipe(new CsvReadableStream({ asObject: true }))
       .on('data', (data) => {
         const company = companyMap.find(data.companyno)
         if (!company) {
@@ -179,10 +184,10 @@ async function extractGhGas () {
           annualSum[year] = {}
         }
         if (!annualSum[year][company.統編]) {
-          annualSum[year][company.統編] = { tot: 0, tot2: 0 }
+          annualSum[year][company.統編] = { tot1: 0, tot2: 0 }
         }
         const sum = annualSum[year][company.統編]
-        sum.tot += tot
+        sum.tot1 += tot - tot2
         sum.tot2 += tot2
       })
       .on('end', () => {
@@ -199,7 +204,7 @@ async function extractGhGas () {
             appendToBoth(company, {
               ...ctx,
               measure: '範疇一直接排放',
-              value: companySum[id].tot
+              value: companySum[id].tot1
             })
 
             appendToBoth(company, {
@@ -210,7 +215,7 @@ async function extractGhGas () {
 
             const income = get(financialStats, `${id}.${year}`)
             if (income) {
-              const totSum = companySum[id].tot + companySum[id].tot2
+              const totSum = companySum[id].tot1 + companySum[id].tot2
               appendToBoth(company, {
                 ...ctx,
                 unit: '公噸CO2e/億元',

@@ -1,6 +1,7 @@
 const fs = require('fs')
 const path = require('path')
-const csv = require('csv-parser')
+const CsvReadableStream = require('csv-reader');
+const AutoDetectDecoderStream = require('autodetect-decoder-stream')
 const { companyMap } = require('./utils')
 const { appendToBoth, finished } = require('./csvLogger')
 
@@ -11,7 +12,8 @@ function extractCap () {
   return new Promise((resolve, reject) => {
     fs
       .createReadStream(path.join(DATA_DIR, 'BGMOPEN1.csv'))
-      .pipe(csv())
+      .pipe(new AutoDetectDecoderStream())
+      .pipe(new CsvReadableStream({ asObject: true }))
       .on('data', (data) => {
         const company = companyMap.find(data.統一編號)
         if (!company) {
@@ -46,7 +48,8 @@ function extractFinance (toFile = true) {
     const stats = []
     fs
       .createReadStream(path.join(DATA_DIR, 'income.csv'))
-      .pipe(csv())
+      .pipe(new AutoDetectDecoderStream())
+      .pipe(new CsvReadableStream({ asObject: true }))
       .on('data', (data) => {
         const company = companyMap.findByStock(data.stock_code)
         if (!company) {
