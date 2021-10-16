@@ -43,7 +43,7 @@ function extractCap () {
 }
 
 function extractFinance (toFile = true) {
-  // 收入、成本與淨利 data/income.csv#total_operating_revenue 2016-2020
+  // 營運狀況 data/income.csv#total_operating_revenue 2016-2020
   return new Promise((resolve, reject) => {
     const stats = []
     fs
@@ -66,7 +66,7 @@ function extractFinance (toFile = true) {
         // https://mops.twse.com.tw/mops/web/t146sb05
         const ctx = {
           esgCategory: 'G',
-          category: '收入、成本與淨利',
+          category: '營運狀況',
           unit: '仟元',
           year
         }
@@ -94,7 +94,7 @@ async function main () {
   // 資本額
   await extractCap()
   // 是否產製CSR報告，是否揭露不利資訊 TODO
-  // 收入、成本與淨利
+  // 營運狀況
   await extractFinance()
   // 稅務透明度-租稅減免 TODO
   // 稅務透明度-補助、補貼 TODO
