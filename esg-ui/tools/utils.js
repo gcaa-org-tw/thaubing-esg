@@ -1,6 +1,7 @@
 const fs = require('fs')
 const path = require('path')
-const csv = require('csv-parser')
+const CsvReadableStream = require('csv-reader')
+const AutoDetectDecoderStream = require('autodetect-decoder-stream')
 
 class CompanyMap {
   constructor () {
@@ -18,7 +19,8 @@ class CompanyMap {
     await new Promise((resolve, reject) => {
       fs
         .createReadStream(path.join(__dirname, '../static/content/companyList.csv'))
-        .pipe(csv())
+        .pipe(new AutoDetectDecoderStream())
+        .pipe(new CsvReadableStream({ asObject: true }))
         .on('data', (data) => {
           this.list.push(data)
           this.byId[data.統編] = data
@@ -32,10 +34,11 @@ class CompanyMap {
     })
     await new Promise((resolve, reject) => {
       fs
-        .createReadStream(path.join(__dirname, '../../data/data_MonitorFactories.csv'))
-        .pipe(csv())
+        .createReadStream(path.join(__dirname, '../../data/石化業工廠_公司登記稅籍列管.csv'))
+        .pipe(new AutoDetectDecoderStream())
+        .pipe(new CsvReadableStream({ asObject: true }))
         .on('data', (data) => {
-          const company = this.find(data.TaxidNo)
+          const company = this.find(data.統一編號)
           if (company) {
             this.byEmsId[data.RegistrationNo] = company
           }

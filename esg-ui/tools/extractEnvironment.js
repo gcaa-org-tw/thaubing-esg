@@ -1,7 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 const { get } = require('lodash')
-const CsvReadableStream = require('csv-reader');
+const CsvReadableStream = require('csv-reader')
 const AutoDetectDecoderStream = require('autodetect-decoder-stream')
 const { companyMap } = require('./utils')
 const { appendToBoth, finished } = require('./csvLogger')
