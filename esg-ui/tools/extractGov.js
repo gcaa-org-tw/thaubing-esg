@@ -22,7 +22,7 @@ function extractCap () {
         const cap = Number.parseFloat(data.資本額)
         const ctx = {
           esgCategory: 'G',
-          category: '',
+          category: '資本額',
           measure: '資本額',
           unit: '元',
           value: cap
