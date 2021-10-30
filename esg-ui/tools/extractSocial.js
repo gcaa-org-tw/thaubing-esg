@@ -30,16 +30,20 @@ function extractSalary () {
           year,
           unit: '仟元'
         }
-        appendToBoth(company, {
-          ...ctx,
-          measure: '平均薪資',
-          value: avg
-        })
-        appendToBoth(company, {
-          ...ctx,
-          measure: '薪資中位數',
-          value: med
-        })
+        if (avg) {
+          appendToBoth(company, {
+            ...ctx,
+            measure: '平均薪資',
+            value: avg
+          })
+        }
+        if (med) {
+          appendToBoth(company, {
+            ...ctx,
+            measure: '薪資中位數',
+            value: med
+          })
+        }
       })
       .on('end', () => {
         resolve()

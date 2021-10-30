@@ -76,7 +76,11 @@ function extractFinance (toFile = true) {
             ...item
           }
           if (toFile) {
-            appendToBoth(company, data)
+            if (Number.isNaN(data.value)) {
+              console.warn(`Field "${item.measure}" = NaN on ${company.公司名稱}`)
+            } else {
+              appendToBoth(company, data)
+            }
           } else {
             stats.push({ company, data })
           }
