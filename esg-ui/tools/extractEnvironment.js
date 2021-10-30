@@ -9,6 +9,48 @@ const { extractFinance } = require('./extractGov')
 
 const DATA_DIR = path.join(__dirname, '../../data')
 
+async function extractWasteFromCom () {
+  await new Promise((resolve) => {
+    createCompanyReportStream('2085268438')
+      .on('data', (data) => {
+        const company = companyMap.findByStock(data.證券代號)
+        if (!company) {
+          return
+        }
+        const year = data.報告書年度
+        const fieldList = ['一般事業廢棄物', '有害事業廢棄物', '資源化再利用'].map((name) => {
+          return {
+            name,
+            value: data[name],
+            unit: data[`${name}單位`]
+          }
+        })
+
+        const ctx = {
+          esgCategory: 'E',
+          category: ' 廢棄物管理',
+          isFromSelf: true,
+          year
+        }
+
+        fieldList.forEach((row) => {
+          if (row.value !== '') {
+            appendToBoth(company, {
+              ...ctx,
+              measure: row.name,
+              value: row.value,
+              unit: row.unit
+            })
+          }
+        })
+      })
+      .on('end', () => {
+        resolve()
+      })
+  })
+}
+
+
 function extractAirPollution () {
   // 空氣污染物申報
   //   空氣污染物 data/ems_p_08.csv
@@ -145,6 +187,47 @@ function extractPenalty () {
             })
           }
         }
+        resolve()
+      })
+  })
+}
+
+async function extractWaterUsageFromCom () {
+  await new Promise((resolve) => {
+    createCompanyReportStream('1237840462')
+      .on('data', (data) => {
+        const company = companyMap.findByStock(data.證券代號)
+        if (!company) {
+          return
+        }
+        const year = data.報告書年度
+        const fieldList = ['總取水量', '回收水量', '耗用水量', '排放水量'].map((name) => {
+          return {
+            name,
+            value: data[name],
+            unit: data[`${name}單位`]
+          }
+        })
+
+        const ctx = {
+          esgCategory: 'E',
+          category: '水資源',
+          isFromSelf: true,
+          year
+        }
+
+        fieldList.forEach((row) => {
+          if (row.value !== '') {
+            appendToBoth(company, {
+              ...ctx,
+              measure: row.name,
+              value: row.value,
+              unit: row.unit
+            })
+          }
+        })
+      })
+      .on('end', () => {
         resolve()
       })
   })
@@ -348,22 +431,20 @@ async function main () {
   await companyMap.finished
   const incomeMap = await genIncomeMap()
   // 溫室氣體排放
-  // await extractGhGas(incomeMap)
+  await extractGhGas(incomeMap)
   await extractGhGasFromCom(incomeMap)
-
   // 能源使用狀況
   //   總用電量
   //   再生能源用電量
-  // await extractPowerUsageFromCom(incomeMap)
-  // 水資源 TODO
-  //   水資源量（取水量）
-  // 廢棄物管理 TODO
-  //   廢棄物項目及量
+  await extractPowerUsageFromCom(incomeMap)
+  // 水資源
+  await extractWaterUsageFromCom()
+  // 廢棄物管理
+  await extractWasteFromCom()
   // 空氣污染物申報
-  // await extractAirPollution()
-  //   排放水量 TODO
+  await extractAirPollution()
   //   違反環境法規紀錄
-  // await extractPenalty()
+  await extractPenalty()
   //   違反環境法規紀錄 TODO
   await finished()
   console.warn('[Environment] done')
