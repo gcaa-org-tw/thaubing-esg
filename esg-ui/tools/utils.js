@@ -1,7 +1,11 @@
 const fs = require('fs')
 const path = require('path')
+const got = require('got')
+const es = require('event-stream')
 const CsvReadableStream = require('csv-reader')
 const AutoDetectDecoderStream = require('autodetect-decoder-stream')
+
+const COMPANY_REPORT_URI = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRcO4BFSZGI6GGQExiWs__Y2tBu8Rs4GVTCdv6J-GDLx0CcdqD7jZMDKtDHK5nQ3A/pub?'
 
 class CompanyMap {
   constructor () {
@@ -70,8 +74,36 @@ class CompanyMap {
   }
 }
 
+function createCompanyReportStream (sheetId) {
+  const query = [
+    `gid=${sheetId}`,
+    'single=true',
+    'output=csv'
+  ].join('&')
+  const endpoint = `${COMPANY_REPORT_URI}${query}`
+  return got.stream(endpoint)
+    .pipe(new AutoDetectDecoderStream())
+    .pipe(new CsvReadableStream({ asObject: true }))
+    .pipe(es.through(function write (data) {
+      const ret = Object.keys(data).reduce((ret, key) => {
+        // convert locale string to number
+        // ex: 5,178,431.000
+        const value = data[key]
+        const number = Number.parseFloat(value.replace(/,/g, ''))
+        if (isNaN(number) || value.match(/[^\d,.-]/)) {
+          ret[key] = data[key]
+        } else {
+          ret[key] = number
+        }
+        return ret
+      }, {})
+      this.emit('data', ret)
+    }))
+}
+
 const companyMap = new CompanyMap()
 
 module.exports = {
-  companyMap
+  companyMap,
+  createCompanyReportStream
 }

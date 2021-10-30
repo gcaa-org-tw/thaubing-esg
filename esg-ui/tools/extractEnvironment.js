@@ -3,7 +3,7 @@ const path = require('path')
 const { get } = require('lodash')
 const CsvReadableStream = require('csv-reader')
 const AutoDetectDecoderStream = require('autodetect-decoder-stream')
-const { companyMap } = require('./utils')
+const { companyMap, createCompanyReportStream } = require('./utils')
 const { appendToBoth, finished } = require('./csvLogger')
 const { extractFinance } = require('./extractGov')
 
@@ -146,6 +146,73 @@ function extractPenalty () {
   })
 }
 
+async function extractGhGasFromCom () {
+  const financialStatsRaw = await extractFinance(false)
+  const financialStats = financialStatsRaw.reduce((stats, row) => {
+    if (row.data.measure !== '營業收入') {
+      return stats
+    }
+    const companyId = row.company.統編
+    if (!stats[companyId]) {
+      stats[companyId] = {}
+    }
+    stats[companyId][row.data.year] = row.data.value
+    return stats
+  }, {})
+  await new Promise((resolve) => {
+    createCompanyReportStream('823686304')
+      .on('data', (data) => {
+        const company = companyMap.findByStock(data.證券代號)
+        if (!company) {
+          return
+        }
+        const year = data.報告書年度
+        const totList = [
+          { name: '範疇一直接排放', value: data['範疇一（值）'] },
+          { name: '範疇二間接排放', value: data['範疇二（值）'] },
+          { name: '範疇三其他排放', value: data['範疇三（值）'] }
+        ]
+        const total = totList.reduce((total, row) => {
+          if (row.value instanceof Number) {
+            return total + row.value
+          }
+          return total
+        }, 0)
+
+        const ctx = {
+          esgCategory: 'E',
+          category: '溫室氣體排放',
+          isFromSelf: true,
+          year,
+          unit: '公噸CO2e'
+        }
+
+        totList.forEach((row) => {
+          if (row.value !== '') {
+            appendToBoth(company, {
+              ...ctx,
+              measure: row.name,
+              value: row.value
+            })
+          }
+        })
+
+        const income = get(financialStats, `${company.統編}.${year}`)
+        if (income) {
+          appendToBoth(company, {
+            ...ctx,
+            unit: '公噸CO2e/億元',
+            measure: '碳密集度',
+            value: total * 10 ** 5 / income
+          })
+        }
+      })
+      .on('end', () => {
+        resolve()
+      })
+  })
+}
+
 async function extractGhGas () {
   // 溫室氣體排放
   //   範疇一直接排放data/ghg_p_01.csv#tot
@@ -234,6 +301,7 @@ async function main () {
   await companyMap.finished
   // 溫室氣體排放
   await extractGhGas()
+  await extractGhGasFromCom()
 
   // 能源使用狀況 TODO
   //   總用電量 TODO
