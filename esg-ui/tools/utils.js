@@ -90,8 +90,8 @@ function createCompanyReportStream (sheetId) {
         // ex: 5,178,431.000
         const value = data[key]
         const number = Number.parseFloat(value.replace(/,/g, ''))
-        if (isNaN(number) || value.match(/[^\d,.-]/)) {
-          ret[key] = data[key]
+        if (Number.isNaN(number) || value.match(/[^\d,.-]/)) {
+          ret[key] = value
         } else {
           ret[key] = number
         }

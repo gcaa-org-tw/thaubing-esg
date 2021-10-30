@@ -113,7 +113,11 @@ function extractPenalty () {
           annualSum[year][company.統編] = { penalty: 0, count: 0 }
         }
         const sum = annualSum[year][company.統編]
-        sum.penalty += penalty
+        if (Number.isNaN(penalty)) {
+          console.warn(`Invalid penalty number for ${company.公司名稱}, DOCUMENT_NO: ${data.DOCUMENT_NO}`)
+        } else {
+          sum.penalty += penalty
+        }
         sum.count += 1
       })
       .on('end', () => {
@@ -146,19 +150,58 @@ function extractPenalty () {
   })
 }
 
-async function extractGhGasFromCom () {
-  const financialStatsRaw = await extractFinance(false)
-  const financialStats = financialStatsRaw.reduce((stats, row) => {
-    if (row.data.measure !== '營業收入') {
-      return stats
-    }
-    const companyId = row.company.統編
-    if (!stats[companyId]) {
-      stats[companyId] = {}
-    }
-    stats[companyId][row.data.year] = row.data.value
-    return stats
-  }, {})
+async function extractPowerUsageFromCom (incomeMap) {
+  await new Promise((resolve) => {
+    createCompanyReportStream('1262693716')
+      .on('data', (data) => {
+        const company = companyMap.findByStock(data.證券代號)
+        if (!company) {
+          return
+        }
+        const year = data.報告書年度
+        const total = data['年度總用電量']
+        const fieldList = [
+          { name: '總用電量', value: total, unit: data['用電量單位'] },
+          { name: '再生能源設置量', value: data['再生能源裝置容量'], unit: data['裝置容量單位'] },
+          { name: '再生能源發電量', value: data['再生能源發電量'], unit: data['發電量單位'] }
+        ]
+
+        const ctx = {
+          esgCategory: 'E',
+          category: '能源使用狀況',
+          isFromSelf: true,
+          year
+        }
+
+        fieldList.forEach((row) => {
+          if (row.value !== '') {
+            appendToBoth(company, {
+              ...ctx,
+              measure: row.name,
+              value: row.value,
+              unit: row.unit
+            })
+          }
+        })
+
+        const income = get(incomeMap, `${company.統編}.${year}`)
+        if (income && typeof total === 'number') {
+          // TODO: handle income or total 無揭露
+          appendToBoth(company, {
+            ...ctx,
+            unit: '度/億元',
+            measure: '能源密集度',
+            value: total * 10 ** 5 / income
+          })
+        }
+      })
+      .on('end', () => {
+        resolve()
+      })
+  })
+}
+
+async function extractGhGasFromCom (incomeMap) {
   await new Promise((resolve) => {
     createCompanyReportStream('823686304')
       .on('data', (data) => {
@@ -173,7 +216,7 @@ async function extractGhGasFromCom () {
           { name: '範疇三其他排放', value: data['範疇三（值）'] }
         ]
         const total = totList.reduce((total, row) => {
-          if (row.value instanceof Number) {
+          if (typeof row.value === 'number') {
             return total + row.value
           }
           return total
@@ -197,8 +240,9 @@ async function extractGhGasFromCom () {
           }
         })
 
-        const income = get(financialStats, `${company.統編}.${year}`)
-        if (income) {
+        const income = get(incomeMap, `${company.統編}.${year}`)
+        if (income && total) {
+          // TODO: handle income or total 無揭露
           appendToBoth(company, {
             ...ctx,
             unit: '公噸CO2e/億元',
@@ -213,23 +257,10 @@ async function extractGhGasFromCom () {
   })
 }
 
-async function extractGhGas () {
+async function extractGhGas (incomeMap) {
   // 溫室氣體排放
   //   範疇一直接排放data/ghg_p_01.csv#tot
   //   範疇二間接排放data/ghg_p_01.csv#tot2
-  const financialStatsRaw = await extractFinance(false)
-  const financialStats = financialStatsRaw.reduce((stats, row) => {
-    if (row.data.measure !== '營業收入') {
-      return stats
-    }
-    const companyId = row.company.統編
-    if (!stats[companyId]) {
-      stats[companyId] = {}
-    }
-    stats[companyId][row.data.year] = row.data.value
-    return stats
-  }, {})
-
   const annualSum = {}
   await new Promise((resolve, reject) => {
     fs
@@ -279,7 +310,7 @@ async function extractGhGas () {
               value: companySum[id].tot2
             })
 
-            const income = get(financialStats, `${id}.${year}`)
+            const income = get(incomeMap, `${id}.${year}`)
             if (income) {
               const totSum = companySum[id].tot1 + companySum[id].tot2
               appendToBoth(company, {
@@ -296,25 +327,43 @@ async function extractGhGas () {
   })
 }
 
+async function genIncomeMap () {
+  const financialStatsRaw = await extractFinance(false)
+  const financialStats = financialStatsRaw.reduce((stats, row) => {
+    if (row.data.measure !== '營業收入') {
+      return stats
+    }
+    const companyId = row.company.統編
+    if (!stats[companyId]) {
+      stats[companyId] = {}
+    }
+    stats[companyId][row.data.year] = row.data.value
+    return stats
+  }, {})
+  return financialStats
+}
+
 async function main () {
   console.warn('[Environment] start')
   await companyMap.finished
+  const incomeMap = await genIncomeMap()
   // 溫室氣體排放
-  await extractGhGas()
-  await extractGhGasFromCom()
+  // await extractGhGas(incomeMap)
+  await extractGhGasFromCom(incomeMap)
 
-  // 能源使用狀況 TODO
-  //   總用電量 TODO
-  //   再生能源用電量 TODO
+  // 能源使用狀況
+  //   總用電量
+  //   再生能源用電量
+  // await extractPowerUsageFromCom(incomeMap)
   // 水資源 TODO
   //   水資源量（取水量）
   // 廢棄物管理 TODO
   //   廢棄物項目及量
   // 空氣污染物申報
-  await extractAirPollution()
+  // await extractAirPollution()
   //   排放水量 TODO
   //   違反環境法規紀錄
-  await extractPenalty()
+  // await extractPenalty()
   //   違反環境法規紀錄 TODO
   await finished()
   console.warn('[Environment] done')
