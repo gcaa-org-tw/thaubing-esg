@@ -21,7 +21,7 @@ async function extractWorkInjury () {
           esgCategory: 'S',
           category: '職業健康',
           isSelfReport: true,
-          unit: '人',
+          unit: '',
           year
         }
 
@@ -90,7 +90,6 @@ async function extractCrew () {
       })
   })
 }
-
 
 function extractSalary () {
   // 員工薪資 data/salary.csv join by stock_code 2018-2020
