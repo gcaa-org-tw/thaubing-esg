@@ -21,16 +21,16 @@ export default {
           groups: [
             ['範疇一直接排放', '範疇二間接排放']
           ],
-          types: {
-            碳密集度: 'line'
-          },
+          // types: {
+          //   碳密集度: 'line'
+          // },
           axes: {
             範疇一直接排放: 'y',
             範疇二間接排放: 'y',
             碳密集度: 'y2'
-          },
-          colors: {
-            碳密集度: '#555'
+          // },
+          // colors: {
+          //   碳密集度: '#555'
           }
         },
         point: {
@@ -48,13 +48,13 @@ export default {
             tick: {
               format: this.genYFormatter()
             }
-          },
-          y2: {
-            show: true,
-            label: this.measureMap.碳密集度.unit,
-            tick: {
-              format: this.genYFormatter()
-            }
+          // },
+          // y2: {
+          //   show: true,
+          //   label: this.measureMap.碳密集度.unit,
+          //   tick: {
+          //     format: this.genYFormatter()
+          //   }
           }
         }
       }

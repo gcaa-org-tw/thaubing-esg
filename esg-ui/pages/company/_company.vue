@@ -8,9 +8,23 @@
       h1.green.fw5.f3 {{company.公司名稱}}
       .green {{company.自訂產業別}} · 資本額 {{capital}}
       .company__subtitle Environment 環境保護相關數據
-      gh-gas-chart(:stats="stats.body")
-      penalty-chart(:stats="stats.body")
-      air-pollution-chart(:stats="stats.body")
+      .charts
+        .charts__item
+          gh-gas-chart(:stats="stats.body")
+        .charts__item
+          gh-gas-self-chart(:stats="stats.body")
+        .charts__item
+          power-usage-self-chart(:stats="stats.body")
+        .charts__item
+          re-power-self-chart(:stats="stats.body")
+        .charts__item
+          water-self-chart(:stats="stats.body")
+        .charts__item
+          waste-self-chart(:stats="stats.body")
+        .charts__item.charts__item--two
+          penalty-chart(:stats="stats.body")
+        .charts__item.charts__item--two
+          air-pollution-chart(:stats="stats.body")
       .company__subtitle Social 社會責任相關數據
       salary-chart(:stats="stats.body")
       .company__subtitle Governance 治理相關數據
@@ -63,6 +77,21 @@ export default {
   &__subtitle {
     margin: 3.25rem 0 1rem;
     color: #373737;
+  }
+}
+.charts {
+  @include l-screen {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 1.5rem;
+    row-gap: 1.5rem;
+  }
+  &__item {
+    height: 24rem;
+    &--two {
+      height: 26rem;
+      grid-column: 1 / 3;
+    }
   }
 }
 </style>

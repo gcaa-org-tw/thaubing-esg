@@ -21,6 +21,7 @@ const INDUSTRY_HEADER = [
   { id: 'esgCategory', title: '分類' },
   { id: 'category', title: '子分類' },
   { id: 'measure', title: '項目' },
+  { id: 'isSelfReport', title: '來自公司報告' },
   { id: 'unit', title: '單位' },
   { id: 'year', title: '年份' },
   { id: 'value', title: '數值' }
@@ -32,6 +33,7 @@ const COMPANY_HEADER = [
   { id: 'esgCategory', title: '分類' },
   { id: 'category', title: '子分類' },
   { id: 'measure', title: '項目' },
+  { id: 'isSelfReport', title: '來自公司報告' },
   { id: 'unit', title: '單位' },
   { id: 'year', title: '年份' },
   { id: 'value', title: '數值' }
@@ -139,6 +141,9 @@ function waitAllFinished () {
 }
 
 function appendToBoth (company, row) {
+  if ('value' in row && Number.isNaN(row.value)) {
+    throw new Error(`Get NaN on company: ${company.公司簡稱}:${company.股票代碼}, measure: ${row.measure}`)
+  }
   appendIndustry(company.自訂產業別, {
     ...row,
     id: company.統編

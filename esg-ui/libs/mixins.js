@@ -1,11 +1,11 @@
 import { format } from 'd3'
 
-export function chartMixin (esgColumns, measureFilter) {
+export function chartMixin (esgColumns, measureFilter, isSelfReport = undefined) {
   if (typeof measureFilter === 'string') {
     // filter by subCat
     const subCat = measureFilter
     measureFilter = function (row) {
-      return row.subCat === subCat
+      return row.subCat === subCat && row.isSelfReport === isSelfReport
     }
   }
   return {
