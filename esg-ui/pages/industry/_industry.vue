@@ -45,11 +45,13 @@
               :ref="catAnchor(column)"
             )
               intersect(@enter="enterColumn(column)")
-                .flex.items-start.justify-end
+                .flex.items-start.justify-end(:title="thTitle(column)")
                   div
                     .pre.overflow-hidden {{beautyMeasure(column)}}
                     .f6(v-if="column.unit") ({{column.unit}})
-                  i.fr.fas.ml2.mt1(:class="thClass(column)")
+                  .ml2.mt1.flex.flex-column.items-center
+                    i.o-80.mb1.fas.fa-copyright(v-if="column.isSelfReport")
+                    i.fas(:class="thClass(column)")
           tbody.stats__body
             tr(v-for="row in visibleStats" :key="row.company.統編")
               th
@@ -86,7 +88,7 @@ function enrichColumns (category) {
   return esgColumns[category].map((column) => {
     const richColumn = {
       ...column,
-      key: `${column.subCat}-${column.measure}`,
+      key: `${column.subCat}-${column.measure}-${column.isSelfReport || ''}`,
       cat: category,
       isSubCatBegin: false,
       span: 0
@@ -120,9 +122,14 @@ export default {
     }
   },
   data () {
+    const defaultOrder = [
+      esgColumns.environment[0].subCat,
+      esgColumns.environment[0].measure,
+      esgColumns.environment[0].isSelfReport || ''
+    ].join('-')
     return {
       industry: this.$route.params.industry,
-      order: `${esgColumns.environment[0].subCat}-${esgColumns.environment[0].measure}`,
+      order: defaultOrder,
       isAsc: false,
 
       activeCat: 'environment',
@@ -172,24 +179,32 @@ export default {
           return
         }
         stat.value = Number.parseFloat(stat.數值)
-        company.stats[`${stat.子分類}-${stat.項目}`] = stat
+        company.stats[`${stat.子分類}-${stat.項目}-${stat.來自公司報告}`] = stat
       })
       return Object.values(companyMap)
     },
     visibleStats () {
       return [...this.companyStats].sort((a, b) => {
-        const aVal = get(a.stats, `${this.order}.數值`)
-        const bVal = get(b.stats, `${this.order}.數值`)
-        if (aVal === undefined) {
+        const aText = get(a.stats, `${this.order}.數值`)
+        const aVal = get(a.stats, `${this.order}.value`)
+        const bText = get(b.stats, `${this.order}.數值`)
+        const bVal = get(b.stats, `${this.order}.value`)
+        if (aText === undefined) {
           return 1
         }
-        if (bVal === undefined) {
+        if (bText === undefined) {
           return -1
         }
-        if (this.isAsc) {
-          return aVal - bVal
+        if (!Number.isNaN(aVal) && !Number.isNaN(bVal)) {
+          return this.isAsc ? aVal - bVal : bVal - aVal
         }
-        return bVal - aVal
+        if (!Number.isNaN(aVal)) {
+          return -1
+        }
+        if (!Number.isNaN(bVal)) {
+          return 1
+        }
+        return this.isAsc ? aText.localeCompare(bText) : bText.localeCompare(aText)
       })
     }
   },
@@ -249,6 +264,12 @@ export default {
       }
       return ''
     },
+    thTitle (column) {
+      if (column.isSelfReport) {
+        return '資料來源：CSR 報告書'
+      }
+      return ''
+    },
     beautyMeasure (column) {
       const measure = column.measure
       if (measure.includes(' ')) {
@@ -268,9 +289,10 @@ export default {
         return '-'
       }
       const field = row.stats[column.key]
-      if (!isNaN(field.value)) {
-        const value = Math.round(field.value * 100) / 100
-        return `${value.toLocaleString(undefined, { minimumFractionDigits: column.toFixed || 0 })}`
+      if (!Number.isNaN(field.value)) {
+        const toFixed = 10 ** (column.toFixed || 0)
+        const value = Math.round(field.value * toFixed) / toFixed
+        return value.toLocaleString()
       }
       return `${field.數值}`
     }

@@ -29,7 +29,7 @@ async function extractWasteFromCom () {
         const ctx = {
           esgCategory: 'E',
           category: ' 廢棄物管理',
-          isFromSelf: true,
+          isSelfReport: true,
           year
         }
 
@@ -212,7 +212,7 @@ async function extractWaterUsageFromCom () {
         const ctx = {
           esgCategory: 'E',
           category: '水資源',
-          isFromSelf: true,
+          isSelfReport: true,
           year
         }
 
@@ -252,7 +252,7 @@ async function extractPowerUsageFromCom (incomeMap) {
         const ctx = {
           esgCategory: 'E',
           category: '能源使用狀況',
-          isFromSelf: true,
+          isSelfReport: true,
           year
         }
 
@@ -308,7 +308,7 @@ async function extractGhGasFromCom (incomeMap) {
         const ctx = {
           esgCategory: 'E',
           category: '溫室氣體排放',
-          isFromSelf: true,
+          isSelfReport: true,
           year,
           unit: '公噸CO2e'
         }

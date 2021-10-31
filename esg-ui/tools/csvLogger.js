@@ -21,7 +21,7 @@ const INDUSTRY_HEADER = [
   { id: 'esgCategory', title: '分類' },
   { id: 'category', title: '子分類' },
   { id: 'measure', title: '項目' },
-  { id: 'isFromSelf', title: '來自公司報告' },
+  { id: 'isSelfReport', title: '來自公司報告' },
   { id: 'unit', title: '單位' },
   { id: 'year', title: '年份' },
   { id: 'value', title: '數值' }
@@ -33,7 +33,7 @@ const COMPANY_HEADER = [
   { id: 'esgCategory', title: '分類' },
   { id: 'category', title: '子分類' },
   { id: 'measure', title: '項目' },
-  { id: 'isFromSelf', title: '來自公司報告' },
+  { id: 'isSelfReport', title: '來自公司報告' },
   { id: 'unit', title: '單位' },
   { id: 'year', title: '年份' },
   { id: 'value', title: '數值' }
