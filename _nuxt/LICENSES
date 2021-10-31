@@ -1,6 +1,3 @@
-/* @license C3.js v0.7.20 | (c) C3 Team and other contributors | http://c3js.org/ */
-
-
 /**
  * @license
  * Lodash <https://lodash.com/>
@@ -9,6 +6,9 @@
  * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
  * Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
  */
+
+
+/* @license C3.js v0.7.20 | (c) C3 Team and other contributors | http://c3js.org/ */
 
 
 /*!
