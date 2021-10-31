@@ -32,18 +32,18 @@ const environment = [
 ]
 
 const social = [
-  { subCat: '員工組成', measure: '正式員工', isFake: true },
-  { subCat: '員工組成', measure: '性別比', isFake: true },
-  { subCat: '員工組成', measure: '新進率', isFake: true },
-  { subCat: '員工組成', measure: '離職率', isFake: true },
-  { subCat: '員工組成', measure: '是否聘用移工', isFake: true },
-  { subCat: '員工組成', measure: '是否聘用身障人士', isFake: true },
-  { subCat: '員工組成', measure: '是否聘用原住民', isFake: true },
+  { subCat: '員工組成', measure: '正式員工', isSelfReport: true, unit: '人' },
+  { subCat: '員工組成', measure: '性別比', isSelfReport: true, unit: '男/女' },
+  { subCat: '員工組成', measure: '新進率', isSelfReport: true, unit: '' },
+  { subCat: '員工組成', measure: '離職率', isSelfReport: true, unit: '' },
+  { subCat: '員工組成', measure: '是否聘用移工', isSelfReport: true, unit: '人' },
+  { subCat: '員工組成', measure: '是否聘用身障人士', isSelfReport: true, unit: '人' },
+  { subCat: '員工組成', measure: '是否聘用原住民', isSelfReport: true, unit: '人' },
   { subCat: '員工薪資', measure: '平均薪資', unit: '仟元' },
   { subCat: '員工薪資', measure: '薪資中位數', unit: '仟元' },
   { subCat: '勞動違規', measure: '違反勞動法規紀錄', isFake: true },
-  { subCat: '職業健康', measure: '職災事故', isFake: true },
-  { subCat: '職業健康', measure: '工安意外', isFake: true }
+  { subCat: '職業健康', measure: '職災事故', isSelfReport: true },
+  { subCat: '職業健康', measure: '工安意外', isSelfReport: true }
 ]
 
 const governance = [
@@ -52,14 +52,15 @@ const governance = [
   { subCat: '營運狀況', measure: '營業成本', unit: '仟元' },
   { subCat: '營運狀況', measure: '營業費用', unit: '仟元' },
   { subCat: '營運狀況', measure: '淨利', unit: '仟元' },
-  { subCat: '是否產製CSR報告', measure: '是否編撰報告書', isFake: true },
-  { subCat: '是否產製CSR報告', measure: '是否揭露負面資訊', isFake: true },
-  { subCat: '稅務透明度', measure: '營利事業所得稅稅額', isFake: true },
-  { subCat: '稅務透明度', measure: '政府補助、補貼金額', isFake: true },
-  { subCat: 'ISO認證', measure: 'ISO 9001', isFake: true },
-  { subCat: 'ISO認證', measure: 'ISO 14001', isFake: true },
-  { subCat: 'ISO認證', measure: 'ISO 45001', isFake: true },
-  { subCat: 'ISO認證', measure: 'ISO 50001', isFake: true }
+  { subCat: '是否產製CSR報告', measure: '是否編撰報告書', isSelfReport: true },
+  // { subCat: '是否產製CSR報告', measure: '是否揭露負面資訊', isFake: true },
+  { subCat: '稅務透明度', measure: '營利事業所得稅稅額', isSelfReport: true, unit: '元' },
+  { subCat: '稅務透明度', measure: '政府補助、補貼金額', isSelfReport: true, unit: '元' },
+  { subCat: '稅務透明度', measure: '研發投入費用', isSelfReport: true, unit: '元' },
+  { subCat: 'ISO認證', measure: 'ISO 9001', isSelfReport: true },
+  { subCat: 'ISO認證', measure: 'ISO 14001', isSelfReport: true },
+  { subCat: 'ISO認證', measure: 'ISO 45001', isSelfReport: true },
+  { subCat: 'ISO認證', measure: 'ISO 50001', isSelfReport: true }
 ]
 
 export {
