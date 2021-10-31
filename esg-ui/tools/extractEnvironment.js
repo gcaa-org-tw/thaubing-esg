@@ -50,7 +50,6 @@ async function extractWasteFromCom () {
   })
 }
 
-
 function extractAirPollution () {
   // 空氣污染物申報
   //   空氣污染物 data/ems_p_08.csv
