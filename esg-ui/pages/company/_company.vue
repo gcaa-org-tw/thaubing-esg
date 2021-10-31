@@ -17,6 +17,10 @@
           power-usage-self-chart(:stats="stats.body")
         .charts__item
           re-power-self-chart(:stats="stats.body")
+        .charts__item
+          water-self-chart(:stats="stats.body")
+        .charts__item
+          waste-self-chart(:stats="stats.body")
         .charts__item.charts__item--two
           penalty-chart(:stats="stats.body")
         .charts__item.charts__item--two
