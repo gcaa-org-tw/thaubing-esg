@@ -59,7 +59,7 @@ async function extractHasCsvFromCom () {
 
         appendToBoth(company, {
           esgCategory: 'G',
-          category: '稅務透明度',
+          category: '是否產製CSR報告',
           isSelfReport: true,
           year,
           measure: '是否編撰報告書',
