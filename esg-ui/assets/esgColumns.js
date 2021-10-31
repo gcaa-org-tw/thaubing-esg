@@ -33,9 +33,9 @@ const environment = [
 
 const social = [
   { subCat: '員工組成', measure: '正式員工', isSelfReport: true, unit: '人' },
-  { subCat: '員工組成', measure: '性別比', isSelfReport: true, unit: '人' },
-  { subCat: '員工組成', measure: '新進率', isSelfReport: true, unit: '人' },
-  { subCat: '員工組成', measure: '離職率', isSelfReport: true, unit: '人' },
+  { subCat: '員工組成', measure: '性別比', isSelfReport: true, unit: '男/女' },
+  { subCat: '員工組成', measure: '新進率', isSelfReport: true, unit: '' },
+  { subCat: '員工組成', measure: '離職率', isSelfReport: true, unit: '' },
   { subCat: '員工組成', measure: '是否聘用移工', isSelfReport: true, unit: '人' },
   { subCat: '員工組成', measure: '是否聘用身障人士', isSelfReport: true, unit: '人' },
   { subCat: '員工組成', measure: '是否聘用原住民', isSelfReport: true, unit: '人' },
