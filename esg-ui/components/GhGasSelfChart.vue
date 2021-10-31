@@ -1,6 +1,7 @@
 <template lang="pug">
   chart-panel(
     title="溫室氣體排放"
+    :is-self-report="true"
     :unit="['公噸CO2e', '公噸/億元']"
     :c3-config="c3Config"
   )
@@ -10,7 +11,7 @@ import { environment } from '~/assets/esgColumns'
 import { chartMixin } from '~/libs/mixins'
 
 export default {
-  mixins: [chartMixin(environment, '溫室氣體排放')],
+  mixins: [chartMixin(environment, '溫室氣體排放', true)],
   computed: {
     c3Config () {
       return {
@@ -19,18 +20,18 @@ export default {
           columns: this.dumpSubCatStats(),
           type: 'bar',
           groups: [
-            ['範疇一直接排放', '範疇二間接排放']
+            ['範疇一直接排放', '範疇二間接排放', '範疇三其他排放']
           ],
-          // types: {
-          //   碳密集度: 'line'
-          // },
+          types: {
+            碳密集度: 'line'
+          },
           axes: {
             範疇一直接排放: 'y',
             範疇二間接排放: 'y',
             碳密集度: 'y2'
-          // },
-          // colors: {
-          //   碳密集度: '#555'
+          },
+          colors: {
+            碳密集度: '#555'
           }
         },
         point: {
@@ -48,13 +49,13 @@ export default {
             tick: {
               format: this.genYFormatter()
             }
-          // },
-          // y2: {
-          //   show: true,
-          //   label: this.measureMap.碳密集度.unit,
-          //   tick: {
-          //     format: this.genYFormatter()
-          //   }
+          },
+          y2: {
+            show: true,
+            label: this.measureMap.碳密集度.unit,
+            tick: {
+              format: this.genYFormatter()
+            }
           }
         }
       }

@@ -1,9 +1,9 @@
 <template lang="pug">
-  .chartPanel.bg-white
+  .chartPanel.bg-white.h-100
     .flex.justify-between.items-start.mb1
       .chartPanel__title.fw5 {{title}}
-      .chartPanel__audit(v-if="isSrcAudited") 來自政府、官方報告
-      .chartPanel__audit(v-else) 來自企業 CSR 報告
+      .chartPanel__audit(v-if="isSelfReport") 來自企業 CSR 報告
+      .chartPanel__audit(v-else) 來自政府、官方報告
     .mb3.pb2
       span(v-if="unit") 單位：{{unitStr}}
     chart-content(:config="c3Config")
@@ -20,9 +20,9 @@ export default {
       type: [String, Array],
       default: ''
     },
-    isSrcAudited: {
+    isSelfReport: {
       type: Boolean,
-      default: true
+      default: false
     },
     tips: {
       type: String,
@@ -60,8 +60,8 @@ export default {
     color: #49591C;
   }
 
-  & + .chartPanel {
-    margin-top: 1.5rem;
+  .chartContent {
+    height: calc(100% - 5rem);
   }
 }
 </style>

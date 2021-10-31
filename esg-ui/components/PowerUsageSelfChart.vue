@@ -1,7 +1,8 @@
 <template lang="pug">
   chart-panel(
-    title="溫室氣體排放"
-    :unit="['公噸CO2e', '公噸/億元']"
+    title="年度總用電量"
+    :is-self-report="true"
+    :unit="['度', '度/億元']"
     :c3-config="c3Config"
   )
 </template>
@@ -10,7 +11,9 @@ import { environment } from '~/assets/esgColumns'
 import { chartMixin } from '~/libs/mixins'
 
 export default {
-  mixins: [chartMixin(environment, '溫室氣體排放')],
+  mixins: [chartMixin(environment, (column) => {
+    return column.subCat === '能源使用狀況' && ['總用電量', '能源密集度'].includes(column.measure)
+  })],
   computed: {
     c3Config () {
       return {
@@ -18,19 +21,15 @@ export default {
           x: 'x',
           columns: this.dumpSubCatStats(),
           type: 'bar',
-          groups: [
-            ['範疇一直接排放', '範疇二間接排放']
-          ],
-          // types: {
-          //   碳密集度: 'line'
-          // },
+          types: {
+            能源密集度: 'line'
+          },
           axes: {
-            範疇一直接排放: 'y',
-            範疇二間接排放: 'y',
-            碳密集度: 'y2'
-          // },
-          // colors: {
-          //   碳密集度: '#555'
+            總用電量: 'y',
+            能源密集度: 'y2'
+          },
+          colors: {
+            能源密集度: '#555'
           }
         },
         point: {
@@ -44,17 +43,17 @@ export default {
             }
           },
           y: {
-            label: this.measureMap.範疇二間接排放.unit,
+            label: this.measureMap.總用電量.unit,
             tick: {
               format: this.genYFormatter()
             }
-          // },
-          // y2: {
-          //   show: true,
-          //   label: this.measureMap.碳密集度.unit,
-          //   tick: {
-          //     format: this.genYFormatter()
-          //   }
+          },
+          y2: {
+            show: true,
+            label: this.measureMap.能源密集度.unit,
+            tick: {
+              format: this.genYFormatter()
+            }
           }
         }
       }
