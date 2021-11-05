@@ -11,7 +11,7 @@ const DATA_DIR = path.join(__dirname, '../../data')
 
 async function extractWasteFromCom () {
   await new Promise((resolve) => {
-    createCompanyReportStream('2085268438')
+    createCompanyReportStream('410840005')
       .on('data', (data) => {
         const company = companyMap.findByStock(data.證券代號)
         if (!company) {
@@ -193,16 +193,16 @@ function extractPenalty () {
 
 async function extractWaterUsageFromCom () {
   await new Promise((resolve) => {
-    createCompanyReportStream('1237840462')
+    createCompanyReportStream('903558775')
       .on('data', (data) => {
         const company = companyMap.findByStock(data.證券代號)
         if (!company) {
           return
         }
         const year = data.報告書年度
-        const fieldList = ['總取水量', '回收水量', '耗用水量', '排放水量'].map((name) => {
+        const fieldList = ['總取水量（不用填寫）', '回收水量', '耗用水量', '排放水量'].map((name) => {
           return {
-            name,
+            name: name.replace(/（.*）/g, ''),
             value: data[name],
             unit: data[`${name}單位`]
           }
@@ -234,7 +234,7 @@ async function extractWaterUsageFromCom () {
 
 async function extractPowerUsageFromCom (incomeMap) {
   await new Promise((resolve) => {
-    createCompanyReportStream('1262693716')
+    createCompanyReportStream('1196916811')
       .on('data', (data) => {
         const company = companyMap.findByStock(data.證券代號)
         if (!company) {
@@ -285,7 +285,7 @@ async function extractPowerUsageFromCom (incomeMap) {
 
 async function extractGhGasFromCom (incomeMap) {
   await new Promise((resolve) => {
-    createCompanyReportStream('823686304')
+    createCompanyReportStream('440421747')
       .on('data', (data) => {
         const company = companyMap.findByStock(data.證券代號)
         if (!company) {

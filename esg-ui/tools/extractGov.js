@@ -9,7 +9,7 @@ const DATA_DIR = path.join(__dirname, '../../data')
 
 async function extractISOFromCom () {
   await new Promise((resolve) => {
-    createCompanyReportStream('315541991')
+    createCompanyReportStream('1256605170')
       .on('data', (data) => {
         const company = companyMap.findByStock(data.證券代號)
         if (!company) {
@@ -46,9 +46,9 @@ async function extractISOFromCom () {
   })
 }
 
-async function extractHasCsvFromCom () {
+async function extractHasCsrFromCom () {
   await new Promise((resolve) => {
-    createCompanyReportStream('1483578032')
+    createCompanyReportStream('1762045206')
       .on('data', (data) => {
         const company = companyMap.findByStock(data.證券代號)
         if (!company) {
@@ -74,7 +74,7 @@ async function extractHasCsvFromCom () {
 
 async function extractTransparencyFromCom () {
   await new Promise((resolve) => {
-    createCompanyReportStream('1321325499')
+    createCompanyReportStream('721116469')
       .on('data', (data) => {
         const company = companyMap.findByStock(data.證券代號)
         if (!company) {
@@ -203,7 +203,7 @@ async function main () {
   // 資本額
   await extractCap()
   // 是否產製CSR報告，是否揭露不利資訊
-  await extractHasCsvFromCom()
+  await extractHasCsrFromCom()
   // 營運狀況
   await extractFinance()
   // 稅務透明度-租稅減免

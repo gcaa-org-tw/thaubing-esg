@@ -9,7 +9,7 @@ const DATA_DIR = path.join(__dirname, '../../data')
 
 async function extractWorkInjury () {
   await new Promise((resolve) => {
-    createCompanyReportStream('1360813754')
+    createCompanyReportStream('1315041422')
       .on('data', (data) => {
         const company = companyMap.findByStock(data.證券代號)
         if (!company) {
@@ -27,7 +27,7 @@ async function extractWorkInjury () {
 
         const fieldList = [
           { measure: '職災事故', value: data.職災事件數 },
-          { measure: '工安意外', value: data.工安意外揭露 }
+          { measure: '工安意外', value: data['工安意外揭露\n（火災、爆炸等）'] }
         ]
 
         fieldList.forEach((row) => {
@@ -48,7 +48,7 @@ async function extractWorkInjury () {
 
 async function extractCrew () {
   await new Promise((resolve) => {
-    createCompanyReportStream('2099140890')
+    createCompanyReportStream('1069906267')
       .on('data', (data) => {
         const company = companyMap.findByStock(data.證券代號)
         if (!company) {
