@@ -30,6 +30,9 @@ const environment = [
   { subCat: '廢棄物管理', measure: '資源化再利用', unit: '噸', isSelfReport: true },
   { subCat: '毒化物申報', measure: '毒化物', isFake: true },
   { subCat: '環境違規', measure: '違反環境法規金額', unit: '元' },
+  { subCat: '環境違規', measure: '違反環境法規金額-空氣', unit: '元', onlyDetail: true },
+  { subCat: '環境違規', measure: '違反環境法規金額-水', unit: '元', onlyDetail: true },
+  { subCat: '環境違規', measure: '違反環境法規金額-misc', unit: '元', onlyDetail: true },
   { subCat: '環境違規', measure: '違反環境法規次數', unit: '次' }
 ]
 

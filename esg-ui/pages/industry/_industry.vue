@@ -86,24 +86,26 @@ const REFRESH_PERIOD = 100
 
 function enrichColumns (category) {
   let spanCursor
-  return esgColumns[category].map((column) => {
-    const richColumn = {
-      ...column,
-      key: `${column.subCat}-${column.measure}-${column.isSelfReport || ''}`,
-      cat: category,
-      isSubCatBegin: false,
-      span: 0
-    }
-    if (!spanCursor || richColumn.subCat !== spanCursor.subCat) {
-      richColumn.isSubCatBegin = true
-      if (!spanCursor) {
-        richColumn.isCatBegin = true
+  return esgColumns[category]
+    .filter(column => !column.onlyDetail)
+    .map((column) => {
+      const richColumn = {
+        ...column,
+        key: `${column.subCat}-${column.measure}-${column.isSelfReport || ''}`,
+        cat: category,
+        isSubCatBegin: false,
+        span: 0
       }
-      spanCursor = richColumn
-    }
-    spanCursor.span += 1
-    return richColumn
-  })
+      if (!spanCursor || richColumn.subCat !== spanCursor.subCat) {
+        richColumn.isSubCatBegin = true
+        if (!spanCursor) {
+          richColumn.isCatBegin = true
+        }
+        spanCursor = richColumn
+      }
+      spanCursor.span += 1
+      return richColumn
+    })
 }
 
 export default {

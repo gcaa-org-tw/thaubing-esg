@@ -1,7 +1,7 @@
 <template lang="pug">
   chart-panel(
     title="違反環境法規"
-    :unit="['金額', '次數']"
+    :unit="['金額']"
     :c3-config="c3Config"
   )
 </template>
@@ -10,27 +10,28 @@ import { environment } from '~/assets/esgColumns'
 import { chartMixin } from '~/libs/mixins'
 
 export default {
-  mixins: [chartMixin(environment, '環境違規')],
+  mixins: [chartMixin(environment, (column) => {
+    return column.subCat === '環境違規' && column.onlyDetail
+  })],
   computed: {
     c3Config () {
+      const columns = this.dumpSubCatStats()
+      const columnMap = {
+        '違反環境法規金額-空氣': '因空氣污染遭裁罰金額',
+        '違反環境法規金額-水': '因水污染遭裁罰金額',
+        '違反環境法規金額-misc': '其他違規項目金額'
+      }
+      columns.forEach((column) => {
+        if (columnMap[column[0]]) {
+          column[0] = columnMap[column[0]]
+        }
+      })
       return {
         data: {
           x: 'x',
-          columns: this.dumpSubCatStats(),
+          columns,
           type: 'bar',
-          types: {
-            違反環境法規次數: 'line'
-          },
-          axes: {
-            違反環境法規金額: 'y',
-            違反環境法規次數: 'y2'
-          },
-          colors: {
-            違反環境法規次數: '#555'
-          }
-        },
-        point: {
-          r: 6
+          groups: [Object.values(columnMap)]
         },
         axis: {
           x: {
@@ -40,14 +41,7 @@ export default {
             }
           },
           y: {
-            label: this.measureMap.違反環境法規金額.unit,
-            tick: {
-              format: this.genYFormatter()
-            }
-          },
-          y2: {
-            show: true,
-            label: this.measureMap.違反環境法規次數.unit,
+            label: this.measureMap['違反環境法規金額-空氣'].unit,
             tick: {
               format: this.genYFormatter()
             }
