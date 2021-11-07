@@ -9,6 +9,8 @@ const { extractFinance } = require('./extractGov')
 
 const DATA_DIR = path.join(__dirname, '../../data')
 
+const EMSP08_PATH = path.join(__dirname, '../assets/emsP08Columns.json')
+
 async function extractWasteFromCom () {
   await new Promise((resolve) => {
     createCompanyReportStream('410840005')
@@ -53,27 +55,7 @@ async function extractWasteFromCom () {
 function extractAirPollution () {
   // 空氣污染物申報
   //   空氣污染物 data/ems_p_08.csv
-  const targetMeasures = [
-    { column: 'Benzene', label: '苯' },
-    { column: 'CarbonTetrachloride', label: '四氯化碳' },
-    { column: 'Dichloroethane11', label: '1-1-二氯乙烷' },
-    { column: 'Dichloroethane12', label: '1-2-二氯乙烷' },
-    { column: 'Dioxin', label: '戴奧辛' },
-    { column: 'Ethylbenzene', label: '乙苯' },
-    { column: 'Methylenechloride', label: '二氯甲烷' },
-    { column: 'NOx', label: '氮氧化物' },
-    { column: 'SOx', label: '硫氧化物' },
-    { column: 'Styrene', label: '苯乙烯' },
-    { column: 'TSP', label: '粒狀污染物' },
-    { column: 'Tetrachloroethylene', label: '四氯乙烯' },
-    { column: 'Toluene', label: '甲苯' },
-    { column: 'Trichloroethane', label: '三氯乙烷' },
-    { column: 'Trichloroethylene', label: '三氯乙烯' },
-    { column: 'VOCs', label: '揮發性有機化合物' },
-    { column: 'Xylene', label: '二甲苯' },
-    { column: 'chloroform', label: '三氯甲烷' },
-    { column: 'heavymetal', label: '重金屬' }
-  ]
+  const targetMeasures = JSON.parse(fs.readFileSync(EMSP08_PATH))
 
   const annualSum = {}
   return new Promise((resolve, reject) => {
@@ -113,15 +95,19 @@ function extractAirPollution () {
             const company = companyMap.find(id)
             const ctx = {
               esgCategory: 'E',
-              category: '空氣污染物申報',
               year
             }
             const sum = companySum[id]
-            Object.keys(sum).forEach((measure) => {
+            targetMeasures.forEach((measure) => {
+              const label = measure.label
+              if (!sum[label]) {
+                return
+              }
               appendToBoth(company, {
                 ...ctx,
-                measure,
-                value: sum[measure]
+                category: `空氣污染物申報-${measure.subCat}`,
+                measure: label,
+                value: sum[label]
               })
             })
           }
