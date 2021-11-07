@@ -26,8 +26,9 @@
         .charts__item.charts__item--two
           air-pollution-chart(:stats="stats.body")
       .company__subtitle Social 社會責任相關數據
-      salary-chart(:stats="stats.body")
       .charts
+        .charts__item.charts__item--two
+          salary-chart(:stats="stats.body")
         .charts__item
           crew-count-self-chart(:stats="stats.body")
         .charts__item
@@ -85,7 +86,7 @@ export default {
   }
 }
 .charts {
-  @include l-screen {
+  @include ns-screen {
     display: grid;
     grid-template-columns: 1fr 1fr;
     column-gap: 1.5rem;

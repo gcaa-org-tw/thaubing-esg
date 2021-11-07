@@ -34,7 +34,8 @@
               :key="column.key"
               v-if="column.span"
               :colspan="column.span"
-            ) {{column.subCat}}
+            )
+              div {{column.subCat}}
           thead.stats__header.stats__header--sub
             th(ref="company-column") 公司名稱
             th.pointer.stats__value(
@@ -431,6 +432,7 @@ $row-height: 3.5rem;
       }
     }
     &--pri {
+      background: #0D0E09;
       th {
         top: 0;
         background: #0D0E09;
@@ -438,6 +440,7 @@ $row-height: 3.5rem;
 
         &.stats__value--begin {
           border-color: #ffffff26;
+          left: 5rem;
         }
       }
     }
@@ -456,6 +459,7 @@ $row-height: 3.5rem;
       text-align: right;
     }
     th {
+      width: 5rem;
       text-align: left;
       background: #fff;
       a {

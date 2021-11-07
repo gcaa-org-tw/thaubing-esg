@@ -17,3 +17,9 @@ $green-primary: #49591C;
     @content
   }
 };
+
+@mixin ns-screen {
+  @media screen and (min-width: 60em) {
+    @content
+  }
+};
