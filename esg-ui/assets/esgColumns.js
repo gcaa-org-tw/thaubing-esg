@@ -1,4 +1,4 @@
-import emsP08Columns from './emsP08Columns'
+import emsP08Columns from './emsP08Columns.json'
 
 const environment = [
   { subCat: '溫室氣體排放', measure: '範疇一直接排放', unit: '公噸CO2e', toFixed: 2 },
@@ -15,19 +15,24 @@ const environment = [
   { subCat: '水資源', measure: '回收水量', unit: '噸', isSelfReport: true },
   { subCat: '水資源', measure: '耗用水量', unit: '噸', isSelfReport: true },
   { subCat: '水資源', measure: '排放水量', unit: '噸', isSelfReport: true },
-  ...emsP08Columns.map((column) => {
-    return {
-      subCat: '空氣污染物申報',
-      measure: column.label,
-      toFixed: 2,
-      isAirPollution: true
-    }
-  }),
+  ...emsP08Columns
+    .filter(column => column.subCat)
+    .map((column) => {
+      return {
+        subCat: `空氣污染物申報-${column.subCat}`,
+        measure: column.label,
+        toFixed: 2,
+        isAirPollution: true
+      }
+    }),
   { subCat: '廢棄物管理', measure: '一般事業廢棄物', unit: '噸', isSelfReport: true },
   { subCat: '廢棄物管理', measure: '有害事業廢棄物', unit: '噸', isSelfReport: true },
   { subCat: '廢棄物管理', measure: '資源化再利用', unit: '噸', isSelfReport: true },
   { subCat: '毒化物申報', measure: '毒化物', isFake: true },
   { subCat: '環境違規', measure: '違反環境法規金額', unit: '元' },
+  { subCat: '環境違規', measure: '違反環境法規金額-空氣', unit: '元', onlyDetail: true },
+  { subCat: '環境違規', measure: '違反環境法規金額-水', unit: '元', onlyDetail: true },
+  { subCat: '環境違規', measure: '違反環境法規金額-misc', unit: '元', onlyDetail: true },
   { subCat: '環境違規', measure: '違反環境法規次數', unit: '次' }
 ]
 

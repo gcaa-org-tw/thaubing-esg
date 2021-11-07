@@ -34,7 +34,8 @@
               :key="column.key"
               v-if="column.span"
               :colspan="column.span"
-            ) {{column.subCat}}
+            )
+              div {{column.subCat}}
           thead.stats__header.stats__header--sub
             th(ref="company-column") 公司名稱
             th.pointer.stats__value(
@@ -85,24 +86,26 @@ const REFRESH_PERIOD = 100
 
 function enrichColumns (category) {
   let spanCursor
-  return esgColumns[category].map((column) => {
-    const richColumn = {
-      ...column,
-      key: `${column.subCat}-${column.measure}-${column.isSelfReport || ''}`,
-      cat: category,
-      isSubCatBegin: false,
-      span: 0
-    }
-    if (!spanCursor || richColumn.subCat !== spanCursor.subCat) {
-      richColumn.isSubCatBegin = true
-      if (!spanCursor) {
-        richColumn.isCatBegin = true
+  return esgColumns[category]
+    .filter(column => !column.onlyDetail)
+    .map((column) => {
+      const richColumn = {
+        ...column,
+        key: `${column.subCat}-${column.measure}-${column.isSelfReport || ''}`,
+        cat: category,
+        isSubCatBegin: false,
+        span: 0
       }
-      spanCursor = richColumn
-    }
-    spanCursor.span += 1
-    return richColumn
-  })
+      if (!spanCursor || richColumn.subCat !== spanCursor.subCat) {
+        richColumn.isSubCatBegin = true
+        if (!spanCursor) {
+          richColumn.isCatBegin = true
+        }
+        spanCursor = richColumn
+      }
+      spanCursor.span += 1
+      return richColumn
+    })
 }
 
 export default {
@@ -431,6 +434,7 @@ $row-height: 3.5rem;
       }
     }
     &--pri {
+      background: #0D0E09;
       th {
         top: 0;
         background: #0D0E09;
@@ -438,6 +442,7 @@ $row-height: 3.5rem;
 
         &.stats__value--begin {
           border-color: #ffffff26;
+          left: 5rem;
         }
       }
     }
@@ -456,6 +461,7 @@ $row-height: 3.5rem;
       text-align: right;
     }
     th {
+      width: 5rem;
       text-align: left;
       background: #fff;
       a {

@@ -4,10 +4,12 @@ const { get } = require('lodash')
 const CsvReadableStream = require('csv-reader')
 const AutoDetectDecoderStream = require('autodetect-decoder-stream')
 const { companyMap, createCompanyReportStream } = require('./utils')
-const { appendToBoth, finished } = require('./csvLogger')
+const { appendToBoth, finished, appendCompany, appendIndustry } = require('./csvLogger')
 const { extractFinance } = require('./extractGov')
 
 const DATA_DIR = path.join(__dirname, '../../data')
+
+const EMSP08_PATH = path.join(__dirname, '../assets/emsP08Columns.json')
 
 async function extractWasteFromCom () {
   await new Promise((resolve) => {
@@ -28,7 +30,7 @@ async function extractWasteFromCom () {
 
         const ctx = {
           esgCategory: 'E',
-          category: ' 廢棄物管理',
+          category: '廢棄物管理',
           isSelfReport: true,
           year
         }
@@ -53,27 +55,7 @@ async function extractWasteFromCom () {
 function extractAirPollution () {
   // 空氣污染物申報
   //   空氣污染物 data/ems_p_08.csv
-  const targetMeasures = [
-    { column: 'Benzene', label: '苯' },
-    { column: 'CarbonTetrachloride', label: '四氯化碳' },
-    { column: 'Dichloroethane11', label: '1-1-二氯乙烷' },
-    { column: 'Dichloroethane12', label: '1-2-二氯乙烷' },
-    { column: 'Dioxin', label: '戴奧辛' },
-    { column: 'Ethylbenzene', label: '乙苯' },
-    { column: 'Methylenechloride', label: '二氯甲烷' },
-    { column: 'NOx', label: '氮氧化物' },
-    { column: 'SOx', label: '硫氧化物' },
-    { column: 'Styrene', label: '苯乙烯' },
-    { column: 'TSP', label: '粒狀污染物' },
-    { column: 'Tetrachloroethylene', label: '四氯乙烯' },
-    { column: 'Toluene', label: '甲苯' },
-    { column: 'Trichloroethane', label: '三氯乙烷' },
-    { column: 'Trichloroethylene', label: '三氯乙烯' },
-    { column: 'VOCs', label: '揮發性有機化合物' },
-    { column: 'Xylene', label: '二甲苯' },
-    { column: 'chloroform', label: '三氯甲烷' },
-    { column: 'heavymetal', label: '重金屬' }
-  ]
+  const targetMeasures = JSON.parse(fs.readFileSync(EMSP08_PATH))
 
   const annualSum = {}
   return new Promise((resolve, reject) => {
@@ -113,15 +95,19 @@ function extractAirPollution () {
             const company = companyMap.find(id)
             const ctx = {
               esgCategory: 'E',
-              category: '空氣污染物申報',
               year
             }
             const sum = companySum[id]
-            Object.keys(sum).forEach((measure) => {
+            targetMeasures.forEach((measure) => {
+              const label = measure.label
+              if (!sum[label]) {
+                return
+              }
               appendToBoth(company, {
                 ...ctx,
-                measure,
-                value: sum[measure]
+                category: `空氣污染物申報-${measure.subCat}`,
+                measure: label,
+                value: sum[label]
               })
             })
           }
@@ -131,8 +117,23 @@ function extractAirPollution () {
   })
 }
 
-function extractPenalty () {
+async function extractPenalty () {
   const annualSum = {}
+  const penaltyCat = await new Promise((resolve) => {
+    const index = {}
+    fs
+      .createReadStream(path.join(DATA_DIR, 'penalty_category.csv'))
+      .pipe(new AutoDetectDecoderStream())
+      .pipe(new CsvReadableStream({ asObject: true }))
+      .on('data', (data) => {
+        index[data.法規名稱] = data.污染項目
+      })
+      .on('end', () => {
+        resolve(index)
+      })
+  })
+  const penaltyTypes = [...new Set(Object.values(penaltyCat))]
+
   return new Promise((resolve, reject) => {
     fs
       .createReadStream(path.join(DATA_DIR, 'ems_p_46_20211015.csv'))
@@ -147,42 +148,78 @@ function extractPenalty () {
         const year = (new Date(data.PENALTY_DATE)).getFullYear()
         const penalty = Number.parseFloat(data.PENALTY_MONEY)
 
+        const reasons = data.TRANSGRESS_LAW.split('，')
+        let penaltyType = 'misc'
+        reasons.some((reason) => {
+          if (penaltyCat[reason]) {
+            penaltyType = penaltyCat[reason]
+            return true
+          }
+          return false
+        })
+
         if (!annualSum[year]) {
           annualSum[year] = {}
         }
         if (!annualSum[year][company.統編]) {
-          annualSum[year][company.統編] = { penalty: 0, count: 0 }
+          annualSum[year][company.統編] = ['all', 'misc', ...penaltyTypes].reduce((sum, type) => {
+            sum[type] = { penalty: 0, count: 0 }
+            return sum
+          }, {})
         }
         const sum = annualSum[year][company.統編]
         if (Number.isNaN(penalty)) {
           console.warn(`Invalid penalty number for ${company.公司名稱}, DOCUMENT_NO: ${data.DOCUMENT_NO}`)
         } else {
-          sum.penalty += penalty
+          sum.all.penalty += penalty
+          sum[penaltyType].penalty += penalty
         }
-        sum.count += 1
+        sum.all.count += 1
+        sum[penaltyType].count += 1
       })
       .on('end', () => {
         for (const year in annualSum) {
           const companySum = annualSum[year]
           for (const id in companySum) {
             const company = companyMap.find(id)
+            const penalty = companySum[id]
             const ctx = {
               esgCategory: 'E',
               category: '環境違規',
               year
             }
-            appendToBoth(company, {
-              ...ctx,
-              measure: '違反環境法規金額',
-              value: companySum[id].penalty,
-              unit: '元'
-            })
-
-            appendToBoth(company, {
-              ...ctx,
-              measure: '違反環境法規次數',
-              value: companySum[id].count,
-              unit: '次'
+            Object.keys(penalty).forEach((type) => {
+              const ctxMoney = {
+                ...ctx,
+                measure: '違反環境法規金額',
+                value: penalty[type].penalty,
+                unit: '元'
+              }
+              const ctxCount = {
+                ...ctx,
+                measure: '違反環境法規次數',
+                value: penalty[type].count,
+                unit: '次'
+              }
+              if (type === 'all') {
+                appendIndustry(company.自訂產業別, {
+                  ...ctxMoney,
+                  id: company.統編
+                })
+                appendIndustry(company.自訂產業別, {
+                  ...ctxCount,
+                  id: company.統編
+                })
+              } else {
+                appendCompany(company.公司簡稱, {
+                  ...ctxMoney,
+                  measure: `${ctxMoney.measure}-${type}`
+                })
+                appendCompany(company.公司簡稱, {
+                  ...ctxCount,
+                  measure: `${ctxCount.measure}-${type}`
+                })
+              }
             })
           }
         }
@@ -444,7 +481,6 @@ async function main () {
   await extractAirPollution()
   //   違反環境法規紀錄
   await extractPenalty()
-  //   違反環境法規紀錄 TODO
   await finished()
   console.warn('[Environment] done')
 }
