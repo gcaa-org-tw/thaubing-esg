@@ -9,7 +9,9 @@ import { environment } from '~/assets/esgColumns'
 import { chartMixin } from '~/libs/mixins'
 
 export default {
-  mixins: [chartMixin(environment, '空氣污染物申報')],
+  mixins: [chartMixin(environment, (column) => {
+    return column.subCat.startsWith('空氣污染物申報-')
+  })],
   computed: {
     c3Config () {
       return {
