@@ -4,7 +4,7 @@ const { get } = require('lodash')
 const CsvReadableStream = require('csv-reader')
 const AutoDetectDecoderStream = require('autodetect-decoder-stream')
 const { companyMap, createCompanyReportStream } = require('./utils')
-const { appendToBoth, finished } = require('./csvLogger')
+const { appendToBoth, finished, appendCompany, appendIndustry } = require('./csvLogger')
 const { extractFinance } = require('./extractGov')
 
 const DATA_DIR = path.join(__dirname, '../../data')
@@ -30,7 +30,7 @@ async function extractWasteFromCom () {
 
         const ctx = {
           esgCategory: 'E',
-          category: ' 廢棄物管理',
+          category: '廢棄物管理',
           isSelfReport: true,
           year
         }
@@ -117,8 +117,23 @@ function extractAirPollution () {
   })
 }
 
-function extractPenalty () {
+async function extractPenalty () {
   const annualSum = {}
+  const penaltyCat = await new Promise((resolve) => {
+    const index = {}
+    fs
+      .createReadStream(path.join(DATA_DIR, 'penalty_category.csv'))
+      .pipe(new AutoDetectDecoderStream())
+      .pipe(new CsvReadableStream({ asObject: true }))
+      .on('data', (data) => {
+        index[data.法規名稱] = data.污染項目
+      })
+      .on('end', () => {
+        resolve(index)
+      })
+  })
+  const penaltyTypes = [...new Set(Object.values(penaltyCat))]
+
   return new Promise((resolve, reject) => {
     fs
       .createReadStream(path.join(DATA_DIR, 'ems_p_46_20211015.csv'))
@@ -133,42 +148,78 @@ function extractPenalty () {
         const year = (new Date(data.PENALTY_DATE)).getFullYear()
         const penalty = Number.parseFloat(data.PENALTY_MONEY)
 
+        const reasons = data.TRANSGRESS_LAW.split('，')
+        let penaltyType = 'misc'
+        reasons.some((reason) => {
+          if (penaltyCat[reason]) {
+            penaltyType = penaltyCat[reason]
+            return true
+          }
+          return false
+        })
+
         if (!annualSum[year]) {
           annualSum[year] = {}
         }
         if (!annualSum[year][company.統編]) {
-          annualSum[year][company.統編] = { penalty: 0, count: 0 }
+          annualSum[year][company.統編] = ['all', 'misc', ...penaltyTypes].reduce((sum, type) => {
+            sum[type] = { penalty: 0, count: 0 }
+            return sum
+          }, {})
         }
         const sum = annualSum[year][company.統編]
         if (Number.isNaN(penalty)) {
           console.warn(`Invalid penalty number for ${company.公司名稱}, DOCUMENT_NO: ${data.DOCUMENT_NO}`)
         } else {
-          sum.penalty += penalty
+          sum.all.penalty += penalty
+          sum[penaltyType].penalty += penalty
         }
-        sum.count += 1
+        sum.all.count += 1
+        sum[penaltyType].count += 1
       })
       .on('end', () => {
         for (const year in annualSum) {
           const companySum = annualSum[year]
           for (const id in companySum) {
             const company = companyMap.find(id)
+            const penalty = companySum[id]
             const ctx = {
               esgCategory: 'E',
               category: '環境違規',
               year
             }
-            appendToBoth(company, {
-              ...ctx,
-              measure: '違反環境法規金額',
-              value: companySum[id].penalty,
-              unit: '元'
-            })
-
-            appendToBoth(company, {
-              ...ctx,
-              measure: '違反環境法規次數',
-              value: companySum[id].count,
-              unit: '次'
+            Object.keys(penalty).forEach((type) => {
+              const ctxMoney = {
+                ...ctx,
+                measure: '違反環境法規金額',
+                value: penalty[type].penalty,
+                unit: '元'
+              }
+              const ctxCount = {
+                ...ctx,
+                measure: '違反環境法規次數',
+                value: penalty[type].count,
+                unit: '次'
+              }
+              if (type === 'all') {
+                appendIndustry(company.自訂產業別, {
+                  ...ctxMoney,
+                  id: company.統編
+                })
+                appendIndustry(company.自訂產業別, {
+                  ...ctxCount,
+                  id: company.統編
+                })
+              } else {
+                appendCompany(company.公司簡稱, {
+                  ...ctxMoney,
+                  measure: `${ctxMoney.measure}-${type}`
+                })
+                appendCompany(company.公司簡稱, {
+                  ...ctxCount,
+                  measure: `${ctxCount.measure}-${type}`
+                })
+              }
             })
           }
         }
@@ -430,7 +481,6 @@ async function main () {
   await extractAirPollution()
   //   違反環境法規紀錄
   await extractPenalty()
-  //   違反環境法規紀錄 TODO
   await finished()
   console.warn('[Environment] done')
 }
