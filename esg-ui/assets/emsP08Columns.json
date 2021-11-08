@@ -17,7 +17,7 @@
   { "column": "Trichloroethylene", "label": "三氯乙烯", "subCat": "有害空氣污染物", "unit": "公噸" },
   { "column": "Xylene", "label": "二甲苯", "subCat": "有害空氣污染物", "unit": "公噸" },
 
-  { "column": "Dioxin", "label": "戴奧辛", "unit": "公噸" },
+  { "column": "Dioxin", "label": "戴奧辛", "unit": "公斤" },
   { "column": "Trichloroethane", "label": "1-1-1-三氯乙烷", "unit": "公噸" },
-  { "column": "heavymetal", "label": "重金屬", "unit": "公斤" }
+  { "column": "heavymetal", "label": "重金屬", "unit": "公噸" }
 ]
