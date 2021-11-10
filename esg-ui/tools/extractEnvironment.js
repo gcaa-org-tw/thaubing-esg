@@ -148,11 +148,13 @@ async function extractPenalty () {
         const year = (new Date(data.PENALTY_DATE)).getFullYear()
         const penalty = Number.parseFloat(data.PENALTY_MONEY)
 
-        const reasons = data.TRANSGRESS_LAW.split('，')
+        const reason = data.TRANSGRESS_LAW
         let penaltyType = 'misc'
-        reasons.some((reason) => {
-          if (penaltyCat[reason]) {
-            penaltyType = penaltyCat[reason]
+        // let's do O(m*n) for now XD
+        // as this is the simplest way to match reason
+        Object.keys(penaltyCat).some((lawName) => {
+          if (reason.includes(lawName)) {
+            penaltyType = penaltyCat[lawName]
             return true
           }
           return false
