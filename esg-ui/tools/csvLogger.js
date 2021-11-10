@@ -141,8 +141,8 @@ function waitAllFinished () {
 }
 
 function appendToBoth (company, row) {
-  if ('value' in row && Number.isNaN(row.value)) {
-    throw new Error(`Get NaN on company: ${company.公司簡稱}:${company.股票代碼}, measure: ${row.measure}`)
+  if ('value' in row && (Number.isNaN(row.value) || row.value === undefined)) {
+    throw new Error(`Get NaN or undefined on company: ${company.公司簡稱}:${company.股票代碼}, measure: ${row.measure}, value: ${row.value}`)
   }
   appendIndustry(company.自訂產業別, {
     ...row,

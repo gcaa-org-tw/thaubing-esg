@@ -27,7 +27,7 @@ async function extractWorkInjury () {
 
         const fieldList = [
           { measure: '職災事故', value: data.職災事件數 },
-          { measure: '工安意外', value: data['工安意外揭露\n（火災、爆炸等）'] }
+          { measure: '工安意外', value: data['工安意外揭露'] }
         ]
 
         fieldList.forEach((row) => {

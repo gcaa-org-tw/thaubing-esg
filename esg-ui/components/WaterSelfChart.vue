@@ -18,13 +18,6 @@ export default {
         data: {
           x: 'x',
           columns: this.dumpSubCatStats(),
-          type: 'bar',
-          groups: [
-            ['回收水量', '耗用水量', '排放水量']
-          ],
-          types: {
-            總取水量: 'line'
-          },
           axes: {
             回收水量: 'y',
             耗用水量: 'y',

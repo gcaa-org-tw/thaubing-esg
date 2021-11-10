@@ -1,8 +1,7 @@
 <template lang="pug">
   chart-panel(
-    title="廢棄物管理"
-    :is-self-report="true"
-    :unit="['噸']"
+    title="一般空氣污染物"
+    :unit="['公噸']"
     :c3-config="c3Config"
   )
 </template>
@@ -11,17 +10,15 @@ import { environment } from '~/assets/esgColumns'
 import { chartMixin } from '~/libs/mixins'
 
 export default {
-  mixins: [chartMixin(environment, '廢棄物管理', true)],
+  mixins: [chartMixin(environment, (column) => {
+    return column.subCat.startsWith('空氣污染物申報-一般空氣污染物')
+  })],
   computed: {
     c3Config () {
       return {
         data: {
           x: 'x',
-          columns: this.dumpSubCatStats(),
-          type: 'bar',
-          groups: [
-            ['一般事業廢棄物', '有害事業廢棄物', '資源化再利用']
-          ]
+          columns: this.dumpSubCatStats()
         },
         axis: {
           x: {
@@ -31,7 +28,6 @@ export default {
             }
           },
           y: {
-            label: this.measureMap.一般事業廢棄物.unit,
             tick: {
               format: this.genYFormatter()
             }
@@ -43,11 +39,4 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-.chartPanel {
-  ::v-deep {
-    .c3-chart-line .c3-line {
-      stroke-width: 3px;
-    }
-  }
-}
 </style>
