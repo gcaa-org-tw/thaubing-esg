@@ -21,6 +21,7 @@ const environment = [
       return {
         subCat: `空氣污染物申報-${column.subCat}`,
         measure: column.label,
+        unit: column.unit,
         toFixed: 2,
         isAirPollution: true
       }
