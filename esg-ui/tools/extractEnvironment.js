@@ -237,7 +237,7 @@ async function extractWaterUsageFromCom () {
           return
         }
         const year = data.報告書年度
-        const fieldList = ['總取水量（不用填寫）', '回收水量', '耗用水量', '排放水量'].map((name) => {
+        const fieldList = ['總取水量', '回收水量', '耗用水量', '排放水量'].map((name) => {
           return {
             name: name.replace(/（.*）/g, ''),
             value: data[name],
