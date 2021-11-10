@@ -17,11 +17,18 @@
           select.industry__typeSelector(v-model="industry")
             option(v-for="opt in industries" :key="opt") {{opt}}
           i.fas.fa-sort
+      div
+        .f6.o-60.mb1 資料年份
+        label.flex.items-center
+          select.industry__typeSelector(:value="year" @input="chageYear")
+            option(v-for="year in yearList" :key="year") {{year}}
+          i.fas.fa-sort
+    .industry__nav.container.flex-ns.items-end
       .flex.mt3.mt0-ns
         .industry__catNav.dim(
           v-for="cat in catList"
           :key="cat.type"
-          :class="{'industry__catNav--active': activeCat === cat.type}"
+          :class="[`industry__catNav--${cat.type}`]"
           @click="visitCat(cat)"
         ) {{cat.label}}
     .container
@@ -42,7 +49,7 @@
               v-for="column in esgColumns"
               :key="column.key"
               @click="toggleSort(column)"
-              :class="{'stats__value--begin': column.isSubCatBegin}"
+              :class="{'stats__value--begin': column.isSubCatBegin, [`stats__value--${column.cat}`]: true}"
               :ref="catAnchor(column)"
             )
               intersect(@enter="enterColumn(column)")
@@ -149,6 +156,9 @@ export default {
     year () {
       return this.$route.query.year || '2019'
     },
+    yearList () {
+      return [...new Set(this.stats.body.map(stat => stat.年份))].sort((a, b) => b - a)
+    },
     downloadLink () {
       return `${this.$router.options.base}content/industry/${this.industry}.csv`
     },
@@ -220,6 +230,15 @@ export default {
     enterColumn (column) {
       // TODO: make intersection more robust in table
       // this.activeCat = column.cat
+    },
+    chageYear (event) {
+      this.$router.push({
+        name: this.$route.name,
+        query: {
+          year: event.target.value
+        },
+        params: this.$route.params
+      })
     },
     checkTablePosition: throttle(function (ev) {
       const target = ev.target
@@ -369,6 +388,7 @@ $nl-space: 1rem;
     padding: 0;
     margin: 0;
     cursor: pointer;
+    width: 7rem;
   }
   &__catNav {
     margin-right: 2.5rem;
@@ -381,6 +401,13 @@ $nl-space: 1rem;
     // &--active {
     //   opacity: 100%;
     // }
+
+    &--social {
+      color: #1A83CF;
+    }
+    &--governance {
+      color: #6F26CB;
+    }
   }
   &__footer {
     margin: 1.5rem 0;
@@ -414,6 +441,15 @@ $row-height: 3.5rem;
   &__value {
     &--begin:not(:nth-child(2)) {
       border-left: 2px solid #00000026;
+    }
+    &--environment {
+      background: $green-primary;
+    }
+    &--social {
+      background: #1A83CF;
+    }
+    &--governance {
+      background: #6F26CB;
     }
   }
   &__header {
@@ -449,8 +485,10 @@ $row-height: 3.5rem;
     &--sub {
       th {
         top: $row-height;
-        background: $green-primary;
         text-align: right;
+        &:first-child {
+          background: $green-primary;
+        }
       }
     }
   }
