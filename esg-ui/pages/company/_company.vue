@@ -23,8 +23,10 @@
           waste-self-chart(:stats="stats.body")
         .charts__item.charts__item--two
           penalty-chart(:stats="stats.body")
-        .charts__item.charts__item--two
-          air-pollution-chart(:stats="stats.body")
+        .charts__item.charts__item
+          regular-air-pollution-chart(:stats="stats.body")
+        .charts__item.charts__item
+          harmful-air-pollution-chart(:stats="stats.body")
       .company__subtitle Social 社會責任相關數據
       .charts
         .charts__item.charts__item--two
