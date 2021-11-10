@@ -17,6 +17,13 @@
           select.industry__typeSelector(v-model="industry")
             option(v-for="opt in industries" :key="opt") {{opt}}
           i.fas.fa-sort
+      div
+        .f6.o-60.mb1 資料年份
+        label.flex.items-center
+          select.industry__typeSelector(:value="year" @input="chageYear")
+            option(v-for="year in yearList" :key="year") {{year}}
+          i.fas.fa-sort
+    .industry__nav.container.flex-ns.items-end
       .flex.mt3.mt0-ns
         .industry__catNav.dim(
           v-for="cat in catList"
@@ -149,6 +156,9 @@ export default {
     year () {
       return this.$route.query.year || '2019'
     },
+    yearList () {
+      return [...new Set(this.stats.body.map(stat => stat.年份))].sort((a, b) => b - a)
+    },
     downloadLink () {
       return `${this.$router.options.base}content/industry/${this.industry}.csv`
     },
@@ -220,6 +230,15 @@ export default {
     enterColumn (column) {
       // TODO: make intersection more robust in table
       // this.activeCat = column.cat
+    },
+    chageYear (event) {
+      this.$router.push({
+        name: this.$route.name,
+        query: {
+          year: event.target.value
+        },
+        params: this.$route.params
+      })
     },
     checkTablePosition: throttle(function (ev) {
       const target = ev.target
@@ -369,6 +388,7 @@ $nl-space: 1rem;
     padding: 0;
     margin: 0;
     cursor: pointer;
+    width: 7rem;
   }
   &__catNav {
     margin-right: 2.5rem;
