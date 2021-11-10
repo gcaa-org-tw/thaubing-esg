@@ -21,7 +21,7 @@
         .industry__catNav.dim(
           v-for="cat in catList"
           :key="cat.type"
-          :class="{'industry__catNav--active': activeCat === cat.type}"
+          :class="[`industry__catNav--${cat.type}`]"
           @click="visitCat(cat)"
         ) {{cat.label}}
     .container
@@ -42,7 +42,7 @@
               v-for="column in esgColumns"
               :key="column.key"
               @click="toggleSort(column)"
-              :class="{'stats__value--begin': column.isSubCatBegin}"
+              :class="{'stats__value--begin': column.isSubCatBegin, [`stats__value--${column.cat}`]: true}"
               :ref="catAnchor(column)"
             )
               intersect(@enter="enterColumn(column)")
@@ -381,6 +381,13 @@ $nl-space: 1rem;
     // &--active {
     //   opacity: 100%;
     // }
+
+    &--social {
+      color: #1A83CF;
+    }
+    &--governance {
+      color: #6F26CB;
+    }
   }
   &__footer {
     margin: 1.5rem 0;
@@ -414,6 +421,15 @@ $row-height: 3.5rem;
   &__value {
     &--begin:not(:nth-child(2)) {
       border-left: 2px solid #00000026;
+    }
+    &--environment {
+      background: $green-primary;
+    }
+    &--social {
+      background: #1A83CF;
+    }
+    &--governance {
+      background: #6F26CB;
     }
   }
   &__header {
@@ -449,8 +465,10 @@ $row-height: 3.5rem;
     &--sub {
       th {
         top: $row-height;
-        background: $green-primary;
         text-align: right;
+        &:first-child {
+          background: $green-primary;
+        }
       }
     }
   }
