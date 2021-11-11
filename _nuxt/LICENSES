@@ -8,6 +8,9 @@
  */
 
 
+/* @license C3.js v0.7.20 | (c) C3 Team and other contributors | http://c3js.org/ */
+
+
 /*!
  * vue-client-only v0.0.0-semantic-release
  * (c) 2021-present egoist <0x142857@gmail.com>
@@ -19,9 +22,6 @@
  * (c) 2018-present egoist <0x142857@gmail.com>
  * Released under the MIT License.
  */
-
-
-/* @license C3.js v0.7.20 | (c) C3 Team and other contributors | http://c3js.org/ */
 
 
 /*!
