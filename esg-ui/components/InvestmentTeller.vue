@@ -49,7 +49,7 @@ export default {
     },
     invStyle () {
       return {
-        gridTemplateColumns: `min(10rem, 25vw) 4rem repeat(${this.fundList.length}, 1fr)`
+        gridTemplateColumns: `min(20rem, 25vw) 4rem repeat(${this.fundList.length}, 1fr)`
       }
     },
     curMaxStatVal () {
@@ -253,7 +253,7 @@ $unknown: #c1c1c1;
   &__company {
     padding: 0 0.5rem;
     position: sticky;
-    left: min(10rem, 25vw);
+    left: min(20rem, 25vw);
   }
   &__fundFlag {
     padding: 0 0.625rem;
