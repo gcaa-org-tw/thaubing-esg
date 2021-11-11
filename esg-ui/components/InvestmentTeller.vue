@@ -1,7 +1,7 @@
 <template lang="pug">
   .invTeller(:style="invStyle")
     .invTeller__measureHead
-      button.invTeller__switch.bg-transparent.f3.fw6.mb2.pointer.db.pa0(
+      button.invTeller__switch.bg-transparent.f3.fw6.mb2.pointer.db.pa0.w-100.tl(
         v-for="measure in orderOptions"
         @click="switchOrder"
         :class="[measure === orderBy ? 'o-100' : 'o-50']"
@@ -36,7 +36,7 @@ export default {
   },
   data () {
     return {
-      orderBy: TARGET_MEASURES[1]
+      orderBy: TARGET_MEASURES[0]
     }
   },
   computed: {
