@@ -336,7 +336,8 @@ async function extractGhGasFromCom (incomeMap) {
           { name: '範疇二間接排放', value: data['範疇二（值）'] },
           { name: '範疇三其他排放', value: data['範疇三（值）'] }
         ]
-        const total = totList.reduce((total, row) => {
+        // total = 範疇一 + 範疇二
+        const total = totList.slice(0, 2).reduce((total, row) => {
           if (typeof row.value === 'number') {
             return total + row.value
           }
