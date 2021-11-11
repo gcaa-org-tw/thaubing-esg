@@ -98,7 +98,7 @@ export default {
         TARGET_MEASURES.forEach((measure) => {
           const value = row.E[measure]
           if (Number.isNaN(value) || value === undefined) {
-            row.E[measure] = quartileMap[measure].thridForth
+            row.E[measure] = 0
             row.color[measure] = 'unknown'
           } else if (value >= quartileMap[measure].thridForth) {
             row.color[measure] = 'red'
@@ -121,7 +121,7 @@ export default {
   methods: {
     printValue (stat) {
       if (stat.color[this.orderBy] === 'unknown') {
-        return '?'
+        return '未揭露'
       }
       return stat.E[this.orderBy].toFixed(2)
     },
@@ -139,6 +139,11 @@ export default {
       return [`invTeller__statVal--${stat.color[this.orderBy]}`]
     },
     barStyle (stat) {
+      if (stat.color[this.orderBy] === 'unknown') {
+        return {
+          width: '6.5rem'
+        }
+      }
       return {
         width: `${stat.E[this.orderBy] * 100 / this.curMaxStatVal}%`
       }
