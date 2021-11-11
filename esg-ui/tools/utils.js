@@ -74,13 +74,13 @@ class CompanyMap {
   }
 }
 
-function createCompanyReportStream (sheetId) {
+function createCompanyReportStream (sheetId, apiBase) {
   const query = [
     `gid=${sheetId}`,
     'single=true',
     'output=csv'
   ].join('&')
-  const endpoint = `${COMPANY_REPORT_URI}${query}`
+  const endpoint = `${apiBase || COMPANY_REPORT_URI}${query}`
   return got.stream(endpoint)
     .pipe(new AutoDetectDecoderStream())
     .pipe(new CsvReadableStream({ asObject: true }))

@@ -23,6 +23,8 @@
           select.industry__typeSelector(:value="year" @input="chageYear")
             option(v-for="year in yearList" :key="year") {{year}}
           i.fas.fa-sort
+    .industry__fund.container
+      investment-teller(:stats="stats.body" :company-map="companyMap" :year="year")
     .industry__nav.container.flex-ns.items-end
       .flex.mt3.mt0-ns
         .industry__catNav.dim(
@@ -175,11 +177,17 @@ export default {
         ...enrichColumns('governance')
       ]
     },
-    companyStats () {
-      const companyMap = this.companyList.body.reduce((map, company) => {
+    companyMap () {
+      return this.companyList.body.reduce((map, company) => {
         if (company.自訂產業別 !== this.$route.params.industry) {
           return map
         }
+        map[company.統編] = company
+        return map
+      }, {})
+    },
+    companyStats () {
+      const companyMap = Object.values(this.companyMap).reduce((map, company) => {
         map[company.統編] = {
           company,
           stats: {}
