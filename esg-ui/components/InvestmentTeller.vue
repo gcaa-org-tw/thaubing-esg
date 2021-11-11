@@ -17,9 +17,12 @@
           company-abbr(:company="stat.company")
         .invTeller__fundFlag.bg-white.flex.items-center(v-for="fund in fundList")
           .invTeller__flag(v-if="stat.X[fund.name]" :class="flagClass(stat)") T
+      .invTeller__unit.tr {{unit}}
 </template>
 <script>
+import { environment } from '~/assets/esgColumns'
 const TARGET_MEASURES = ['碳密集度', '能源密集度']
+
 export default {
   props: {
     stats: {
@@ -41,6 +44,9 @@ export default {
     }
   },
   computed: {
+    unit () {
+      return environment.find(column => column.measure === this.orderBy).unit
+    },
     invStyle () {
       return {
         gridTemplateColumns: `min(10rem, 25vw) 4rem repeat(${this.fundList.length}, 1fr)`
@@ -191,6 +197,9 @@ $unknown: #c1c1c1;
   width: 100%;
   max-height: 50vh;
   overflow: auto;
+  @include ns-screen {
+    max-height: none;
+  }
 }
 
 .invTeller {
@@ -220,6 +229,10 @@ $unknown: #c1c1c1;
   &__stat {
     background: white;
     height: 2rem;
+    position: sticky;
+    left: 0;
+  }
+  &__unit {
     position: sticky;
     left: 0;
   }
