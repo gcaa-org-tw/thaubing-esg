@@ -3,9 +3,49 @@ const path = require('path')
 const CsvReadableStream = require('csv-reader')
 const AutoDetectDecoderStream = require('autodetect-decoder-stream')
 const { companyMap, createCompanyReportStream } = require('./utils')
-const { appendToBoth, finished } = require('./csvLogger')
+const { appendToBoth, finished, appendIndustry } = require('./csvLogger')
 
 const DATA_DIR = path.join(__dirname, '../../data')
+
+async function extractEsgIndexFromCom () {
+  await new Promise((resolve) => {
+    createCompanyReportStream('580664726', 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCiyzgDnjrQVIJ0H5xLFJDjmhQhVoBqfEAZRPVG0JfQcVGnJTcLorgF3d02pERBO2GYkv7i8kbuWJA/pub?')
+      .on('data', (data) => {
+        const company = companyMap.findByStock(data.證券代號)
+        if (!company) {
+          return
+        }
+        const year = data.報告書年度
+        const indexList = [
+          '中國信託臺灣ESG永續關鍵半導體ETF基金',
+          '元大臺灣ESG永續ETF基金',
+          '永豐台灣ESG永續優質ETF基金',
+          '國泰ESG永續高股息',
+          '富邦臺灣公司治理100基金'
+        ]
+
+        const ctx = {
+          esgCategory: 'X',
+          category: '相關金融商品',
+          year
+        }
+
+        indexList.forEach((index) => {
+          if (data[index]) {
+            appendIndustry(company.自訂產業別, {
+              ...ctx,
+              measure: index,
+              value: 'T',
+              id: company.統編
+            })
+          }
+        })
+      })
+      .on('end', () => {
+        resolve()
+      })
+  })
+}
 
 async function extractISOFromCom () {
   await new Promise((resolve) => {
@@ -210,6 +250,8 @@ async function main () {
   // 稅務透明度-補助、補貼
   await extractTransparencyFromCom()
   await extractISOFromCom()
+  // 基金投資標的
+  await extractEsgIndexFromCom()
   await finished()
   console.warn('[Gov] done')
 }
