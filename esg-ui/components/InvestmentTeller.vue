@@ -1,21 +1,22 @@
 <template lang="pug">
-  .invTeller(:style="invStyle")
-    .invTeller__measureHead
-      button.invTeller__switch.bg-transparent.f3.fw6.mb2.pointer.db.pa0(
-        v-for="measure in orderOptions"
-        @click="switchOrder"
-        :class="[measure === orderBy ? 'o-100' : 'o-50']"
-      ) {{measure}}
-    .invTeller__fundHead.black(v-for="fund in fundList")
-      .fw6 {{fund.cat}}
-      .fw4(v-for="line in fundName(fund)") {{line}}
-    template(v-for="stat in sortedStats")
-      .invTeller__stat.bg-white.br2.br--left
-        .invTeller__statVal.br2.h-100.ml-auto.fw6.pr1.flex.items-center.justify-end(:class="barClass(stat)" :style="barStyle(stat)") {{printValue(stat)}}
-      .invTeller__company.bg-white.flex.items-center
-        | {{stat.company.公司簡稱}}
-      .invTeller__fundFlag.bg-white.flex.items-center(v-for="fund in fundList")
-        .invTeller__flag(v-if="stat.X[fund.name]" :class="flagClass(stat)") T
+  .invTellerWrapper
+    .invTeller(:style="invStyle" v-if="fundList.length")
+      .invTeller__measureHead
+        button.invTeller__switch.bg-transparent.w-100-ns.f3.fw6.mb2.pointer.db.pa0.tl(
+          v-for="measure in orderOptions"
+          @click="switchOrder"
+          :class="[measure === orderBy ? 'o-100' : 'o-50']"
+        ) {{measure}}
+      .invTeller__fundHead.black(v-for="fund in fundList")
+        .fw6 {{fund.cat}}
+        .fw4(v-for="line in fundName(fund)") {{line}}
+      template(v-for="stat in sortedStats")
+        .invTeller__stat.bg-white.br2.br--left
+          .invTeller__statVal.br2.h-100.ml-auto.fw6.pr1.flex.items-center.justify-end(:class="barClass(stat)" :style="barStyle(stat)") {{printValue(stat)}}
+        .invTeller__company.bg-white.flex.items-center
+          company-abbr(:company="stat.company")
+        .invTeller__fundFlag.bg-white.flex.items-center(v-for="fund in fundList")
+          .invTeller__flag(v-if="stat.X[fund.name]" :class="flagClass(stat)") T
 </template>
 <script>
 const TARGET_MEASURES = ['碳密集度', '能源密集度']
@@ -36,13 +37,13 @@ export default {
   },
   data () {
     return {
-      orderBy: TARGET_MEASURES[1]
+      orderBy: TARGET_MEASURES[0]
     }
   },
   computed: {
     invStyle () {
       return {
-        gridTemplateColumns: `1.5fr 4rem repeat(${this.fundList.length}, 1fr)`
+        gridTemplateColumns: `min(10rem, 25vw) 4rem repeat(${this.fundList.length}, 1fr)`
       }
     },
     curMaxStatVal () {
@@ -98,7 +99,7 @@ export default {
         TARGET_MEASURES.forEach((measure) => {
           const value = row.E[measure]
           if (Number.isNaN(value) || value === undefined) {
-            row.E[measure] = quartileMap[measure].thridForth
+            row.E[measure] = 0
             row.color[measure] = 'unknown'
           } else if (value >= quartileMap[measure].thridForth) {
             row.color[measure] = 'red'
@@ -121,9 +122,10 @@ export default {
   methods: {
     printValue (stat) {
       if (stat.color[this.orderBy] === 'unknown') {
-        return '?'
+        return '未揭露'
       }
-      return stat.E[this.orderBy].toFixed(2)
+      const value = Math.round(stat.E[this.orderBy] * 100) / 100
+      return value.toLocaleString()
     },
     switchOrder () {
       this.orderBy = TARGET_MEASURES.find(haystack => haystack !== this.orderBy)
@@ -139,6 +141,11 @@ export default {
       return [`invTeller__statVal--${stat.color[this.orderBy]}`]
     },
     barStyle (stat) {
+      if (stat.color[this.orderBy] === 'unknown') {
+        return {
+          width: '6.5rem'
+        }
+      }
       return {
         width: `${stat.E[this.orderBy] * 100 / this.curMaxStatVal}%`
       }
@@ -180,22 +187,41 @@ $yellow: #FACB3D;
 $green: #6FAC45;
 $unknown: #c1c1c1;
 
+.invTellerWrapper {
+  width: 100%;
+  max-height: 50vh;
+  overflow: auto;
+}
+
 .invTeller {
   display: grid;
   row-gap: 0.375rem;
   max-width: 80rem;
+  min-width: 48rem;
+  position: relative;
 
   &__measureHead {
     grid-column: 1 / span 2;
     padding: 0.375rem 0.625rem;
+    position: sticky;
+    left: 0;
+    top: 0;
+    z-index: 1;
+    background: #EBEDEB;
+    // background: linear-gradient(90deg, rgba(235,237,235,1) 0%, rgba(235,237,235,1) 60%, rgba(255,255,255,0.26) 75%, #ffffff00 90%);
   }
   &__fundHead {
     padding: 0.375rem 0.625rem;
+    position: sticky;
+    top: 0;
+    background: #EBEDEB;
   }
 
   &__stat {
     background: white;
     height: 2rem;
+    position: sticky;
+    left: 0;
   }
   &__statVal {
     background: $unknown;
@@ -213,6 +239,8 @@ $unknown: #c1c1c1;
   }
   &__company {
     padding: 0 0.5rem;
+    position: sticky;
+    left: min(10rem, 25vw);
   }
   &__fundFlag {
     padding: 0 0.625rem;
