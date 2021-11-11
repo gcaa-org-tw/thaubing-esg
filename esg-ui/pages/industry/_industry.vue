@@ -10,7 +10,7 @@
       .industry__year.f6.o-70 資料年份：{{year}}
       a.industry__officialSite.absolute(href="https://thaubing.gcaa.org.tw/")
         img(src="~/assets/logo.png")
-    .industry__nav.container.flex-ns.items-end
+    .industry__nav.container.flex.items-end
       .mr5
         .f6.o-60.mb1 產業
         label.flex.items-center
