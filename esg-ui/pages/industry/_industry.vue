@@ -65,7 +65,7 @@
           tbody.stats__body
             tr(v-for="row in visibleStats" :key="row.company.統編")
               th
-                nuxt-link.dim(:to="companyUrl(row.company)") {{row.company.公司簡稱}}
+                company-abbr(:company="row.company")
               td.stats__value(
                 v-for="column in esgColumns"
                 :key="column.key"
@@ -269,9 +269,6 @@ export default {
         return ['fa-sort-up']
       }
       return ['fa-sort-down']
-    },
-    companyUrl (company) {
-      return `/company/${company.公司簡稱}`
     },
     visitCat (cat) {
       const ref = this.$refs[`cat-${cat.type}`]
@@ -510,10 +507,6 @@ $row-height: 3.5rem;
       width: 5rem;
       text-align: left;
       background: #fff;
-      a {
-        color: $green-primary;
-        text-decoration: underline;
-      }
     }
     tr {
       &:not(:last-child) {

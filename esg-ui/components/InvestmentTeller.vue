@@ -13,7 +13,7 @@
       .invTeller__stat.bg-white.br2.br--left
         .invTeller__statVal.br2.h-100.ml-auto.fw6.pr1.flex.items-center.justify-end(:class="barClass(stat)" :style="barStyle(stat)") {{printValue(stat)}}
       .invTeller__company.bg-white.flex.items-center
-        | {{stat.company.公司簡稱}}
+        company-abbr(:company="stat.company")
       .invTeller__fundFlag.bg-white.flex.items-center(v-for="fund in fundList")
         .invTeller__flag(v-if="stat.X[fund.name]" :class="flagClass(stat)") T
 </template>
