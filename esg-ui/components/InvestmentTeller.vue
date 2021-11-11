@@ -1,5 +1,5 @@
 <template lang="pug">
-  .invTeller(:style="invStyle")
+  .invTeller(:style="invStyle" v-if="fundList.length")
     .invTeller__measureHead
       button.invTeller__switch.bg-transparent.f3.fw6.mb2.pointer.db.pa0.w-100.tl(
         v-for="measure in orderOptions"
@@ -123,7 +123,8 @@ export default {
       if (stat.color[this.orderBy] === 'unknown') {
         return '未揭露'
       }
-      return stat.E[this.orderBy].toFixed(2)
+      const value = Math.round(stat.E[this.orderBy] * 100) / 100
+      return value.toLocaleString()
     },
     switchOrder () {
       this.orderBy = TARGET_MEASURES.find(haystack => haystack !== this.orderBy)
