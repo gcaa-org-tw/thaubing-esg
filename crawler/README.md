@@ -1,38 +1,47 @@
-# thaubing-esg > crawler
+# ESG 檢測儀 - 資料爬蟲
 
-## Requirement
+## 安裝需求
 
-- Python 3.9+ and [pipenv](https://pipenv.pypa.io/en/latest/)
+- [Python](https://www.python.org/) 3.9+
+- [pipenv](https://pipenv.pypa.io/en/latest/)
 
-Install the required dependencies by running in the root directory,
+## 開發流程
+
+首次使用，需安裝所需套件：
 
 ```bash
-pip install pipenv       # install pipenv
-pipenv install           # install dependencies
+pip install pipenv  # install pipenv
+pipenv install      # install dependencies
 ```
 
-## How to run
-
-To scrape with specific spider, run,
+### 執行爬蟲
 
 ```bash
-cd crawler # move to directory ./crawler
+# without year specified
+pipenv run scrapy crawl [spider_name]
+
+# with year specified
 pipenv run scrapy crawl [spider_name] -a year=[year]
 ```
 
-...where the optional argument `year` indicates the target year for financial report. If no argument is provided, by default, the latest year avialable is used.
+#### 參數說明
 
-## Projects
+- `spider_name`：資料爬蟲的蜘蛛名稱，詳見下方可用蜘蛛列表
+- `year`：資料爬蟲的年份，選填，預設值為最近年度
 
-- Spider: name of the spider.
-- Description: brief description of the spider.
-- Ouput: scraped data or files, saved in directory `$ ./data/`.
-- Dependency: requirement for running the spider (output from the dependent spider(s) needed as spider input.)
+### 可用蜘蛛列表
 
-| Spider         | Description    | Output             | Dependency |
-| -------------- | -------------- | ------------------ | ---------- |
-| `company`      | 公司基本資料          | company.csv | - |
-| `financial`    | 合併財務報表          | financial/webpages/[year]/*.html | `company` |
-| `income`       | 重要會計科目資料       | income.csv | `financial` |
-| `salary`       | 員工薪資資料          | salary.csv<br>salary/webpages/*.html | - |
-| `shareholding` | 董監事持股餘額明細資料  | shareholding.csv<br>shareholding/webpages/[year]/[stock_code].html | `company` |
+| 蜘蛛 | 說明 | 輸出檔案名 | 前置需求 |
+| --- | ---- | -------- | ------- |
+| `company`      | 公司基本資料 | company.csv | - |
+| `financial`    | 合併財務報表 | financial/webpages/[year]/*.html | `company` |
+| `income`       | 重要會計科目資料 | income.csv | `financial` |
+| `salary`       | 員工薪資資料 | salary.csv<br>salary/webpages/*.html | - |
+| `shareholding` | 董監事持股餘額明細資料 | shareholding.csv<br>shareholding/webpages/[year]/[stock_code].html | `company` |
+
+#### 欄位說明
+
+- **蜘蛛**：蜘蛛名稱。
+- **說明**`：該蜘蛛所爬取的資料集名稱。
+- **輸出檔案名**：該蜘蛛所爬取的資料檔名，檔案存於目錄 `$ ./data/` 內。
+- **前置需求**：執行該蜘蛛的需求條件，用作該蜘蛛的輸入參數。
