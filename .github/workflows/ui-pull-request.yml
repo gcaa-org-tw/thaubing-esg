@@ -6,6 +6,9 @@ defaults:
 
 on:
   pull_request:
+    paths:
+      - 'data/**'
+      - 'esg-ui/**'
     branches:
       - main
       - master

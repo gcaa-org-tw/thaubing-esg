@@ -6,6 +6,9 @@ defaults:
 
 on:
   push:
+    paths:
+      - 'data/**'
+      - 'esg-ui/**'
     branches:
       - main
       - master
