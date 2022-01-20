@@ -6,7 +6,7 @@
         nuxt-link.white.dim(to="/about") 關於計畫
     .mw8.center.mt4.ph3
       h1.green.fw5.f3 {{company.公司名稱}}
-      .green {{company.自訂產業別}} · 資本額 {{capital}}
+      .green {{company.自訂產業別}} · 資本額 {{capital}} 元
       .company__subtitle Environment 環境保護相關數據
       .charts
         .charts__item
