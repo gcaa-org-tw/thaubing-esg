@@ -1,5 +1,51 @@
 FILENAME_COMPANY = 'company.csv'
 
+# 公司登記資料-C製造業
+# https://quality.data.gov.tw/dq_download_csv.php?nid=[nid]&md5_url=[md5_url]
+company_payload = [
+    { # 東台灣排除六都
+        "nid": 108385,
+        "md5_url": "1249a34c949b05a8645ac19fdeaef602"
+    },
+    { # 南台灣排除六都
+        "nid": 108367,
+        "md5_url": "4644850b293f8d9488df77f351bfe93c"
+    },
+    { # 北台灣排除六都
+        "nid": 108363,
+        "md5_url": "f0aa2c3f4349d5a5c5b21d1c57e1bc7c"
+    },
+    { # 中台灣排除六都
+        "nid": 108354,
+        "md5_url": "caac4cd079f4d68ef67d81c965e26c4f"
+    },
+    { # 台北市
+        "nid": 44692,
+        "md5_url": "f23b9d9a7cd3ae78c2ee85c2bde8b76f"
+    },
+    { # 新北市
+        "nid": 44676,
+        "md5_url": "04fc4827d5f245d8a4dc0eb3f3b7238e"
+    },
+    { # 桃園市
+        "nid": 45662,
+        "md5_url": "9b37980cf5276c8d92c98a5f4a972752"
+    },
+    { # 台中市
+        "nid": 45644,
+        "md5_url": "4ac4fd25720c78effbebc6007f2466cb"
+    },
+    { # 台南市
+        "nid": 54295,
+        "md5_url": "b856f96703cd9a8a41b0463ae36071ae"
+    },
+    { # 高雄市
+        "nid": 54294,
+        "md5_url": "b291804edb8a98df9c9cf5e9c1945827"
+    }
+]
+
+
 accounting_subjects = [
     {
       "key": "total_operating_revenue",
