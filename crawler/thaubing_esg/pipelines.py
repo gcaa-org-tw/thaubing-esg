@@ -9,8 +9,48 @@ def gen_data_filepath(filename: str):
         os.makedirs(filedir)
     return filepath
 
+
 class CompanyPipeline:
     filepath = gen_data_filepath('company.csv')
+
+    def open_spider(self, spider):
+        self.file = open(self.filepath, 'wb')
+        self.exporter = CsvItemExporter(self.file)
+
+        self.company_abbr = pd.read_csv(gen_data_filepath('temp/company_abbr.csv'))
+
+        # specifies exported fields and order
+        self.exporter.fields_to_export = [
+            'stock_code',
+            'name',
+            'name_abbr',
+            'tax_code',
+            'industry_code',
+            'industry',
+            'company_type'
+        ]
+
+    def close_spider(self, spider):
+        self.exporter.finish_exporting()
+        self.file.close()
+
+    def process_item(self, item, spider):
+        # for items that has stock_code, assign its name_abbr and company_type
+        if item['stock_code'] != '':
+            try:
+                item_abbr = self.company_abbr.loc[self.company_abbr['stock_code'] == int(item['stock_code'])].iloc[0]
+                item['name_abbr'] = item_abbr.loc['name_abbr']
+                item['company_type'] = item_abbr.loc['company_type']
+                # spider.logger.info('stock_code={}, name_abbr={}'.format(item['stock_code'], item_abbr.loc['name_abbr']))
+            except:
+                # spider.logger.info('No name_abbr and/or company_type found for stock_code={}'.format(item['stock_code']))
+                pass
+        self.exporter.export_item(item)
+        return item
+
+
+class CompanyAbbrPipeline:
+    filepath = gen_data_filepath('temp/company_abbr.csv')
 
     def open_spider(self, spider):
         self.file = open(self.filepath, 'wb')
@@ -23,7 +63,8 @@ class CompanyPipeline:
             'name_abbr',
             'tax_code',
             'industry_code',
-            'company_type',
+            'industry',
+            'company_type'
         ]
 
     def close_spider(self, spider):
