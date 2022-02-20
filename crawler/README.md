@@ -33,7 +33,8 @@ pipenv run scrapy crawl [spider_name] -a year=[year]
 
 | 蜘蛛 | 說明 | 輸出檔案名 | 前置需求 |
 | --- | ---- | -------- | ------- |
-| `company`      | 公司基本資料 | company.csv | - |
+| `company_abbr` | 公司基本資料－公司簡稱和公司類型（上市、興櫃、公開發行） | temp/company_abbr.csv | - |
+| `company`      | 公司基本資料 | company.csv | `company_abbr` |
 | `financial`    | 合併財務報表 | financial/webpages/[year]/*.html | `company` |
 | `income`       | 重要會計科目資料 | income.csv | `financial` |
 | `salary`       | 員工薪資資料 | salary.csv<br>salary/webpages/*.html | - |
