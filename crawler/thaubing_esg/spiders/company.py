@@ -4,8 +4,7 @@ from io import BytesIO
 from scrapy import Request
 from scrapy.spiders import CSVFeedSpider
 from ..items import CompanyItem
-from ..util import zip_urls
-
+from ..util import industry_code_switcher, zip_urls
 
 class CompanySpider(CSVFeedSpider):
     name = 'company'
@@ -27,7 +26,12 @@ class CompanySpider(CSVFeedSpider):
         item['name']          = row['公司名稱']
         item['tax_code']      = row['統一編號']
         item['industry_code'] = row['產業別（金融監督管理委員會匯入）']
+        if item['industry_code'] != '':
+            item['industry'] = self._parse_industry_code(item['industry_code'])
         return item
+
+    def _parse_industry_code(self, industry_code):
+        return industry_code_switcher.get(int(industry_code), '')
 
 
 class PrerunZipfileDownloader:
