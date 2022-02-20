@@ -20,10 +20,8 @@ class CompanyPipeline:
         self.exporter.fields_to_export = [
             'stock_code',
             'name',
-            'name_abbr',
             'tax_code',
             'industry_code',
-            'company_type',
         ]
 
     def close_spider(self, spider):
