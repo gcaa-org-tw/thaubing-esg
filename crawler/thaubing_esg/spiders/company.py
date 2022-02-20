@@ -1,35 +1,60 @@
+import os
+import requests, zipfile
+from io import BytesIO
+from scrapy import Request
 from scrapy.spiders import CSVFeedSpider
 from ..items import CompanyItem
+from ..util import zip_urls
 
 
 class CompanySpider(CSVFeedSpider):
     name = 'company'
-    start_urls = [
-        'https://mopsfin.twse.com.tw/opendata/t187ap03_L.csv', # 上市公司 https://data.gov.tw/dataset/18419
-        'https://mopsfin.twse.com.tw/opendata/t187ap03_R.csv', # 興櫃公司 https://data.gov.tw/dataset/28568
-        'https://mopsfin.twse.com.tw/opendata/t187ap03_P.csv', # 公開發行公司 https://data.gov.tw/dataset/28567
-    ]
     custom_settings = {
         'ITEM_PIPELINES': {
             'thaubing_esg.pipelines.CompanyPipeline': 300
         },
     }
 
+    def start_requests(self):
+        csv_filepaths = PrerunZipfileDownloader().start_download()
+        requests = [Request(csv) for csv in csv_filepaths]
+
+        return requests
+
     def parse_row(self, response, row):
         item = CompanyItem()
-        item['stock_code']    = row['公司代號']
+        item['stock_code']    = row['股票代號（金融監督管理委員會匯入）']
         item['name']          = row['公司名稱']
-        item['name_abbr']     = row['公司簡稱']
-        item['tax_code']      = row['營利事業統一編號']
-        item['industry_code'] = row['產業別']
-        item['company_type']  = self._parse_company_type(response.url)
+        item['tax_code']      = row['統一編號']
+        item['industry_code'] = row['產業別（金融監督管理委員會匯入）']
         return item
 
-    def _parse_company_type(self, response_url):
-        switcher = {
-            't187ap03_L': '上市公司',
-            't187ap03_R': '興櫃公司',
-            't187ap03_P': '公開發行公司',
-        }
-        filename = response_url.split('/')[-1].split('.')[0]
-        return switcher.get(filename, '不明公司類別')
+
+class PrerunZipfileDownloader:
+    filepath = os.path.normpath(os.path.join(os.path.dirname(__file__), '../../../data/temp'))
+
+    def start_download(self):
+        csv_filepaths = []
+        for zip_file in zip_urls:
+            print('Downloading starts for {} ...'.format(zip_file['name']))
+
+            # download zip file
+            url = 'https://data.gcis.nat.gov.tw/od/file?oid={}'.format(zip_file['oid'])
+            req = requests.get(url)
+
+            # extracting the zip file contents
+            file = zipfile.ZipFile(BytesIO(req.content))
+            raw_filename = file.infolist()[0].filename
+            file.extractall(self.filepath)
+            file.close()
+
+            # rename csv
+            new_filename = zip_file['name'] + '.csv'
+            os.rename(self._abspath_filename(raw_filename), self._abspath_filename(new_filename))
+            csv_filepaths += [ 'file:///' + self._abspath_filename(new_filename) ]
+
+        print('Downloading completed.')
+        return csv_filepaths
+
+    def _abspath_filename (self, filename: str):
+        return os.path.normpath(os.path.join(self.filepath, filename))
