@@ -3,3 +3,6 @@
 
 # output raw data (saved in repo thaubing-esg-raw-data)
 data/**/*.html
+
+# intermediate result
+data/temp/
