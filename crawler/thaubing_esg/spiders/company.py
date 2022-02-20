@@ -36,6 +36,13 @@ class PrerunZipfileDownloader:
     def start_download(self):
         csv_filepaths = []
         for zip_file in zip_urls:
+            new_filename = zip_file['name'] + '.csv'
+            csv_filepaths += [ 'file:///' + self._abspath_filename(new_filename) ]
+
+            # if extracted csv already exists in temp, skip downloading
+            if os.path.isfile(self._abspath_filename(new_filename)):
+                continue
+
             print('Downloading starts for {} ...'.format(zip_file['name']))
 
             # download zip file
@@ -49,9 +56,7 @@ class PrerunZipfileDownloader:
             file.close()
 
             # rename csv
-            new_filename = zip_file['name'] + '.csv'
             os.rename(self._abspath_filename(raw_filename), self._abspath_filename(new_filename))
-            csv_filepaths += [ 'file:///' + self._abspath_filename(new_filename) ]
 
         print('Downloading completed.')
         return csv_filepaths
