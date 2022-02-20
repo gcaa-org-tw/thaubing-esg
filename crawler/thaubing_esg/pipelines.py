@@ -38,11 +38,13 @@ class CompanyPipeline:
         # for items that has stock_code, assign its name_abbr and company_type
         if item['stock_code'] != '':
             try:
-                item_abbr = self.company_abbr.loc[self.company_abbr['stock_code'] == item['stock_code']].iloc[0]
+                item_abbr = self.company_abbr.loc[self.company_abbr['stock_code'] == int(item['stock_code'])].iloc[0]
                 item['name_abbr'] = item_abbr.loc['name_abbr']
                 item['company_type'] = item_abbr.loc['company_type']
+                # spider.logger.info('stock_code={}, name_abbr={}'.format(item['stock_code'], item_abbr.loc['name_abbr']))
             except:
-                spider.logger.debug('No name_abbr and/or company_type found for stock_code={}'.format(item['stock_code']))
+                # spider.logger.info('No name_abbr and/or company_type found for stock_code={}'.format(item['stock_code']))
+                pass
         self.exporter.export_item(item)
         return item
 
