@@ -12,6 +12,9 @@ def gen_data_filepath(filename: str):
 class CompanyPipeline:
     filepath = gen_data_filepath('company.csv')
 
+class CompanyAbbrPipeline:
+    filepath = gen_data_filepath('temp/company_abbr.csv')
+
     def open_spider(self, spider):
         self.file = open(self.filepath, 'wb')
         self.exporter = CsvItemExporter(self.file)
@@ -20,8 +23,10 @@ class CompanyPipeline:
         self.exporter.fields_to_export = [
             'stock_code',
             'name',
+            'name_abbr',
             'tax_code',
             'industry_code',
+            'company_type'
         ]
 
     def close_spider(self, spider):
