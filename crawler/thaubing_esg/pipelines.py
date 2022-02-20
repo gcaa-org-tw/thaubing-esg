@@ -9,6 +9,7 @@ def gen_data_filepath(filename: str):
         os.makedirs(filedir)
     return filepath
 
+
 class CompanyPipeline:
     filepath = gen_data_filepath('company.csv')
 
@@ -39,6 +40,7 @@ class CompanyPipeline:
                 item_abbr = self.company_abbr.loc[self.company_abbr['stock_code'] == item['stock_code']].iloc[0]
                 item['name_abbr'] = item_abbr.loc['name_abbr']
                 item['company_type'] = item_abbr.loc['company_type']
+                # item['industry'] = industry_code
             except:
                 spider.logger.debug('No name_abbr and/or company_type found for stock_code={}'.format(item['stock_code']))
         self.exporter.export_item(item)
@@ -59,6 +61,7 @@ class CompanyAbbrPipeline:
             'name_abbr',
             'tax_code',
             'industry_code',
+            'industry',
             'company_type'
         ]
 

@@ -98,7 +98,7 @@ accounting_subjects = [
      }
 ]
 
-industry_code = {
+industry_code_switcher = {
      1: "水泥工業",
      2: "食品工業",
      3: "塑膠工業",

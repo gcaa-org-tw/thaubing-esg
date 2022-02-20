@@ -1,6 +1,6 @@
 from scrapy.spiders import CSVFeedSpider
 from ..items import CompanyItem
-
+from ..util import industry_code_switcher
 
 class CompanyAbbrSpider(CSVFeedSpider):
     name = 'company_abbr'
@@ -22,6 +22,7 @@ class CompanyAbbrSpider(CSVFeedSpider):
         item['name_abbr']     = row['公司簡稱']
         item['tax_code']      = row['營利事業統一編號']
         item['industry_code'] = row['產業別']
+        item['industry']     = self._parse_industry_code(row['產業別'])
         item['company_type'] = self._parse_company_type(response.url)
         return item
 
@@ -33,3 +34,6 @@ class CompanyAbbrSpider(CSVFeedSpider):
         }
         filename = response_url.split('/')[-1].split('.')[0]
         return switcher.get(filename, '不明公司類別')
+
+    def _parse_industry_code(self, industry_code):
+        return industry_code_switcher.get(int(industry_code), '')
