@@ -6,6 +6,9 @@ from scrapy.spiders import CSVFeedSpider
 from ..items import CompanyItem
 from ..util import industry_code_switcher, zip_urls
 
+# 全國營業(稅籍)登記資料集 https://data.gov.tw/dataset/9400
+BGMOPEN1_ZIP_URL = 'https://eip.fia.gov.tw/data/BGMOPEN1.zip'
+
 class CompanySpider(CSVFeedSpider):
     name = 'company'
     custom_settings = {
@@ -38,32 +41,18 @@ class PrerunZipfileDownloader:
     filepath = os.path.normpath(os.path.join(os.path.dirname(__file__), '../../../data/temp'))
 
     def start_download(self):
-        csv_filepaths = []
-        for zip_file in zip_urls:
-            new_filename = zip_file['name'] + '.csv'
-            csv_filepaths += [ 'file:///' + self._abspath_filename(new_filename) ]
+        # download zip file
+        req = requests.get(BGMOPEN1_ZIP_URL)
 
-            # if extracted csv already exists in temp, skip downloading
-            if os.path.isfile(self._abspath_filename(new_filename)):
-                continue
-
-            print('Downloading starts for {} ...'.format(zip_file['name']))
-
-            # download zip file
-            url = 'https://data.gcis.nat.gov.tw/od/file?oid={}'.format(zip_file['oid'])
-            req = requests.get(url)
-
-            # extracting the zip file contents
-            file = zipfile.ZipFile(BytesIO(req.content))
-            raw_filename = file.infolist()[0].filename
-            file.extractall(self.filepath)
-            file.close()
-
-            # rename csv
-            os.rename(self._abspath_filename(raw_filename), self._abspath_filename(new_filename))
+        # extracting the zip file contents
+        file = zipfile.ZipFile(BytesIO(req.content))
+        filename = file.infolist()[0].filename
+        file.extractall(self.filepath)
+        file.close()
 
         print('Downloading completed.')
-        return csv_filepaths
+        csv_filepath += 'file:///' + self._abspath_filename(filename)
+        return csv_filepath
 
     def _abspath_filename (self, filename: str):
         return os.path.normpath(os.path.join(self.filepath, filename))
