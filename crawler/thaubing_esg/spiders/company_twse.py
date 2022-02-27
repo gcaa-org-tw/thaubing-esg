@@ -19,7 +19,7 @@ class CompanyTwseSpider(CSVFeedSpider):
         item = CompanyItem()
         item['stock_code']    = row['公司代號']
         item['name']          = row['公司名稱']
-        item['name_abbr']     = row['公司簡稱']
+        item['name_abbr']     = str(row['公司簡稱']).replace('*', '') # fix for '愛普*'
         item['tax_code']      = row['營利事業統一編號']
         item['industry_code'] = row['產業別']
         item['industry']     = self._parse_industry_code(row['產業別'])
