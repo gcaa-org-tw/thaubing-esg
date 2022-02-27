@@ -12,21 +12,21 @@ class CompanyPipeline:
         self.file = self.filepath.open(mode='wb')
         self.exporter = CsvItemExporter(self.file)
 
-        self.company_abbr = pd.read_csv(str(DATA_DIR.joinpath('temp/company_abbr.csv').resolve()))
-        self.company_abbr['tax_code'] = self.company_abbr['tax_code'].apply(format_tax_code)
+        self.company_twse = pd.read_csv(str(DATA_DIR.joinpath('company_twse.csv').resolve()))
+        self.company_twse['tax_code'] = self.company_twse['tax_code'].apply(format_tax_code)
 
         # specifies exported fields and order
         self.exporter.fields_to_export = [
-            'stock_code', # joined from ./data/temp/company_abbr.csv
+            'stock_code', # joined from ./data/company_twse.csv
             'name',
-            'name_abbr',  # joined from ./data/temp/company_abbr.csv
+            'name_abbr',  # joined from ./data/company_twse.csv
             'tax_code',
             'parent_tax_code',
             'amount_capital',
             'address',
-            'ind_class_codes'
+            'ind_class_codes',
 
-            # joined from ./data/temp/company_abbr.csv
+            # joined from ./data/company_twse.csv
             'industry_code',
             'industry',
             'company_type'
@@ -37,7 +37,7 @@ class CompanyPipeline:
         self.file.close()
 
     def process_item(self, item, spider):
-        item_abbr = self.company_abbr.loc[self.company_abbr['tax_code'] == format_tax_code(item['tax_code'])]
+        item_abbr = self.company_twse.loc[self.company_twse['tax_code'] == format_tax_code(item['tax_code'])]
         if item_abbr.__len__() == 1:
             item_abbr = item_abbr.iloc[0]
             item['stock_code']    = item_abbr['stock_code']
@@ -50,8 +50,8 @@ class CompanyPipeline:
         return item
 
 
-class CompanyAbbrPipeline:
-    filepath = DATA_DIR.joinpath('temp/company_abbr.csv')
+class CompanyTwsePipeline:
+    filepath = DATA_DIR.joinpath('company_twse.csv')
 
     def open_spider(self, spider):
         self.file = self.filepath.open(mode='wb')

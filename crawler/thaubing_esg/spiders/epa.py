@@ -50,10 +50,9 @@ class EpaSpider(Spider):
         if res['total'] - res['offset'] >= res['limit']:
             next_offset = res['_links']['next'].split("&offset=")[1]
             next_url = self._gen_request_url(offset=next_offset)
-            self.logger.info('offset=%s, total=%s, next_offset=%s', res['offset'], res['total'], next_offset)
             yield response.follow(next_url, callback=self.parse_item)
         else:
-            self.logger.info('Completed scraping epa dataset_id=%s, total=%s!', self.dataset_id, res['total'])
+            self.logger.info('Completed scraping epa dataset_id=%s!', self.dataset_id)
 
     def _gen_request_url(self, offset=0):
         return (
