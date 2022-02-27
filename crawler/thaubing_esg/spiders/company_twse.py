@@ -2,8 +2,8 @@ from scrapy.spiders import CSVFeedSpider
 from ..items import CompanyItem
 from ..util import industry_code_switcher
 
-class CompanyAbbrSpider(CSVFeedSpider):
-    name = 'company_abbr'
+class CompanyTwseSpider(CSVFeedSpider):
+    name = 'company_twse'
     start_urls = [
         'https://mopsfin.twse.com.tw/opendata/t187ap03_L.csv', # 上市公司 https://data.gov.tw/dataset/18419
         'https://mopsfin.twse.com.tw/opendata/t187ap03_R.csv', # 興櫃公司 https://data.gov.tw/dataset/28568
@@ -11,7 +11,7 @@ class CompanyAbbrSpider(CSVFeedSpider):
     ]
     custom_settings = {
         'ITEM_PIPELINES': {
-            'thaubing_esg.pipelines.CompanyAbbrPipeline': 300
+            'thaubing_esg.pipelines.CompanyTwsePipeline': 300
         },
     }
 
@@ -36,4 +36,4 @@ class CompanyAbbrSpider(CSVFeedSpider):
         return switcher.get(filename, '不明公司類別')
 
     def _parse_industry_code(self, industry_code):
-        return industry_code_switcher.get(int(industry_code), '')
+        return industry_code_switcher.get(str(industry_code).zfill(2), '')

@@ -50,8 +50,8 @@ class CompanyPipeline:
         return item
 
 
-class CompanyAbbrPipeline:
-    filepath = DATA_DIR.joinpath('temp/company_abbr.csv')
+class CompanyTwsePipeline:
+    filepath = DATA_DIR.joinpath('company_twse.csv')
 
     def open_spider(self, spider):
         self.file = self.filepath.open(mode='wb')
