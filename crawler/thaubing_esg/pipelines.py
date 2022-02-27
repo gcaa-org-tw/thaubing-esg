@@ -1,30 +1,32 @@
-import os
+from pathlib import Path
 import pandas as pd
 from scrapy.exporters import CsvItemExporter
+from .util import format_tax_code
 
-def gen_data_filepath(filename: str):
-    filepath = os.path.normpath(os.path.join(os.path.dirname(__file__), '../../data/' + filename))
-    filedir = os.path.dirname(filepath)
-    if not os.path.exists(filedir):
-        os.makedirs(filedir)
-    return filepath
-
+DATA_DIR = Path(__file__).joinpath('../../../data').resolve()
 
 class CompanyPipeline:
-    filepath = gen_data_filepath('company.csv')
+    filepath = DATA_DIR.joinpath('company.csv')
 
     def open_spider(self, spider):
-        self.file = open(self.filepath, 'wb')
+        self.file = self.filepath.open(mode='wb')
         self.exporter = CsvItemExporter(self.file)
 
-        self.company_abbr = pd.read_csv(gen_data_filepath('temp/company_abbr.csv'))
+        self.company_abbr = pd.read_csv(str(DATA_DIR.joinpath('temp/company_abbr.csv').resolve()))
+        self.company_abbr['tax_code'] = self.company_abbr['tax_code'].apply(format_tax_code)
 
         # specifies exported fields and order
         self.exporter.fields_to_export = [
-            'stock_code',
+            'stock_code', # joined from ./data/temp/company_abbr.csv
             'name',
-            'name_abbr',
+            'name_abbr',  # joined from ./data/temp/company_abbr.csv
             'tax_code',
+            'parent_tax_code',
+            'amount_capital',
+            'address',
+            'ind_class_codes'
+
+            # joined from ./data/temp/company_abbr.csv
             'industry_code',
             'industry',
             'company_type'
@@ -35,25 +37,24 @@ class CompanyPipeline:
         self.file.close()
 
     def process_item(self, item, spider):
-        # for items that has stock_code, assign its name_abbr and company_type
-        if item['stock_code'] != '':
-            try:
-                item_abbr = self.company_abbr.loc[self.company_abbr['stock_code'] == int(item['stock_code'])].iloc[0]
-                item['name_abbr'] = item_abbr.loc['name_abbr']
-                item['company_type'] = item_abbr.loc['company_type']
-                # spider.logger.info('stock_code={}, name_abbr={}'.format(item['stock_code'], item_abbr.loc['name_abbr']))
-            except:
-                # spider.logger.info('No name_abbr and/or company_type found for stock_code={}'.format(item['stock_code']))
-                pass
+        item_abbr = self.company_abbr.loc[self.company_abbr['tax_code'] == format_tax_code(item['tax_code'])]
+        if item_abbr.__len__() == 1:
+            item_abbr = item_abbr.iloc[0]
+            item['stock_code']    = item_abbr['stock_code']
+            item['name_abbr']     = item_abbr['name_abbr']
+            item['industry_code'] = item_abbr['industry_code']
+            item['industry']      = item_abbr['industry']
+            item['company_type']  = item_abbr['company_type']
+
         self.exporter.export_item(item)
         return item
 
 
 class CompanyAbbrPipeline:
-    filepath = gen_data_filepath('temp/company_abbr.csv')
+    filepath = DATA_DIR.joinpath('temp/company_abbr.csv')
 
     def open_spider(self, spider):
-        self.file = open(self.filepath, 'wb')
+        self.file = self.filepath.open(mode='wb')
         self.exporter = CsvItemExporter(self.file)
 
         # specifies exported fields and order
@@ -80,10 +81,10 @@ class IncomePipeline:
 
     def open_spider(self, spider):
         try:
-            self.filepath = gen_data_filepath('income/income-{}.csv'.format(spider.year))
+            self.filepath = DATA_DIR.joinpath('income/income-{}.csv'.format(spider.year))
         except:
-            self.filepath = gen_data_filepath('income.csv')
-        self.file = open(self.filepath, 'wb')
+            self.filepath = DATA_DIR.joinpath('income.csv')
+        self.file = self.filepath.open(mode='wb')
         self.exporter = CsvItemExporter(self.file)
 
         # specifies exported fields and order
@@ -119,10 +120,10 @@ class SalaryPipeline:
 
     def open_spider(self, spider):
         try:
-            self.filepath = gen_data_filepath('salary/salary-{}.csv'.format(spider.year))
+            self.filepath = DATA_DIR.joinpath('salary/salary-{}.csv'.format(spider.year))
         except:
-            self.filepath = gen_data_filepath('salary.csv')
-        self.file = open(self.filepath, 'wb')
+            self.filepath = DATA_DIR.joinpath('salary.csv')
+        self.file = self.filepath.open(mode='wb')
         self.exporter = CsvItemExporter(self.file)
 
         # specifies exported fields and order
@@ -163,10 +164,10 @@ class ShareholdingPipeline:
 
     def open_spider(self, spider):
         try:
-            self.filepath = gen_data_filepath('shareholding/shareholding-{}.csv'.format(spider.year))
+            self.filepath = DATA_DIR.joinpath('shareholding/shareholding-{}.csv'.format(spider.year))
         except:
-            self.filepath = gen_data_filepath('shareholding.csv')
-        self.file = open(self.filepath, 'wb')
+            self.filepath = DATA_DIR.joinpath('shareholding.csv')
+        self.file = self.filepath.open(mode='wb')
         self.exporter = CsvItemExporter(self.file)
 
         # specifies exported fields and order
@@ -203,8 +204,8 @@ class ShareholdingPipeline:
 class EpaPipeline:
 
     def open_spider(self, spider):
-        self.filepath = gen_data_filepath(spider.dataset_id + '.csv')
-        self.file = open(self.filepath, 'wb')
+        self.filepath = DATA_DIR.joinpath(spider.dataset_id + '.csv')
+        self.file = self.filepath.open(mode='wb')
         self.exporter = CsvItemExporter(self.file, encoding='utf-8-sig')
 
         # # specifies exported fields and order
