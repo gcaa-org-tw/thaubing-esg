@@ -1,5 +1,9 @@
 FILENAME_COMPANY = 'company.csv'
 
+def format_tax_code(tax_code):
+    code = str(tax_code).zfill(8)
+    return code
+
 accounting_subjects = [
     {
       "key": "total_operating_revenue",
