@@ -5,7 +5,10 @@ const es = require('event-stream')
 const CsvReadableStream = require('csv-reader')
 const AutoDetectDecoderStream = require('autodetect-decoder-stream')
 
-const COMPANY_REPORT_URI = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRcO4BFSZGI6GGQExiWs__Y2tBu8Rs4GVTCdv6J-GDLx0CcdqD7jZMDKtDHK5nQ3A/pub?'
+const COMPANY_REPORT_URI = {
+  塑膠: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRcO4BFSZGI6GGQExiWs__Y2tBu8Rs4GVTCdv6J-GDLx0CcdqD7jZMDKtDHK5nQ3A/pub?',
+  化學: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQH2ytKMQE2RipT0rL4iYcNosbOs41XnSg5RRd4lwKcdgsDZfiSavBWvIqma-lIjxnWNQhb0MmVy6nx/pub?'
+}
 
 class CompanyMap {
   constructor () {
@@ -74,13 +77,29 @@ class CompanyMap {
   }
 }
 
+function mergeCompanyReportStream (sheetList = [], onData) {
+  return Promise.all(sheetList.map((sheet) => {
+    return new Promise((resolve) => {
+      const base = COMPANY_REPORT_URI[sheet.industry]
+      if (!base) {
+        throw new Error(`Undefined industry: ${sheet.industry}`)
+      }
+      createCompanyReportStream(sheet.id, base)
+        .on('data', onData)
+        .on('end', () => {
+          resolve()
+        })
+    })
+  }))
+}
+
 function createCompanyReportStream (sheetId, apiBase) {
   const query = [
     `gid=${sheetId}`,
     'single=true',
     'output=csv'
   ].join('&')
-  const endpoint = `${apiBase || COMPANY_REPORT_URI}${query}`
+  const endpoint = `${apiBase || COMPANY_REPORT_URI.塑膠工業}${query}`
   return got.stream(endpoint)
     .pipe(new AutoDetectDecoderStream())
     .pipe(new CsvReadableStream({ asObject: true }))
@@ -105,5 +124,6 @@ const companyMap = new CompanyMap()
 
 module.exports = {
   companyMap,
-  createCompanyReportStream
+  createCompanyReportStream,
+  mergeCompanyReportStream
 }
