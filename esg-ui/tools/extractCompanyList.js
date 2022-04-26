@@ -2,6 +2,7 @@ const fs = require('fs')
 const path = require('path')
 const axios = require('axios')
 const resumer = require('resumer')
+const got = require('got')
 const CsvReadableStream = require('csv-reader')
 const AutoDetectDecoderStream = require('autodetect-decoder-stream')
 const { appendCompanyList, finished } = require('./csvLogger')
@@ -10,20 +11,12 @@ const LIST_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRzr0lFprPJzQv
 
 const INDUSTRY_MAP = {
   塑膠工業: '石化業'
+  // 化學工業: '石化業'
 }
 
-async function main () {
-  let resp
-  try {
-    resp = await axios.get(LIST_URL)
-  } catch (error) {
-    console.error(`Failed to download company list because: ${error}`)
-    return
-  }
+function main () {
   const industries = new Set()
-  const stream = resumer()
-  stream
-    .queue(resp.data)
+  got.stream(LIST_URL)
     .pipe(new AutoDetectDecoderStream())
     .pipe(new CsvReadableStream({ asObject: true }))
     .on('data', (data) => {
@@ -38,16 +31,15 @@ async function main () {
         normalizedIndustry
       })
     })
-
-  setTimeout(async () => {
-    const resp = await finished()
-    fs.writeFileSync(
-      path.join(__dirname, '../assets/industries.json'),
-      JSON.stringify(Array.from(industries))
-    )
-    // eslint-disable-next-line no-console
-    console.log(`${resp[0]} company list extracted.`)
-  })
+    .on('end', async () => {
+      const resp = await finished()
+      fs.writeFileSync(
+        path.join(__dirname, '../assets/industries.json'),
+        JSON.stringify(Array.from(industries))
+      )
+      // eslint-disable-next-line no-console
+      console.log(`${resp[0]} company list extracted.`)
+    })
 }
 
 main()
