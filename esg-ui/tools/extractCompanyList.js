@@ -1,7 +1,5 @@
 const fs = require('fs')
 const path = require('path')
-const axios = require('axios')
-const resumer = require('resumer')
 const got = require('got')
 const CsvReadableStream = require('csv-reader')
 const AutoDetectDecoderStream = require('autodetect-decoder-stream')
