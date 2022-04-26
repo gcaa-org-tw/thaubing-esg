@@ -2,7 +2,7 @@ const fs = require('fs')
 const path = require('path')
 const CsvReadableStream = require('csv-reader')
 const AutoDetectDecoderStream = require('autodetect-decoder-stream')
-const { companyMap, createCompanyReportStream } = require('./utils')
+const { companyMap, createCompanyReportStream, mergeCompanyReportStream } = require('./utils')
 const { appendToBoth, finished, appendIndustry } = require('./csvLogger')
 
 const DATA_DIR = path.join(__dirname, '../../data')
@@ -47,109 +47,109 @@ async function extractEsgIndexFromCom () {
   })
 }
 
-async function extractISOFromCom () {
-  await new Promise((resolve) => {
-    createCompanyReportStream('1256605170')
-      .on('data', (data) => {
-        const company = companyMap.findByStock(data.證券代號)
-        if (!company) {
-          return
-        }
-        const year = data.報告書年度
+function extractISOFromCom () {
+  return mergeCompanyReportStream(
+    [
+      { id: '1256605170', industry: '塑膠' },
+      { id: '1680588036', industry: '化學' }
+    ],
+    (data) => {
+      const company = companyMap.findByStock(data.證券代號)
+      if (!company) {
+        return
+      }
+      const year = data.報告書年度
 
-        const ctx = {
-          esgCategory: 'G',
-          category: 'ISO認證',
-          isSelfReport: true,
-          year
-        }
-        const fieldList = [
-          { measure: 'ISO 9001', value: data['ISO 9001（品質管理系統）'] },
-          { measure: 'ISO 14001', value: data['ISO 14001（環境管理系統）'] },
-          { measure: 'ISO 45001', value: data['ISO 45001（職業安全衛生管理系統）'] },
-          { measure: 'ISO 50001', value: data['ISO 50001（能源管理系統）'] }
-        ]
+      const ctx = {
+        esgCategory: 'G',
+        category: 'ISO認證',
+        isSelfReport: true,
+        year
+      }
+      const fieldList = [
+        { measure: 'ISO 9001', value: data['ISO 9001（品質管理系統）'] },
+        { measure: 'ISO 14001', value: data['ISO 14001（環境管理系統）'] },
+        { measure: 'ISO 45001', value: data['ISO 45001（職業安全衛生管理系統）'] },
+        { measure: 'ISO 50001', value: data['ISO 50001（能源管理系統）'] }
+      ]
 
-        fieldList.forEach((row) => {
-          if (row.value !== '') {
-            appendToBoth(company, {
-              ...ctx,
-              measure: row.measure,
-              value: row.value
-            })
-          }
-        })
+      fieldList.forEach((row) => {
+        if (row.value !== '') {
+          appendToBoth(company, {
+            ...ctx,
+            measure: row.measure,
+            value: row.value
+          })
+        }
       })
-      .on('end', () => {
-        resolve()
-      })
-  })
+    }
+  )
 }
 
-async function extractHasCsrFromCom () {
-  await new Promise((resolve) => {
-    createCompanyReportStream('1762045206')
-      .on('data', (data) => {
-        const company = companyMap.findByStock(data.證券代號)
-        if (!company) {
-          return
-        }
-        const year = data.報告書年度
-        const value = data.是否編撰報告書
+function extractHasCsrFromCom () {
+  return mergeCompanyReportStream(
+    [
+      { id: '1762045206', industry: '塑膠' },
+      { id: '567687738', industry: '化學' }
+    ],
+    (data) => {
+      const company = companyMap.findByStock(data.證券代號)
+      if (!company) {
+        return
+      }
+      const year = data.報告書年度
+      const value = data.是否編撰報告書
 
-        appendToBoth(company, {
-          esgCategory: 'G',
-          category: '是否產製CSR報告',
-          isSelfReport: true,
-          year,
-          measure: '是否編撰報告書',
-          value
-        })
+      appendToBoth(company, {
+        esgCategory: 'G',
+        category: '是否產製CSR報告',
+        isSelfReport: true,
+        year,
+        measure: '是否編撰報告書',
+        value
       })
-      .on('end', () => {
-        resolve()
-      })
-  })
+    }
+  )
 }
 
-async function extractTransparencyFromCom () {
-  await new Promise((resolve) => {
-    createCompanyReportStream('721116469')
-      .on('data', (data) => {
-        const company = companyMap.findByStock(data.證券代號)
-        if (!company) {
-          return
+function extractTransparencyFromCom () {
+  return mergeCompanyReportStream(
+    [
+      { id: '721116469', industry: '塑膠' },
+      { id: '1634361752', industry: '化學' }
+    ],
+    (data) => {
+      const company = companyMap.findByStock(data.證券代號)
+      if (!company) {
+        return
+      }
+      const year = data.報告書年度
+
+      const ctx = {
+        esgCategory: 'G',
+        category: '稅務透明度',
+        isSelfReport: true,
+        unit: '元',
+        year
+      }
+
+      const fieldList = [
+        { measure: '營利事業所得稅稅額', value: data.營利事業所得稅繳納金額 },
+        { measure: '政府補助、補貼金額', value: data.政府補助總金額 },
+        { measure: '研發投入費用', value: data.研發經費投入金額 }
+      ]
+
+      fieldList.forEach((row) => {
+        if (row.value !== '' && !Number.isNaN(row.value)) {
+          appendToBoth(company, {
+            ...ctx,
+            measure: row.measure,
+            value: row.value
+          })
         }
-        const year = data.報告書年度
-
-        const ctx = {
-          esgCategory: 'G',
-          category: '稅務透明度',
-          isSelfReport: true,
-          unit: '元',
-          year
-        }
-
-        const fieldList = [
-          { measure: '營利事業所得稅稅額', value: data.營利事業所得稅繳納金額 },
-          { measure: '政府補助、補貼金額', value: data.政府補助總金額 },
-          { measure: '研發投入費用', value: data.研發經費投入金額 }
-        ]
-
-        fieldList.forEach((row) => {
-          if (row.value !== '' && !Number.isNaN(row.value)) {
-            appendToBoth(company, {
-              ...ctx,
-              measure: row.measure,
-              value: row.value
-            })
-          }
-        })
       })
-      .on('end', () => {
-        resolve()
-      })
-  })
+    }
+  )
 }
 
 function extractCap () {
@@ -222,7 +222,7 @@ function extractFinance (toFile = true) {
           }
           if (toFile) {
             if (Number.isNaN(data.value)) {
-              console.warn(`Field "${item.measure}" = NaN on ${company.公司名稱}`)
+              console.warn(`Field "${item.measure}" = NaN on ${company.公司名稱} / ${year}`)
             } else {
               appendToBoth(company, data)
             }

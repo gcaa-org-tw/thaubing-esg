@@ -2,93 +2,93 @@ const fs = require('fs')
 const path = require('path')
 const CsvReadableStream = require('csv-reader')
 const AutoDetectDecoderStream = require('autodetect-decoder-stream')
-const { companyMap, createCompanyReportStream } = require('./utils')
+const { companyMap, mergeCompanyReportStream } = require('./utils')
 const { appendToBoth, finished } = require('./csvLogger')
 
 const DATA_DIR = path.join(__dirname, '../../data')
 
-async function extractWorkInjury () {
-  await new Promise((resolve) => {
-    createCompanyReportStream('1315041422')
-      .on('data', (data) => {
-        const company = companyMap.findByStock(data.證券代號)
-        if (!company) {
-          return
+function extractWorkInjury () {
+  return mergeCompanyReportStream(
+    [
+      { id: '1315041422', industry: '塑膠' },
+      { id: '748457616', industry: '化學' }
+    ],
+    (data) => {
+      const company = companyMap.findByStock(data.證券代號)
+      if (!company) {
+        return
+      }
+      const year = data.報告書年度
+
+      const ctx = {
+        esgCategory: 'S',
+        category: '職業健康',
+        isSelfReport: true,
+        unit: '',
+        year
+      }
+
+      const fieldList = [
+        { measure: '職災事故', value: data.職災事件數 },
+        { measure: '工安意外', value: data['工安意外揭露'] }
+      ]
+
+      fieldList.forEach((row) => {
+        if (row.value !== '' && !Number.isNaN(row.value)) {
+          appendToBoth(company, {
+            ...ctx,
+            measure: row.measure,
+            value: row.value
+          })
         }
-        const year = data.報告書年度
-
-        const ctx = {
-          esgCategory: 'S',
-          category: '職業健康',
-          isSelfReport: true,
-          unit: '',
-          year
-        }
-
-        const fieldList = [
-          { measure: '職災事故', value: data.職災事件數 },
-          { measure: '工安意外', value: data['工安意外揭露'] }
-        ]
-
-        fieldList.forEach((row) => {
-          if (row.value !== '' && !Number.isNaN(row.value)) {
-            appendToBoth(company, {
-              ...ctx,
-              measure: row.measure,
-              value: row.value
-            })
-          }
-        })
       })
-      .on('end', () => {
-        resolve()
-      })
-  })
+    }
+  )
 }
 
-async function extractCrew () {
-  await new Promise((resolve) => {
-    createCompanyReportStream('1069906267')
-      .on('data', (data) => {
-        const company = companyMap.findByStock(data.證券代號)
-        if (!company) {
-          return
+function extractCrew () {
+  return mergeCompanyReportStream(
+    [
+      { id: '1069906267', industry: '塑膠' },
+      { id: '572772205', industry: '化學' }
+    ],
+    (data) => {
+      const company = companyMap.findByStock(data.證券代號)
+      if (!company) {
+        return
+      }
+      const year = data.報告書年度
+      const total = data['總人數\n（前兩項加總）']
+
+      const ctx = {
+        esgCategory: 'S',
+        category: '員工組成',
+        isSelfReport: true,
+        unit: '人',
+        year
+      }
+
+      const fieldList = [
+        { measure: '正式員工', value: data.正式人員 },
+        { measure: '性別比', value: data.男性正式員工 / data.女性正式員工 },
+        { measure: '新進率', value: data.新進人數 / total },
+        { measure: '離職率', value: data.離職人數 / total },
+        { measure: '是否聘用移工', value: data.移工聘用人數 || '無揭露' },
+        { measure: '是否聘用身障人士', value: data.身障聘用人數 || '無揭露' },
+        { measure: '是否聘用原住民', value: data.原民聘用人數 || '無揭露' }
+      ]
+
+      fieldList.forEach((row) => {
+        if (row.value !== '' && !Number.isNaN(row.value)) {
+          appendToBoth(company, {
+            ...ctx,
+            measure: row.measure,
+            value: row.value
+          })
         }
-        const year = data.報告書年度
-        const total = data['總人數\n（前兩項加總）']
-
-        const ctx = {
-          esgCategory: 'S',
-          category: '員工組成',
-          isSelfReport: true,
-          unit: '人',
-          year
-        }
-
-        const fieldList = [
-          { measure: '正式員工', value: data.正式人員 },
-          { measure: '性別比', value: data.男性正式員工 / data.女性正式員工 },
-          { measure: '新進率', value: data.新進人數 / total },
-          { measure: '離職率', value: data.離職人數 / total },
-          { measure: '是否聘用移工', value: data.移工聘用人數 },
-          { measure: '是否聘用身障人士', value: data.身障聘用人數 },
-          { measure: '是否聘用原住民', value: data.原民聘用人數 }
-        ]
-
-        fieldList.forEach((row) => {
-          if (row.value !== '' && !Number.isNaN(row.value)) {
-            appendToBoth(company, {
-              ...ctx,
-              measure: row.measure,
-              value: row.value
-            })
-          }
-        })
       })
-      .on('end', () => {
-        resolve()
-      })
-  })
+    }
+  )
 }
 
 function extractSalary () {

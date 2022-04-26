@@ -3,7 +3,7 @@ const path = require('path')
 const { get } = require('lodash')
 const CsvReadableStream = require('csv-reader')
 const AutoDetectDecoderStream = require('autodetect-decoder-stream')
-const { companyMap, createCompanyReportStream } = require('./utils')
+const { companyMap, mergeCompanyReportStream } = require('./utils')
 const { appendToBoth, finished, appendCompany, appendIndustry } = require('./csvLogger')
 const { extractFinance } = require('./extractGov')
 
@@ -11,45 +11,46 @@ const DATA_DIR = path.join(__dirname, '../../data')
 
 const EMSP08_PATH = path.join(__dirname, '../assets/emsP08Columns.json')
 
-async function extractWasteFromCom () {
-  await new Promise((resolve) => {
-    createCompanyReportStream('410840005')
-      .on('data', (data) => {
-        const company = companyMap.findByStock(data.證券代號)
-        if (!company) {
-          return
+function extractWasteFromCom () {
+  return mergeCompanyReportStream(
+    [
+      { id: '410840005', industry: '塑膠' },
+      { id: '30305318', industry: '化學' }
+    ],
+    (data) => {
+      const company = companyMap.findByStock(data.證券代號)
+      if (!company) {
+        console.warn('company not found:', data)
+        return
+      }
+      const year = data.報告書年度
+      const fieldList = ['一般事業廢棄物', '有害事業廢棄物', '資源化再利用'].map((name) => {
+        return {
+          name,
+          value: data[name],
+          unit: data[`${name}單位`]
         }
-        const year = data.報告書年度
-        const fieldList = ['一般事業廢棄物', '有害事業廢棄物', '資源化再利用'].map((name) => {
-          return {
-            name,
-            value: data[name],
-            unit: data[`${name}單位`]
-          }
-        })
+      })
 
-        const ctx = {
-          esgCategory: 'E',
-          category: '廢棄物管理',
-          isSelfReport: true,
-          year
+      const ctx = {
+        esgCategory: 'E',
+        category: '廢棄物管理',
+        isSelfReport: true,
+        year
+      }
+
+      fieldList.forEach((row) => {
+        if (row.value !== '') {
+          appendToBoth(company, {
+            ...ctx,
+            measure: row.name,
+            value: row.value,
+            unit: row.unit
+          })
         }
-
-        fieldList.forEach((row) => {
-          if (row.value !== '') {
-            appendToBoth(company, {
-              ...ctx,
-              measure: row.name,
-              value: row.value,
-              unit: row.unit
-            })
-          }
-        })
       })
-      .on('end', () => {
-        resolve()
-      })
-  })
+    }
+  )
 }
 
 function extractAirPollution () {
@@ -230,153 +231,153 @@ async function extractPenalty () {
   })
 }
 
-async function extractWaterUsageFromCom () {
-  await new Promise((resolve) => {
-    createCompanyReportStream('903558775')
-      .on('data', (data) => {
-        const company = companyMap.findByStock(data.證券代號)
-        if (!company) {
-          return
+function extractWaterUsageFromCom () {
+  return mergeCompanyReportStream(
+    [
+      { id: '903558775', industry: '塑膠' },
+      { id: '137179509', industry: '化學' }
+    ],
+    (data) => {
+      const company = companyMap.findByStock(data.證券代號)
+      if (!company) {
+        return
+      }
+      const year = data.報告書年度
+      const fieldList = ['總取水量', '回收水量', '耗用水量', '排放水量'].map((name) => {
+        return {
+          name: name.replace(/（.*）/g, ''),
+          value: data[name],
+          unit: data[`${name}單位`]
         }
-        const year = data.報告書年度
-        const fieldList = ['總取水量', '回收水量', '耗用水量', '排放水量'].map((name) => {
-          return {
-            name: name.replace(/（.*）/g, ''),
-            value: data[name],
-            unit: data[`${name}單位`]
-          }
-        })
-
-        const ctx = {
-          esgCategory: 'E',
-          category: '水資源',
-          isSelfReport: true,
-          year
-        }
-
-        fieldList.forEach((row) => {
-          if (row.value !== '') {
-            appendToBoth(company, {
-              ...ctx,
-              measure: row.name,
-              value: row.value,
-              unit: row.unit
-            })
-          }
-        })
       })
-      .on('end', () => {
-        resolve()
-      })
-  })
-}
 
-async function extractPowerUsageFromCom (incomeMap) {
-  await new Promise((resolve) => {
-    createCompanyReportStream('1196916811')
-      .on('data', (data) => {
-        const company = companyMap.findByStock(data.證券代號)
-        if (!company) {
-          return
-        }
-        const year = data.報告書年度
-        const total = data['年度總用電量']
-        const fieldList = [
-          { name: '總用電量', value: total, unit: data['用電量單位'] },
-          { name: '再生能源設置量', value: data['再生能源裝置容量'], unit: data['裝置容量單位'] },
-          { name: '再生能源發電量', value: data['再生能源發電量'], unit: data['發電量單位'] }
-        ]
+      const ctx = {
+        esgCategory: 'E',
+        category: '水資源',
+        isSelfReport: true,
+        year
+      }
 
-        const ctx = {
-          esgCategory: 'E',
-          category: '能源使用狀況',
-          isSelfReport: true,
-          year
-        }
-
-        fieldList.forEach((row) => {
-          if (row.value !== '') {
-            appendToBoth(company, {
-              ...ctx,
-              measure: row.name,
-              value: row.value,
-              unit: row.unit
-            })
-          }
-        })
-
-        const income = get(incomeMap, `${company.統編}.${year}`)
-        if (income && typeof total === 'number') {
-          // TODO: handle income or total 無揭露
+      fieldList.forEach((row) => {
+        if (row.value !== '') {
           appendToBoth(company, {
             ...ctx,
-            unit: '度/億元',
-            measure: '能源密集度',
-            value: total * 10 ** 5 / income
+            measure: row.name,
+            value: row.value,
+            unit: row.unit
           })
         }
       })
-      .on('end', () => {
-        resolve()
-      })
-  })
+    }
+  )
 }
 
-async function extractGhGasFromCom (incomeMap) {
-  await new Promise((resolve) => {
-    createCompanyReportStream('440421747')
-      .on('data', (data) => {
-        const company = companyMap.findByStock(data.證券代號)
-        if (!company) {
-          return
-        }
-        const year = data.報告書年度
-        const totList = [
-          { name: '範疇一直接排放', value: data['範疇一（值）'] },
-          { name: '範疇二間接排放', value: data['範疇二（值）'] },
-          { name: '範疇三其他排放', value: data['範疇三（值）'] }
-        ]
-        // total = 範疇一 + 範疇二
-        const total = totList.slice(0, 2).reduce((total, row) => {
-          if (typeof row.value === 'number') {
-            return total + row.value
-          }
-          return total
-        }, 0)
+function extractPowerUsageFromCom (incomeMap) {
+  return mergeCompanyReportStream(
+    [
+      { id: '1196916811', industry: '塑膠' },
+      { id: '1218075634', industry: '化學' }
+    ],
+    (data) => {
+      const company = companyMap.findByStock(data.證券代號)
+      if (!company) {
+        return
+      }
+      const year = data.報告書年度
+      const total = data['年度總用電量']
+      const fieldList = [
+        { name: '總用電量', value: total, unit: data['用電量單位'] },
+        { name: '再生能源設置量', value: data['再生能源裝置容量'], unit: data['裝置容量單位'] },
+        { name: '再生能源發電量', value: data['再生能源發電量'], unit: data['發電量單位'] }
+      ]
 
-        const ctx = {
-          esgCategory: 'E',
-          category: '溫室氣體排放',
-          isSelfReport: true,
-          year,
-          unit: '公噸CO2e'
-        }
+      const ctx = {
+        esgCategory: 'E',
+        category: '能源使用狀況',
+        isSelfReport: true,
+        year
+      }
 
-        totList.forEach((row) => {
-          if (row.value !== '') {
-            appendToBoth(company, {
-              ...ctx,
-              measure: row.name,
-              value: row.value
-            })
-          }
-        })
-
-        const income = get(incomeMap, `${company.統編}.${year}`)
-        if (income && total) {
-          // TODO: handle income or total 無揭露
+      fieldList.forEach((row) => {
+        if (row.value !== '') {
           appendToBoth(company, {
             ...ctx,
-            unit: '公噸CO2e/億元',
-            measure: '碳密集度',
-            value: total * 10 ** 5 / income
+            measure: row.name,
+            value: row.value,
+            unit: row.unit
           })
         }
       })
-      .on('end', () => {
-        resolve()
+
+      const income = get(incomeMap, `${company.統編}.${year}`)
+      if (income && typeof total === 'number') {
+        // TODO: handle income or total 無揭露
+        appendToBoth(company, {
+          ...ctx,
+          unit: '度/億元',
+          measure: '能源密集度',
+          value: total * 10 ** 5 / income
+        })
+      }
+    }
+  )
+}
+
+function extractGhGasFromCom (incomeMap) {
+  return mergeCompanyReportStream(
+    [
+      { id: '440421747', industry: '塑膠' },
+      { id: '842330154', industry: '化學' }
+    ],
+    (data) => {
+      const company = companyMap.findByStock(data.證券代號)
+      if (!company) {
+        return
+      }
+      const year = data.報告書年度
+      const totList = [
+        { name: '範疇一直接排放', value: data['範疇一（值）'] },
+        { name: '範疇二間接排放', value: data['範疇二（值）'] },
+        { name: '範疇三其他排放', value: data['範疇三（值）'] }
+      ]
+      // total = 範疇一 + 範疇二
+      const total = totList.slice(0, 2).reduce((total, row) => {
+        if (typeof row.value === 'number') {
+          return total + row.value
+        }
+        return total
+      }, 0)
+
+      const ctx = {
+        esgCategory: 'E',
+        category: '溫室氣體排放',
+        isSelfReport: true,
+        year,
+        unit: '公噸CO2e'
+      }
+
+      totList.forEach((row) => {
+        if (row.value !== '') {
+          appendToBoth(company, {
+            ...ctx,
+            measure: row.name,
+            value: row.value
+          })
+        }
       })
-  })
+
+      const income = get(incomeMap, `${company.統編}.${year}`)
+      if (income && total) {
+        // TODO: handle income or total 無揭露
+        appendToBoth(company, {
+          ...ctx,
+          unit: '公噸CO2e/億元',
+          measure: '碳密集度',
+          value: total * 10 ** 5 / income
+        })
+      }
+    }
+  )
 }
 
 async function extractGhGas (incomeMap) {
