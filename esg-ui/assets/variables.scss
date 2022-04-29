@@ -1,5 +1,11 @@
 $green-primary: #49591C;
 
+$xxl-space: 8.125rem;
+$xl-space: 5rem;
+$l-space: 2rem;
+$nl-space: 1rem;
+
+
 @mixin xxl-screen {
   @media screen and (min-width: 120em) {
     @content
