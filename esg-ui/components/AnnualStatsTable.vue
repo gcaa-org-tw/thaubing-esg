@@ -46,7 +46,7 @@
                 :key="column.key"
                 :class="{'stats__value--begin': column.isSubCatBegin}"
               )
-                span(:class="{'light-silver': column.isFake}") {{beautyValue(row, column)}}
+                stats-value(:row="row" :column-meta="column")
 </template>
 <script>
 import Intersect from 'vue-intersect'
@@ -211,21 +211,6 @@ export default {
       }
       const line1Len = Math.floor(measure.length / 2)
       return `${measure.slice(0, line1Len)}\n${measure.slice(line1Len)}`
-    },
-    beautyValue (row, column) {
-      if (column.isFake) {
-        return '待解鎖'
-      }
-      if (!(column.key in row.stats)) {
-        return '-'
-      }
-      const field = row.stats[column.key]
-      if (!Number.isNaN(field.value)) {
-        const toFixed = 10 ** (column.toFixed || 0)
-        const value = Math.round(field.value * toFixed) / toFixed
-        return value.toLocaleString()
-      }
-      return `${field.數值}`
     }
   }
 }
