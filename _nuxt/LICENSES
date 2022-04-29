@@ -11,6 +11,9 @@
  */
 
 
+/* @license C3.js v0.7.20 | (c) C3 Team and other contributors | http://c3js.org/ */
+
+
 /*!
   * vue-router v3.5.2
   * (c) 2021 Evan You
@@ -22,9 +25,6 @@
  * (c) 2014-2021 Evan You
  * Released under the MIT License.
  */
-
-
-/* @license C3.js v0.7.20 | (c) C3 Team and other contributors | http://c3js.org/ */
 
 
 /**
