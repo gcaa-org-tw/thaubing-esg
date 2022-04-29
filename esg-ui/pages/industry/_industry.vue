@@ -24,7 +24,7 @@
             option(v-for="year in yearList" :key="year") {{year}}
           i.fas.fa-sort
     .industry__fund.container
-      investment-teller(:stats="stats.body" :company-map="companyMap" :year="year")
+      investment-teller(:stats="stats.body" :quartile="quartile" :company-map="companyMap" :year="year")
     annual-stats-table(:company-stats="companyStats")
     .industry__footer.flex.items-center.justify-end.container
       a.industry__cta.db.br2.pv2.ph3.fw7.white(:href="downloadLink") 下載此頁資料
@@ -41,9 +41,11 @@ export default {
   async asyncData ({ $content, params, redirect }) {
     try {
       const stats = await $content('industry', params.industry).fetch()
+      const quartile = await $content('industry', `${params.industry}-quartile`).fetch()
       const companyList = await $content('companyList').fetch()
       return {
         stats,
+        quartile,
         companyList
       }
     } catch {

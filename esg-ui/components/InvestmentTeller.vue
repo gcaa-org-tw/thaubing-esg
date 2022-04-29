@@ -21,7 +21,9 @@
 </template>
 <script>
 import { environment } from '~/assets/esgColumns'
-const TARGET_MEASURES = ['碳密集度', '能源密集度']
+import { MAJOR_MEASURE_LIST } from '~/assets/defs'
+
+const TARGET_MEASURES = MAJOR_MEASURE_LIST.E
 
 export default {
   props: {
@@ -30,6 +32,10 @@ export default {
       required: true
     },
     companyMap: {
+      type: Object,
+      required: true
+    },
+    quartile: {
       type: Object,
       required: true
     },
@@ -95,10 +101,7 @@ export default {
         return ret
       }, {})
 
-      const quartileMap = TARGET_MEASURES.reduce((map, measure) => {
-        map[measure] = this.findQuartileValue(companyMap, measure)
-        return map
-      }, {})
+      const quartileMap = this.quartile[this.year].E
 
       return Object.values(companyMap).map((row) => {
         row.color = {}
@@ -107,7 +110,7 @@ export default {
           if (Number.isNaN(value) || value === undefined) {
             row.E[measure] = 0
             row.color[measure] = 'unknown'
-          } else if (value >= quartileMap[measure].thridForth) {
+          } else if (value >= quartileMap[measure].thirdForth) {
             row.color[measure] = 'red'
           } else if (value >= quartileMap[measure].oneForth) {
             row.color[measure] = 'yellow'
@@ -158,31 +161,6 @@ export default {
     },
     flagClass (stat) {
       return [`invTeller__flag--${stat.color[this.orderBy]}`]
-    },
-    findQuartileValue (companyMap, measure) {
-      const sortedValues = Object.values(companyMap)
-        .filter((row) => {
-          return !Number.isNaN(row.E[measure])
-        })
-        .map(row => row.E[measure])
-        .sort((a, b) => a - b)
-
-      const len = sortedValues.length
-      const ret = {
-        oneForth: 0,
-        thridForth: 0
-      }
-      if (len === 1) {
-        return {
-          oneForth: sortedValues[0],
-          thridForth: sortedValues[0]
-        }
-      } else {
-        const oneForthLen = Math.round(len / 4)
-        ret.oneForth = (sortedValues[oneForthLen - 1] + sortedValues[oneForthLen]) / 2
-        ret.thridForth = (sortedValues[len - oneForthLen] + sortedValues[len - oneForthLen - 1]) / 2
-      }
-      return ret
     }
   }
 }
