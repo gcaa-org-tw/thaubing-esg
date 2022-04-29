@@ -5,4 +5,4 @@ cd "`dirname $0`"
 node extractEnvironment.js
 node extractSocial.js
 node extractGov.js
-
+node aggregateMetrics.js

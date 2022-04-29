@@ -15,3 +15,20 @@ a {
 .green {
   color: $green-primary;
 }
+
+.container {
+  padding-left: $nl-space;
+  padding-right: $nl-space;
+  @include xxl-screen {
+    padding-left: $xxl-space;
+    padding-right: $xxl-space;
+  }
+  @include xl-screen {
+    padding-left: $xl-space;
+    padding-right: $xl-space;
+  }
+  @include l-screen {
+    padding-left: $l-space;
+    padding-right: $l-space;
+  }
+}
