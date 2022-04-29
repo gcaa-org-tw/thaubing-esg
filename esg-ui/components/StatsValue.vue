@@ -1,8 +1,17 @@
 <template lang="pug">
-  component.statsValue(:is="widget" :class="{'light-silver': columnMeta.isFake}")
+  component.statsValue(
+    :is="widget"
+    :class="{'light-silver': columnMeta.isFake}"
+    :quartile="quartile"
+    :row="row"
+    :column-meta="columnMeta"
+  )
     | {{beautyValue}}
 </template>
 <script>
+import QuartileCell from './QuartileCell'
+import { MAJOR_MEASURE_LIST } from '~/assets/defs'
+
 export default {
   props: {
     columnMeta: {
@@ -12,11 +21,20 @@ export default {
     row: {
       type: Object,
       required: true
+    },
+    quartile: {
+      type: Object,
+      required: true
     }
   },
   computed: {
     widget () {
-      return 'span'
+      const majorMeasureList = MAJOR_MEASURE_LIST.E
+      if (this.columnMeta.isSelfReport && majorMeasureList.includes(this.columnMeta.measure)) {
+        return QuartileCell
+      } else {
+        return 'span'
+      }
     },
     beautyValue () {
       if (this.columnMeta.isFake) {

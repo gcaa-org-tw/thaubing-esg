@@ -23,9 +23,9 @@
           select.industry__typeSelector(:value="year" @input="chageYear")
             option(v-for="year in yearList" :key="year") {{year}}
           i.fas.fa-sort
-    .industry__fund.container
-      investment-teller(:stats="stats.body" :quartile="quartile" :company-map="companyMap" :year="year")
-    annual-stats-table(:company-stats="companyStats")
+    // .industry__fund.container
+    //   investment-teller(:stats="stats.body" :quartile="quartile" :company-map="companyMap" :year="year")
+    annual-stats-table(:company-stats="companyStats" :quartile="activeQuartile")
     .industry__footer.flex.items-center.justify-end.container
       a.industry__cta.db.br2.pv2.ph3.fw7.white(:href="downloadLink") 下載此頁資料
     .container
@@ -103,6 +103,9 @@ export default {
         company.stats[`${stat.子分類}-${stat.項目}-${stat.來自公司報告}`] = stat
       })
       return Object.values(companyMap)
+    },
+    activeQuartile () {
+      return this.quartile[this.year] || {}
     }
   },
   watch: {

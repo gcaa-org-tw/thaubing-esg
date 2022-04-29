@@ -166,11 +166,6 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-$red: #E24243;
-$yellow: #FACB3D;
-$green: #6FAC45;
-$unknown: #c1c1c1;
-
 .invTellerWrapper {
   width: 100%;
   max-height: 50vh;

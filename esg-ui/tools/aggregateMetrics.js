@@ -13,7 +13,8 @@ function calQuartile (valueList) {
   const len = sortedValues.length
   const ret = {
     oneForth: 0,
-    thirdForth: 0
+    thirdForth: 0,
+    max: sortedValues[len - 1]
   }
   if (len === 1) {
     ret.oneForth = sortedValues[0]

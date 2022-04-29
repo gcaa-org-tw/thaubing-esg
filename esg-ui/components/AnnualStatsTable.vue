@@ -46,7 +46,7 @@
                 :key="column.key"
                 :class="{'stats__value--begin': column.isSubCatBegin}"
               )
-                stats-value(:row="row" :column-meta="column")
+                stats-value(:row="row" :column-meta="column" :quartile="quartile")
 </template>
 <script>
 import Intersect from 'vue-intersect'
@@ -94,16 +94,15 @@ export default {
     companyStats: {
       type: Array,
       required: true
+    },
+    quartile: {
+      type: Object,
+      required: true
     }
   },
   data () {
-    const defaultOrder = [
-      esgColumns.environment[0].subCat,
-      esgColumns.environment[0].measure,
-      esgColumns.environment[0].isSelfReport || ''
-    ].join('-')
     return {
-      order: defaultOrder,
+      order: '溫室氣體排放-碳密集度-true',
       isAsc: false,
 
       activeCat: 'environment',
