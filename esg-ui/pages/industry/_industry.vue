@@ -1,8 +1,9 @@
 <template lang="pug">
   .industry
     .industry__header.container.pv3.relative.no-repeat.cover
-      .industry__about.tr
-        nuxt-link.dim(to="/about") 關於計畫
+      .industry__about.flex.justify-end
+        nuxt-link.mr3.dim(to="/about") 關於計畫
+        nuxt-link.dim(to="/terms-of-service") 免則聲明
       nuxt-link(to="/")
         h1.industry__title.fw7 ESG 檢測儀
       p.industry__desp

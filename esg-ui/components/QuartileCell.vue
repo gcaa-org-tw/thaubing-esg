@@ -49,7 +49,7 @@ export default {
     },
     barStyle () {
       const value = this.value
-      if (Number.isNaN(value)) {
+      if (Number.isNaN(value) || value === undefined) {
         return { width: '30%' }
       }
       return {
