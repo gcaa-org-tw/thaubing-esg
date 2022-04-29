@@ -20,11 +20,11 @@
       div
         .f6.o-60.mb1 資料年份
         label.flex.items-center
-          select.industry__typeSelector(:value="year" @input="chageYear")
+          select.industry__typeSelector(:value="year" @input="changeYear")
             option(v-for="year in yearList" :key="year") {{year}}
           i.fas.fa-sort
-    // .industry__fund.container
-    //   investment-teller(:stats="stats.body" :quartile="quartile" :company-map="companyMap" :year="year")
+    .industry__fund.container(v-if="isGuanshiyinn")
+      investment-teller(:stats="stats.body" :quartile="quartile" :company-map="companyMap" :year="year")
     annual-stats-table(:company-stats="companyStats" :quartile="activeQuartile")
     .industry__footer.flex.items-center.justify-end.container
       a.industry__cta.db.br2.pv2.ph3.fw7.white(:href="downloadLink") 下載此頁資料
@@ -32,6 +32,7 @@
       gcaa-footer
 </template>
 <script>
+import Konami from 'konami'
 import { friendlyHeader } from '~/libs/crawlerFriendly'
 import industries from '~/assets/industries.json'
 
@@ -54,7 +55,10 @@ export default {
   },
   data () {
     return {
-      industry: this.$route.params.industry
+      industry: this.$route.params.industry,
+
+      isGuanshiyinn: false,
+      konamiHandler: new Konami(() => { this.toggleGuanshiyinn() })
     }
   },
   head: friendlyHeader({
@@ -113,8 +117,11 @@ export default {
       this.$router.push(`/industry/${this.industry}`)
     }
   },
+  beforeDestroy () {
+    this.konamiHandler.unload()
+  },
   methods: {
-    chageYear (event) {
+    changeYear (event) {
       this.$router.push({
         name: this.$route.name,
         query: {
@@ -122,6 +129,9 @@ export default {
         },
         params: this.$route.params
       })
+    },
+    toggleGuanshiyinn () {
+      this.isGuanshiyinn = !this.isGuanshiyinn
     }
   }
 }
