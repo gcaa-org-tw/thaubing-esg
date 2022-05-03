@@ -5,11 +5,13 @@
     :quartile="quartile"
     :row="row"
     :column-meta="columnMeta"
+    :value="beautyValue"
   )
     | {{beautyValue}}
 </template>
 <script>
 import QuartileCell from './QuartileCell'
+import LongCell from './LongCell'
 import { MAJOR_MEASURE_LIST } from '~/assets/defs'
 
 export default {
@@ -32,6 +34,8 @@ export default {
       const majorMeasureList = MAJOR_MEASURE_LIST.E
       if (this.columnMeta.isSelfReport && majorMeasureList.includes(this.columnMeta.measure)) {
         return QuartileCell
+      } else if (this.columnMeta.measure === '工安意外') {
+        return LongCell
       } else {
         return 'span'
       }
