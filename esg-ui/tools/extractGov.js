@@ -51,7 +51,8 @@ function extractISOFromCom () {
   return mergeCompanyReportStream(
     [
       { id: '1256605170', industry: '塑膠' },
-      { id: '1680588036', industry: '化學' }
+      { id: '1680588036', industry: '化學' },
+      { id: '1680588036', industry: '水泥鋼鐵半導體' }
     ],
     (data) => {
       const company = companyMap.findByStock(data.證券代號)
@@ -90,7 +91,8 @@ function extractHasCsrFromCom () {
   return mergeCompanyReportStream(
     [
       { id: '1762045206', industry: '塑膠' },
-      { id: '567687738', industry: '化學' }
+      { id: '567687738', industry: '化學' },
+      { id: '967180348', industry: '水泥鋼鐵半導體' }
     ],
     (data) => {
       const company = companyMap.findByStock(data.證券代號)
@@ -116,7 +118,8 @@ function extractTransparencyFromCom () {
   return mergeCompanyReportStream(
     [
       { id: '721116469', industry: '塑膠' },
-      { id: '1634361752', industry: '化學' }
+      { id: '1634361752', industry: '化學' },
+      { id: '1634361752', industry: '水泥鋼鐵半導體' }
     ],
     (data) => {
       const company = companyMap.findByStock(data.證券代號)

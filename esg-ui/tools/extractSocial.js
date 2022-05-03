@@ -11,7 +11,8 @@ function extractWorkInjury () {
   return mergeCompanyReportStream(
     [
       { id: '1315041422', industry: '塑膠' },
-      { id: '748457616', industry: '化學' }
+      { id: '748457616', industry: '化學' },
+      { id: '748457616', industry: '水泥鋼鐵半導體' }
     ],
     (data) => {
       const company = companyMap.findByStock(data.證券代號)
@@ -50,7 +51,8 @@ function extractCrew () {
   return mergeCompanyReportStream(
     [
       { id: '1069906267', industry: '塑膠' },
-      { id: '572772205', industry: '化學' }
+      { id: '572772205', industry: '化學' },
+      { id: '572772205', industry: '水泥鋼鐵半導體' }
     ],
     (data) => {
       const company = companyMap.findByStock(data.證券代號)

@@ -15,7 +15,8 @@ function extractWasteFromCom () {
   return mergeCompanyReportStream(
     [
       { id: '410840005', industry: '塑膠' },
-      { id: '30305318', industry: '化學' }
+      { id: '30305318', industry: '化學' },
+      { id: '30305318', industry: '水泥鋼鐵半導體' }
     ],
     (data) => {
       const company = companyMap.findByStock(data.證券代號)
@@ -235,7 +236,8 @@ function extractWaterUsageFromCom () {
   return mergeCompanyReportStream(
     [
       { id: '903558775', industry: '塑膠' },
-      { id: '137179509', industry: '化學' }
+      { id: '137179509', industry: '化學' },
+      { id: '137179509', industry: '水泥鋼鐵半導體' }
     ],
     (data) => {
       const company = companyMap.findByStock(data.證券代號)
@@ -276,7 +278,8 @@ function extractPowerUsageFromCom (incomeMap) {
   return mergeCompanyReportStream(
     [
       { id: '1196916811', industry: '塑膠' },
-      { id: '1218075634', industry: '化學' }
+      { id: '1218075634', industry: '化學' },
+      { id: '1218075634', industry: '水泥鋼鐵半導體' }
     ],
     (data) => {
       const company = companyMap.findByStock(data.證券代號)
@@ -327,7 +330,8 @@ function extractGhGasFromCom (incomeMap) {
   return mergeCompanyReportStream(
     [
       { id: '440421747', industry: '塑膠' },
-      { id: '842330154', industry: '化學' }
+      { id: '842330154', industry: '化學' },
+      { id: '842330154', industry: '水泥鋼鐵半導體' }
     ],
     (data) => {
       const company = companyMap.findByStock(data.證券代號)
@@ -376,6 +380,13 @@ function extractGhGasFromCom (incomeMap) {
           value: total * 10 ** 5 / income
         })
       }
+      if (total) {
+        appendToBoth(company, {
+          ...ctx,
+          measure: '直接＋間接排放',
+          value: total
+        })
+      }
     }
   )
 }
@@ -409,6 +420,7 @@ async function extractGhGas (incomeMap) {
         const sum = annualSum[year][company.統編]
         sum.tot1 += tot - tot2
         sum.tot2 += tot2
+        sum.tot = tot
       })
       .on('end', () => {
         for (const year in annualSum) {
@@ -431,6 +443,12 @@ async function extractGhGas (incomeMap) {
               ...ctx,
               measure: '範疇二間接排放',
               value: companySum[id].tot2
+            })
+
+            appendToBoth(company, {
+              ...ctx,
+              measure: '直接＋間接排放',
+              value: companySum[id].tot
             })
 
             const income = get(incomeMap, `${id}.${year}`)
