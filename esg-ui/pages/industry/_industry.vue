@@ -69,7 +69,7 @@ export default {
   }),
   computed: {
     year () {
-      return this.$route.query.year || '2019'
+      return this.$route.query.year || '2020'
     },
     yearList () {
       return [...new Set(this.stats.body.map(stat => stat.年份))]
