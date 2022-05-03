@@ -380,6 +380,13 @@ function extractGhGasFromCom (incomeMap) {
           value: total * 10 ** 5 / income
         })
       }
+      if (total) {
+        appendToBoth(company, {
+          ...ctx,
+          measure: '直接＋間接排放',
+          value: total
+        })
+      }
     }
   )
 }
@@ -413,6 +420,7 @@ async function extractGhGas (incomeMap) {
         const sum = annualSum[year][company.統編]
         sum.tot1 += tot - tot2
         sum.tot2 += tot2
+        sum.tot = tot
       })
       .on('end', () => {
         for (const year in annualSum) {
@@ -435,6 +443,12 @@ async function extractGhGas (incomeMap) {
               ...ctx,
               measure: '範疇二間接排放',
               value: companySum[id].tot2
+            })
+
+            appendToBoth(company, {
+              ...ctx,
+              measure: '直接＋間接排放',
+              value: companySum[id].tot
             })
 
             const income = get(incomeMap, `${id}.${year}`)
