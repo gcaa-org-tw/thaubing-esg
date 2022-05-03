@@ -420,7 +420,6 @@ async function extractGhGas (incomeMap) {
         const sum = annualSum[year][company.統編]
         sum.tot1 += tot - tot2
         sum.tot2 += tot2
-        sum.tot = tot
       })
       .on('end', () => {
         for (const year in annualSum) {
@@ -445,15 +444,16 @@ async function extractGhGas (incomeMap) {
               value: companySum[id].tot2
             })
 
+            const totSum = companySum[id].tot1 + companySum[id].tot2
+
             appendToBoth(company, {
               ...ctx,
               measure: '直接＋間接排放',
-              value: companySum[id].tot
+              value: totSum
             })
 
             const income = get(incomeMap, `${id}.${year}`)
             if (income) {
-              const totSum = companySum[id].tot1 + companySum[id].tot2
               appendToBoth(company, {
                 ...ctx,
                 unit: '公噸CO2e/億元',
