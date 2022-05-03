@@ -15,7 +15,8 @@ function extractWasteFromCom () {
   return mergeCompanyReportStream(
     [
       { id: '410840005', industry: '塑膠' },
-      { id: '30305318', industry: '化學' }
+      { id: '30305318', industry: '化學' },
+      { id: '30305318', industry: '水泥鋼鐵半導體' }
     ],
     (data) => {
       const company = companyMap.findByStock(data.證券代號)
@@ -235,7 +236,8 @@ function extractWaterUsageFromCom () {
   return mergeCompanyReportStream(
     [
       { id: '903558775', industry: '塑膠' },
-      { id: '137179509', industry: '化學' }
+      { id: '137179509', industry: '化學' },
+      { id: '137179509', industry: '水泥鋼鐵半導體' }
     ],
     (data) => {
       const company = companyMap.findByStock(data.證券代號)
@@ -276,7 +278,8 @@ function extractPowerUsageFromCom (incomeMap) {
   return mergeCompanyReportStream(
     [
       { id: '1196916811', industry: '塑膠' },
-      { id: '1218075634', industry: '化學' }
+      { id: '1218075634', industry: '化學' },
+      { id: '1218075634', industry: '水泥鋼鐵半導體' }
     ],
     (data) => {
       const company = companyMap.findByStock(data.證券代號)
@@ -327,7 +330,8 @@ function extractGhGasFromCom (incomeMap) {
   return mergeCompanyReportStream(
     [
       { id: '440421747', industry: '塑膠' },
-      { id: '842330154', industry: '化學' }
+      { id: '842330154', industry: '化學' },
+      { id: '842330154', industry: '水泥鋼鐵半導體' }
     ],
     (data) => {
       const company = companyMap.findByStock(data.證券代號)
