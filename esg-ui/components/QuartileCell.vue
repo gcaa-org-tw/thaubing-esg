@@ -1,6 +1,6 @@
 <template lang="pug">
   .qua
-    .qua__val.flex.items-center.justify-end.ml-auto.br2(
+    .qua__val.flex.items-center.justify-end.ml-auto.br2.pr1(
       :class="barClass"
       :style="barStyle"
     )
@@ -61,13 +61,14 @@ export default {
 </script>
 <style lang="scss" scoped>
 .qua {
+  width: 12rem;
   &__val {
     background: $unknown;
     color: black;
-    width: 14rem;
     &--red {
       background: $red;
       color: white;
+      text-shadow: 1px 1px 3px #555;
     }
     &--green {
       background: $green;

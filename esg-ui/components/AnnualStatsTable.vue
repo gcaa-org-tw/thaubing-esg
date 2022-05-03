@@ -223,6 +223,7 @@ export default {
     z-index: 1;
     overflow: auto;
     max-height: calc(100vh - #{$banner-height} - #{$footer-height});
+    min-height: 30rem;
   }
   &__nav {
     margin-top: 2.25rem;
