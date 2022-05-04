@@ -2,9 +2,16 @@ import fs from 'fs'
 import path from 'path'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
+import { friendlyHeader } from './libs/crawlerFriendly'
 import industries from './assets/industries.json'
 
 dayjs.extend(utc)
+
+const defaultHeader = friendlyHeader({
+  title: 'ESG 檢測儀：我們與永續轉型的距離',
+  description: '打造永續環境資料庫，推動企業永續發展。',
+  coverUrl: 'og-default.jpg'
+})()
 
 const companies = fs
   .readdirSync(path.join(__dirname, 'static/content/company'))
@@ -26,8 +33,8 @@ export default {
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { hid: 'description', name: 'description', content: '' },
-      { name: 'format-detection', content: 'telephone=no' }
+      { name: 'format-detection', content: 'telephone=no' },
+      ...defaultHeader.meta
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/thaubing-esg/favicon.ico' },
