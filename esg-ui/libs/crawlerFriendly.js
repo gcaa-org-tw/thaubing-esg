@@ -1,6 +1,6 @@
 // import { cleanMarkdown } from './markdownUtils'
 
-const TITLE_TAIL = 'ESG 檢測儀：我們與永續轉型的距離'
+const TITLE_TAIL = 'ESG 檢測儀'
 
 export function genMeta (name, content) {
   const nameAttr = name.startsWith('og:') ? 'property' : 'name'
