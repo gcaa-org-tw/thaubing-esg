@@ -53,6 +53,7 @@ export default {
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
+    '~/plugins/vue-components.client'
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
@@ -61,7 +62,10 @@ export default {
   // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
   buildModules: [
     // https://go.nuxtjs.dev/eslint
-    '@nuxtjs/eslint-module'
+    '@nuxtjs/eslint-module',
+    ['@nuxtjs/google-analytics', {
+      id: 'G-LZPET9EHHH'
+    }]
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
@@ -69,6 +73,7 @@ export default {
     // https://go.nuxtjs.dev/axios
     '@nuxtjs/axios',
     '@nuxtjs/style-resources',
+    'vue-plausible',
     // https://go.nuxtjs.dev/content
     '@nuxt/content'
   ],
@@ -80,6 +85,10 @@ export default {
   content: {
     dir: 'static/content',
     liveEdit: false
+  },
+
+  plausible: {
+    domain: 'gcaa-org-tw.github.io/thaubing-esg'
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
