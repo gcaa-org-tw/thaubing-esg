@@ -3,7 +3,9 @@
     .company__nav.pv3.no-repeat.cover
       .mw8.ph3.flex.justify-between.center
         nuxt-link.f3.fw5.white(to="/") ESG 檢測儀
-        nuxt-link.white.dim(to="/about") 關於計畫
+        .flex.items-center
+          nuxt-link.mr3.white.dim(to="/about") 關於計畫
+          nuxt-link.white.dim(to="/terms-of-service") 免責聲明
     .mw8.center.mt4.ph3
       h1.green.fw5.f3 {{company.公司名稱}}
       .green {{company.自訂產業別}} · 資本額 {{capital}} 元
