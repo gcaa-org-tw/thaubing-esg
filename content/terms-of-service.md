@@ -54,3 +54,5 @@ title: 免責聲明與資料來源說明
 <br>
 若您有想知道更多的資訊，或想提供關於資料的想法，亦歡迎隨時與我們聯繫。<br>
 聯繫方式：綠色公民行動聯盟 透明足跡計畫｜thaubing@gcaa.org.tw
+
+<i class="fas fa-copyright"></i>
