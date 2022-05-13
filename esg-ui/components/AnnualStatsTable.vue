@@ -1,6 +1,6 @@
 <template lang="pug">
   .ast
-    .ast__nav.container.flex-ns.items-end
+    .ast__nav.esgContainer.flex-ns.items-end
       .flex.mt3.mt0-ns
         .ast__catNav.dim(
           v-for="cat in catList"
@@ -8,28 +8,29 @@
           :class="[`ast__catNav--${cat.type}`]"
           @click="visitCat(cat)"
         ) {{cat.label}}
-    .container
+    .esgContainer
       .ast__scroller(@scroll="checkTablePosition")
         table.ast__stats.stats.mv3.ba.b--moon-gray(:class="{'stats--float': !isFirstColumnVisible}")
-          thead.stats__header.stats__header--pri
-            th
-            th.stats__value.stats__value--begin(
-              v-for="column in esgColumns"
-              :key="column.key"
-              v-if="column.span"
-              :colspan="column.span"
-            )
-              div {{column.subCat}}
-          thead.stats__header.stats__header--sub
-            th(ref="company-column") 公司名稱
-            th.pointer.stats__value(
-              v-for="column in esgColumns"
-              :key="column.key"
-              @click="toggleSort(column)"
-              :class="{'stats__value--begin': column.isSubCatBegin, [`stats__value--${column.cat}`]: true}"
-              :ref="catAnchor(column)"
-            )
-              intersect(@enter="enterColumn(column)")
+          thead
+            tr.stats__header.stats__header--pri
+              th
+              th.stats__value.stats__value--begin(
+                v-for="column in esgColumns"
+                :key="column.key"
+                v-if="column.span"
+                :colspan="column.span"
+              )
+                div {{column.subCat}}
+            tr.stats__header.stats__header--sub
+              th(ref="company-column") 公司名稱
+              th.pointer.stats__value(
+                v-for="column in esgColumns"
+                :key="column.key"
+                @click="toggleSort(column)"
+                :class="{'stats__value--begin': column.isSubCatBegin, [`stats__value--${column.cat}`]: true}"
+                :ref="catAnchor(column)"
+              )
+                // vue-intersect(@enter="enterColumn(column)")
                 .flex.items-start.justify-end(:title="thTitle(column)")
                   div
                     .pre.overflow-hidden {{beautyMeasure(column)}}
@@ -49,7 +50,7 @@
                 stats-value(:row="row" :column-meta="column" :quartile="quartile")
 </template>
 <script>
-import Intersect from 'vue-intersect'
+// import VueIntersect from 'vue-intersect'
 import { get, throttle } from 'lodash'
 import esgColumns from '~/assets/esgColumns'
 
@@ -87,9 +88,9 @@ function enrichColumns (category) {
 }
 
 export default {
-  components: {
-    Intersect
-  },
+  // components: {
+  //   VueIntersect
+  // },
   props: {
     companyStats: {
       type: Array,
@@ -147,10 +148,10 @@ export default {
     }
   },
   methods: {
-    enterColumn (column) {
-      // TODO: make intersection more robust in table
-      // this.activeCat = column.cat
-    },
+    // enterColumn (column) {
+    //   // TODO: make intersection more robust in table
+    //   // this.activeCat = column.cat
+    // },
     checkTablePosition: throttle(function (ev) {
       const target = ev.target
       this.isFirstRowVisible = target.scrollTop === 0

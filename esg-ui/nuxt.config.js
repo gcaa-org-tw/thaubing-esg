@@ -19,7 +19,7 @@ const companies = fs
 
 export default {
   // Disable server-side rendering: https://go.nuxtjs.dev/ssr-mode
-  ssr: false,
+  // ssr: false,
 
   // Target: https://go.nuxtjs.dev/config-target
   target: 'static',
@@ -37,7 +37,7 @@ export default {
       ...defaultHeader.meta
     ],
     link: [
-      { rel: 'icon', type: 'image/x-icon', href: '/thaubing-esg/favicon.ico' },
+      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
       { rel: 'canonical', href: 'https://thaubing-esg.gcaa.org.tw' },
       { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
       { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: true },
@@ -78,6 +78,8 @@ export default {
 
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
+    // https://go.nuxtjs.dev/buefy
+    'nuxt-buefy',
     // https://go.nuxtjs.dev/axios
     '@nuxtjs/axios',
     '@nuxtjs/style-resources',
@@ -88,6 +90,11 @@ export default {
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {},
+
+  buefy: {
+    defaultIconPack: 'fas',
+    materialDesignIcons: false
+  },
 
   // Content module configuration: https://go.nuxtjs.dev/config-content
   content: {
@@ -111,6 +118,7 @@ export default {
     routes: [
       ...industries.map(industry => `/industry/${industry}`),
       ...companies.map(company => `/company/${company}`)
-    ]
+    ],
+    concurrency: 10
   }
 }

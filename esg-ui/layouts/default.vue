@@ -1,5 +1,5 @@
 <template lang="pug">
-  .gcaaEsg
+  .gcaaEsg.pb3
     nuxt
 </template>
 <style lang="scss">

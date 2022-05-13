@@ -21,6 +21,7 @@
     "konami": "^1.6.3",
     "lodash": "^4.17.21",
     "nuxt": "^2.15.7",
+    "nuxt-buefy": "^0.4.22",
     "tachyons": "^4.12.0",
     "vue-intersect": "^1.1.6",
     "vue-plausible": "^1.3.1"

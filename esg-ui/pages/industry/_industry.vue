@@ -1,6 +1,6 @@
 <template lang="pug">
   .industry
-    .industry__header.container.pv3.relative.no-repeat.cover
+    .industry__header.esgContainer.pv3.relative.no-repeat.cover
       .industry__about.flex.justify-end
         nuxt-link.mr3.dim(to="/about") 關於計畫
         nuxt-link.dim(to="/terms-of-service") 免責聲明
@@ -11,25 +11,31 @@
       .industry__year.f6.o-70 資料年份：{{year}}
       a.industry__officialSite.absolute(href="https://thaubing.gcaa.org.tw/")
         img(src="~/assets/logo.png")
-    .industry__nav.container.flex.items-end
+    .industry__nav.esgContainer.flex.items-end
       .mr5
         .f6.o-60.mb1 產業
-        label.flex.items-center
-          select.industry__typeSelector(v-model="industry")
-            option(v-for="opt in industries" :key="opt") {{opt}}
-          i.fas.fa-sort
+        b-dropdown.industry__typeSelector(aria-role="menu")
+          template(slot="trigger")
+            button.flex.justify-between.items-center.w-100.pointer
+              .black.f3.flex-auto.tl {{industry}}
+              i.fas.fa-sort.flex-none
+          b-dropdown-item(v-for="opt in industries" :key="opt" aria-role="menuitem" :has-link="true")
+            nuxt-link(:to="industryLink(opt)") {{opt}}
       div
         .f6.o-60.mb1 資料年份
-        label.flex.items-center
-          select.industry__typeSelector(:value="year" @input="changeYear")
-            option(v-for="year in yearList" :key="year") {{year}}
-          i.fas.fa-sort
-    .industry__fund.container(v-if="isGuanshiyinn")
+        b-dropdown.industry__typeSelector(aria-role="menu")
+          template(slot="trigger")
+            button.flex.justify-between.items-center.w-100.pointer
+              .black.f3.flex-auto.tl {{year}}
+              i.fas.fa-sort.flex-none
+          b-dropdown-item(v-for="year in yearList" :key="year" aria-role="menuitem" :has-link="true")
+            nuxt-link(:to="yearLink(year)") {{year}}
+    .industry__fund.esgContainer(v-if="isGuanshiyinn")
       investment-teller(:stats="stats.body" :quartile="quartile" :company-map="companyMap" :year="year")
     annual-stats-table(:company-stats="companyStats" :quartile="activeQuartile")
-    .industry__footer.flex.items-center.justify-end.container
+    .industry__footer.flex.items-center.justify-end.esgContainer
       a.industry__cta.db.br2.pv2.ph3.fw7.white(:href="downloadLink") 下載此頁資料
-    .container
+    .esgContainer
       gcaa-footer
 </template>
 <script>
@@ -56,10 +62,8 @@ export default {
   },
   data () {
     return {
-      industry: this.$route.params.industry,
-
       isGuanshiyinn: false,
-      konamiHandler: new Konami(() => { this.toggleGuanshiyinn() })
+      konamiHandler: null
     }
   },
   head: friendlyHeader({
@@ -68,6 +72,9 @@ export default {
     }
   }),
   computed: {
+    industry () {
+      return this.$route.params.industry || '石化業'
+    },
     year () {
       return this.$route.query.year || '2020'
     },
@@ -113,23 +120,34 @@ export default {
       return this.quartile[this.year] || {}
     }
   },
-  watch: {
-    industry () {
-      this.$router.push(`/industry/${this.industry}`)
-    }
+  mounted () {
+    this.konamiHandler = new Konami(() => { this.toggleGuanshiyinn() })
   },
   beforeDestroy () {
-    this.konamiHandler.unload()
+    if (this.konamiHandler) {
+      this.konamiHandler.unload()
+    }
   },
   methods: {
-    changeYear (event) {
-      this.$router.push({
+    industryLink (industry) {
+      return {
         name: this.$route.name,
         query: {
-          year: event.target.value
+          year: this.year
+        },
+        params: {
+          industry
+        }
+      }
+    },
+    yearLink (year) {
+      return {
+        name: this.$route.name,
+        query: {
+          year
         },
         params: this.$route.params
-      })
+      }
     },
     toggleGuanshiyinn () {
       this.isGuanshiyinn = !this.isGuanshiyinn
@@ -167,6 +185,39 @@ export default {
   }
 
   &__typeSelector {
+    width: 8rem;
+    ::v-deep {
+      .dropdown-menu {
+        min-width: 8rem;
+      }
+      .dropdown-trigger {
+        width: 100%;
+
+        button {
+          border: none;
+          outline: none;
+          background: transparent;
+        }
+      }
+
+      .dropdown-content {
+        background: #333;
+      }
+
+      .has-link a {
+        padding: 0.5rem;
+        color: white;
+        font-size: 1.5rem;
+
+        &:hover {
+          background: #555;
+          color: white;
+        }
+      }
+    }
+  }
+
+  &__typeSelector2 {
     appearance: none;
     background: transparent;
     border: none;
