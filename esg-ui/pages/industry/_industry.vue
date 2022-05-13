@@ -59,7 +59,7 @@ export default {
       industry: this.$route.params.industry,
 
       isGuanshiyinn: false,
-      konamiHandler: new Konami(() => { this.toggleGuanshiyinn() })
+      konamiHandler: null
     }
   },
   head: friendlyHeader({
@@ -117,6 +117,9 @@ export default {
     industry () {
       this.$router.push(`/industry/${this.industry}`)
     }
+  },
+  mounted () {
+    this.konamiHandler = new Konami(() => { this.toggleGuanshiyinn() })
   },
   beforeDestroy () {
     this.konamiHandler.unload()

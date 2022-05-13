@@ -29,7 +29,7 @@
               :class="{'stats__value--begin': column.isSubCatBegin, [`stats__value--${column.cat}`]: true}"
               :ref="catAnchor(column)"
             )
-              intersect(@enter="enterColumn(column)")
+              vue-intersect(@enter="enterColumn(column)")
                 .flex.items-start.justify-end(:title="thTitle(column)")
                   div
                     .pre.overflow-hidden {{beautyMeasure(column)}}
@@ -49,7 +49,7 @@
                 stats-value(:row="row" :column-meta="column" :quartile="quartile")
 </template>
 <script>
-import Intersect from 'vue-intersect'
+// import VueIntersect from 'vue-intersect'
 import { get, throttle } from 'lodash'
 import esgColumns from '~/assets/esgColumns'
 
@@ -87,9 +87,9 @@ function enrichColumns (category) {
 }
 
 export default {
-  components: {
-    Intersect
-  },
+  // components: {
+  //   VueIntersect
+  // },
   props: {
     companyStats: {
       type: Array,
