@@ -1,5 +1,5 @@
 <template lang="pug">
-  .footer.bt.bw1.mv3.pv3.flex-ns.justify-between.tr.tl-ns
+  .esgFooter.bt.bw1.mv3.pv3.flex-ns.justify-between.tr.tl-ns
     .mid-gray
       | 由
       a.dim(href="http://www.gcaa.org.tw/") 綠色公民行動聯盟
@@ -25,7 +25,7 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-.footer {
+.esgFooter {
   border-color: #00000010;
   a {
     color: $green-primary;

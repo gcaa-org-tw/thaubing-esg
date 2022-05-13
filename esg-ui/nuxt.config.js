@@ -78,6 +78,8 @@ export default {
 
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
+    // https://go.nuxtjs.dev/buefy
+    'nuxt-buefy',
     // https://go.nuxtjs.dev/axios
     '@nuxtjs/axios',
     '@nuxtjs/style-resources',
@@ -88,6 +90,11 @@ export default {
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {},
+
+  buefy: {
+    defaultIconPack: 'fas',
+    materialDesignIcons: false
+  },
 
   // Content module configuration: https://go.nuxtjs.dev/config-content
   content: {
@@ -111,6 +118,7 @@ export default {
     routes: [
       ...industries.map(industry => `/industry/${industry}`),
       ...companies.map(company => `/company/${company}`)
-    ]
+    ],
+    concurrency: 10
   }
 }

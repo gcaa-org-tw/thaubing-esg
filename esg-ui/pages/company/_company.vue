@@ -38,11 +38,10 @@
         .charts__item
           crew-ratio-self-chart(:stats="stats.body")
       .company__subtitle Governance 治理相關數據
-      .charts
+      .charts.mb4
         .charts__item.charts__item--two
           income-chart(:stats="stats.body")
-        .charts__item.charts__item--two
-          gcaa-footer
+      gcaa-footer
 </template>
 <script>
 import { friendlyHeader } from '~/libs/crawlerFriendly'
