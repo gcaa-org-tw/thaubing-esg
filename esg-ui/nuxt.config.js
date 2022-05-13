@@ -7,6 +7,8 @@ import industries from './assets/industries.json'
 
 dayjs.extend(utc)
 
+const isProd = process.env.NODE_ENV === 'production'
+
 const defaultHeader = friendlyHeader({
   title: 'ESG 檢測儀：我們與永續轉型的距離',
   description: '打造永續環境資料庫，推動企業永續發展。',
@@ -85,8 +87,13 @@ export default {
     '@nuxtjs/style-resources',
     'vue-plausible',
     // https://go.nuxtjs.dev/content
-    '@nuxt/content'
+    '@nuxt/content',
+    '@nuxtjs/sentry'
   ],
+
+  sentry: {
+    dsn: isProd ? 'https://ed8ec34f968e493fac0f02d3e9f9c331@o190111.ingest.sentry.io/6402639' : ''
+  },
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {},
@@ -120,5 +127,8 @@ export default {
       ...companies.map(company => `/company/${company}`)
     ],
     concurrency: 10
+  },
+  router: {
+    trailingSlash: false
   }
 }
