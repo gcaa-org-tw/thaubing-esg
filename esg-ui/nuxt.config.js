@@ -38,6 +38,7 @@ export default {
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/thaubing-esg/favicon.ico' },
+      { rel: 'canonical', href: 'https://thaubing-esg.gcaa.org.tw' },
       { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
       { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: true },
       { href: 'https://fonts.googleapis.com/css2?family=Lato&family=Noto+Sans+TC:wght@400;500;700&display=swap', rel: 'stylesheet' }
