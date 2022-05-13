@@ -13,7 +13,7 @@ export function genMeta (name, content) {
 
 // all three attribute can be either static string or callback that use vue instance as this
 export function friendlyHeader ({ title, description, coverUrl }) {
-  const SITE_URL = process.env.SITE_URL || 'https://gcaa-org-tw.github.io/thaubing-esg'
+  const SITE_URL = process.env.SITE_URL || 'https://thaubing-esg.gcaa.org.tw'
 
   function getContentAtBest (sth) {
     if (typeof sth === 'string') {
