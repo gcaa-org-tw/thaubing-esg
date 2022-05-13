@@ -120,5 +120,8 @@ export default {
       ...companies.map(company => `/company/${company}`)
     ],
     concurrency: 10
+  },
+  router: {
+    trailingSlash: false
   }
 }
