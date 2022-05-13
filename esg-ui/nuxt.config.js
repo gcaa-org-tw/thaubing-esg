@@ -95,7 +95,7 @@ export default {
   },
 
   plausible: {
-    domain: 'gcaa-org-tw.github.io/thaubing-esg'
+    domain: 'thaubing-esg.gcaa.org.tw'
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
@@ -111,9 +111,5 @@ export default {
       ...industries.map(industry => `/industry/${industry}`),
       ...companies.map(company => `/company/${company}`)
     ]
-  },
-
-  router: {
-    base: process.env.NODE_ENV === 'production' ? '/thaubing-esg' : '/'
   }
 }
