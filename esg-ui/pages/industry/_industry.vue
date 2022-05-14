@@ -17,10 +17,10 @@
         b-dropdown.industry__typeSelector(aria-role="menu")
           template(slot="trigger")
             button.flex.justify-between.items-center.w-100.pointer
-              .black.f3.flex-auto.tl {{industry}}
+              .black.f3.flex-auto.tl {{industry.label}}
               i.fas.fa-sort.flex-none
-          b-dropdown-item(v-for="opt in industries" :key="opt" aria-role="menuitem" :has-link="true")
-            // nuxt-link(:to="industryLink(opt)") {{opt}}
+          b-dropdown-item(v-for="opt in industries" :key="opt.code" aria-role="menuitem" :has-link="true")
+            nuxt-link(:to="industryLink(opt.code)") {{opt.label}}
       div
         .f6.o-60.mb1 資料年份
         b-dropdown.industry__typeSelector(aria-role="menu")
@@ -50,7 +50,10 @@ export default {
     try {
       const stats = await $content('industry', params.industry).fetch()
       const quartile = await $content('industry', `${params.industry}-quartile`).fetch()
-      const companyList = await $content('companyList').fetch()
+      const allCompanyList = await $content('companyList').fetch()
+      const companyList = allCompanyList.body.filter((company) => {
+        return company.上市上櫃產業編碼 === params.industry
+      })
       return {
         stats,
         quartile,
@@ -68,12 +71,15 @@ export default {
   },
   head: friendlyHeader({
     title () {
-      return this.$route.params.industry
+      return this.industry.label
     }
   }),
   computed: {
     industry () {
-      return this.$route.params.industry || '石化業'
+      // default 石化業
+      const code = this.$route.params.industry || '03'
+      const industry = industries.find(needle => needle.code === code)
+      return industry || industries[0]
     },
     year () {
       return this.$route.query.year || '2020'
@@ -84,16 +90,13 @@ export default {
         .sort((a, b) => b - a)
     },
     downloadLink () {
-      return `${this.$router.options.base}content/industry/${this.industry}.csv`
+      return `${this.$router.options.base}content/industry/${this.industry.code}.csv`
     },
     industries () {
       return industries
     },
     companyMap () {
-      return this.companyList.body.reduce((map, company) => {
-        if (company.自訂產業別 !== this.$route.params.industry) {
-          return map
-        }
+      return this.companyList.reduce((map, company) => {
         map[company.統編] = company
         return map
       }, {})

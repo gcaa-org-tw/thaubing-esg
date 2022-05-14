@@ -4,7 +4,9 @@
 <script>
 export default {
   middleware ({ redirect }) {
-    return redirect('/industry/石化業/')
+    // goto 石化 by default
+    // we can't use non-ascii in url due to nuxt hydration bug
+    return redirect('/industry/03/')
   }
 }
 </script>
