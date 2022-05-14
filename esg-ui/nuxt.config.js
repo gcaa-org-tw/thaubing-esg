@@ -116,6 +116,7 @@ export default {
     routes: [
       ...industries.map(industry => `/industry/${industry.code}/`)
     ],
-    concurrency: 10
+    concurrency: 10,
+    fallback: '404.html'
   }
 }
