@@ -11,6 +11,7 @@ const COMPANY_LIST_HEADER = [
   { id: 'stockCode', title: '股票代碼' },
   { id: 'id', title: '統編' },
   { id: 'industry', title: '上市上櫃產業別' },
+  { id: 'industryCode', title: '上市上櫃產業編碼' },
   { id: 'normalizedIndustry', title: '自訂產業別' }
 ]
 
@@ -144,7 +145,7 @@ function appendToBoth (company, row) {
   if ('value' in row && (Number.isNaN(row.value) || row.value === undefined)) {
     throw new Error(`Get NaN or undefined on company: ${company.公司簡稱}:${company.股票代碼}, measure: ${row.measure}, value: ${row.value}`)
   }
-  appendIndustry(company.自訂產業別, {
+  appendIndustry(company.上市上櫃產業編碼, {
     ...row,
     id: company.統編
   })

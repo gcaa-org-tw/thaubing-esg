@@ -34,6 +34,36 @@ export default {
   .nuxt-content {
     line-height: 1.75;
     ::v-deep {
+
+      h2, h3 {
+        margin: 2.5rem 0 1rem;
+
+        + h2,
+        + h3 {
+          margin-top: 1rem;
+        }
+
+        a {
+          display: none;
+        }
+      }
+      h2 {
+        font-size: 1.75rem;
+      }
+
+      h3 {
+        font-size: 1.5rem;
+      }
+
+      ol,
+      ul {
+        margin-left: 1rem;
+      }
+
+      ul {
+        list-style-type: disc;
+      }
+
       p + p {
         margin-top: 2rem;
       }

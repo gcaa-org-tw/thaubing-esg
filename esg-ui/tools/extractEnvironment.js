@@ -206,11 +206,11 @@ async function extractPenalty () {
                 unit: '次'
               }
               if (type === 'all') {
-                appendIndustry(company.自訂產業別, {
+                appendIndustry(company.上市上櫃產業編碼, {
                   ...ctxMoney,
                   id: company.統編
                 })
-                appendIndustry(company.自訂產業別, {
+                appendIndustry(company.上市上櫃產業編碼, {
                   ...ctxCount,
                   id: company.統編
                 })

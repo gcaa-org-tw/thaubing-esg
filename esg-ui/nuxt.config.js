@@ -15,14 +15,7 @@ const defaultHeader = friendlyHeader({
   coverUrl: 'og-default.jpg'
 })()
 
-const companies = fs
-  .readdirSync(path.join(__dirname, 'static/content/company'))
-  .map(filename => filename.slice(0, -4))
-
 export default {
-  // Disable server-side rendering: https://go.nuxtjs.dev/ssr-mode
-  // ssr: false,
-
   // Target: https://go.nuxtjs.dev/config-target
   target: 'static',
 
@@ -123,12 +116,8 @@ export default {
 
   generate: {
     routes: [
-      ...industries.map(industry => `/industry/${industry}`),
-      ...companies.map(company => `/company/${company}`)
+      ...industries.map(industry => `/industry/${industry.code}/`)
     ],
     concurrency: 10
-  },
-  router: {
-    trailingSlash: false
   }
 }

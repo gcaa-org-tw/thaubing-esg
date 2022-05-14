@@ -102,7 +102,7 @@ async function main () {
 
   await Promise.all(
     INDUSTRY_LIST.map(industry => calQuartilePerIndustry(
-      industry,
+      industry.code,
       DEFS.MAJOR_MEASURE_LIST
     ))
   )
