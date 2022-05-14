@@ -1,5 +1,3 @@
-import fs from 'fs'
-import path from 'path'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { friendlyHeader } from './libs/crawlerFriendly'
