@@ -13,19 +13,23 @@ const INDUSTRY_MAP = {
 }
 
 function main () {
-  const industries = new Set()
+  const industries = []
   got.stream(LIST_URL)
     .pipe(new AutoDetectDecoderStream())
     .pipe(new CsvReadableStream({ asObject: true }))
     .on('data', (data) => {
       const normalizedIndustry = INDUSTRY_MAP[data.industry] || data.industry
-      industries.add(normalizedIndustry)
+      industries[data.industry_code] = {
+        label: normalizedIndustry,
+        code: data.industry_code
+      }
       appendCompanyList({
         name: data.name,
         abbr: data.name_abbr,
         stockCode: data.stock_code,
         id: data.tax_code,
         industry: data.industry,
+        industryCode: data.industry_code,
         normalizedIndustry
       })
     })
@@ -33,7 +37,7 @@ function main () {
       const resp = await finished()
       fs.writeFileSync(
         path.join(__dirname, '../assets/industries.json'),
-        JSON.stringify(Array.from(industries))
+        JSON.stringify(Object.values(industries))
       )
       // eslint-disable-next-line no-console
       console.log(`${resp[0]} company list extracted.`)

@@ -32,7 +32,7 @@ async function extractEsgIndexFromCom () {
 
         indexList.forEach((index) => {
           if (data[index]) {
-            appendIndustry(company.自訂產業別, {
+            appendIndustry(company.上市上櫃產業編碼, {
               ...ctx,
               measure: index,
               value: 'T',
