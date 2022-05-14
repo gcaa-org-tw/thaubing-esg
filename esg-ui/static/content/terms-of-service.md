@@ -25,27 +25,23 @@ title: 免責聲明與資料來源說明
 上述所有資料來源均為開放資料，綠盟ESG檢測儀網站僅進行資料彙整與再應用，並未修改任何原始數據及資料，資料正確性由原始提供者負責。<br>
 因現階段企業CSR報告書並無統一格式，亦缺乏經整理後之開放資料，綠盟於收集時採人工方式，逐一查找資料數據，並經單位統一換算後公開。<br>
 
-# 使用之政府開放資料如下：
+
+### 使用之政府開放資料如下：
 1. 溫室氣體排放（範疇一、範疇二）
-- [環保署－溫室氣體年排放量](https://data.epa.gov.tw/dataset/detail/GHG_P_01)
-
+   - [環保署－溫室氣體年排放量](https://data.epa.gov.tw/dataset/detail/GHG_P_01)
 2. 空氣污染物申報-一般／有害空氣污染物
-- [環保署－各工廠空氣污染物排放資料](https://data.epa.gov.tw/dataset/detail/EMS_P_08)
-
+   - [環保署－各工廠空氣污染物排放資料](https://data.epa.gov.tw/dataset/detail/EMS_P_08)
 3. 環境違規
-- [環保署－列管事業污染源裁處資料](https://data.epa.gov.tw/dataset/detail/EMS_P_46)
-
+   - [環保署－列管事業污染源裁處資料](https://data.epa.gov.tw/dataset/detail/EMS_P_46)
 4. 員工薪資
-- [公開資訊觀測站－非擔任主管職務之全時員工薪資資訊](https://mops.twse.com.tw/mops/web/t100sb15)
-
+   - [公開資訊觀測站－非擔任主管職務之全時員工薪資資訊](https://mops.twse.com.tw/mops/web/t100sb15)
 5. 資本額與公司基本資料
-- [政府資料開放平台－上市公司基本資料](https://data.gov.tw/dataset/18419)
-- [政府資料開放平台－上櫃股票基本資料](https://data.gov.tw/dataset/25036)
-- [政府資料開放平台－興櫃公司基本資料](https://data.gov.tw/dataset/28568)
-- [政府資料開放平台－公開發行公司基本資料](https://data.gov.tw/dataset/28567)
-
+   - [政府資料開放平台－上市公司基本資料](https://data.gov.tw/dataset/18419)
+   - [政府資料開放平台－上櫃股票基本資料](https://data.gov.tw/dataset/25036)
+   - [政府資料開放平台－興櫃公司基本資料](https://data.gov.tw/dataset/28568)
+   - [政府資料開放平台－公開發行公司基本資料](https://data.gov.tw/dataset/28567)
 6. 營運狀況
-- [公開資訊觀測站－綜合損益表](https://mops.twse.com.tw/mops/web/t163sb04)
+   - [公開資訊觀測站－綜合損益表](https://mops.twse.com.tw/mops/web/t163sb04)
 
 ### 使用之企業CSR報告人工查找資料如下：
 凡是於大表中欄位標題標示有「🅲」者，皆取自該企業當年度之CSR報告書。<br>
