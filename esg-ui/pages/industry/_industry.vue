@@ -2,8 +2,8 @@
   .industry
     .industry__header.esgContainer.pv3.relative.no-repeat.cover
       .industry__about.flex.justify-end
-        nuxt-link.mr3.dim(to="/about") 關於計畫
-        nuxt-link.dim(to="/terms-of-service") 免責聲明
+        nuxt-link.mr3.dim(to="/about/") 關於計畫
+        nuxt-link.dim(to="/terms-of-service/") 免責聲明
       nuxt-link(to="/")
         h1.industry__title.fw7 ESG 檢測儀
       p.industry__desp
@@ -20,7 +20,7 @@
               .black.f3.flex-auto.tl {{industry}}
               i.fas.fa-sort.flex-none
           b-dropdown-item(v-for="opt in industries" :key="opt" aria-role="menuitem" :has-link="true")
-            nuxt-link(:to="industryLink(opt)") {{opt}}
+            // nuxt-link(:to="industryLink(opt)") {{opt}}
       div
         .f6.o-60.mb1 資料年份
         b-dropdown.industry__typeSelector(aria-role="menu")
@@ -215,18 +215,6 @@ export default {
         }
       }
     }
-  }
-
-  &__typeSelector2 {
-    appearance: none;
-    background: transparent;
-    border: none;
-    outline: none;
-    font-size: 1.5rem;
-    padding: 0;
-    margin: 0;
-    cursor: pointer;
-    width: 7rem;
   }
 
   &__footer {

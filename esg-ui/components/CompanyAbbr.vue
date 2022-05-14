@@ -11,7 +11,7 @@ export default {
   },
   computed: {
     companyUrl () {
-      return `/company/${this.company.公司簡稱}`
+      return `/company/${this.company.統編}/`
     }
   }
 }

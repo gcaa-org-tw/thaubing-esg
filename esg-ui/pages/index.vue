@@ -4,7 +4,7 @@
 <script>
 export default {
   middleware ({ redirect }) {
-    return redirect('/industry/石化業')
+    return redirect('/industry/石化業/')
   }
 }
 </script>
