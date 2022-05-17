@@ -42,6 +42,10 @@ export function chartMixin (esgColumns, measureFilter, isSelfReport = undefined)
           if (!(row.項目 in this.measureMap)) {
             return
           }
+          const measure = this.measureMap[row.項目]
+          if (!!measure.isSelfReport !== !!row.來自公司報告) {
+            return
+          }
           const year = row.年份
           if (!annualStats[year]) {
             annualStats[year] = {}
