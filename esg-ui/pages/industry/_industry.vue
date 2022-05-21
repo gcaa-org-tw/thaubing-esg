@@ -14,7 +14,7 @@
     .industry__nav.esgContainer.flex.items-end
       .mr5
         .f6.o-60.mb1 產業
-        b-dropdown.industry__typeSelector(aria-role="menu")
+        b-dropdown.industry__typeSelector(aria-role="menu" ref="industryDropdown")
           template(slot="trigger")
             button.flex.justify-between.items-center.w-100.pointer
               .black.f3.flex-auto.tl {{industry.label}}
@@ -129,6 +129,11 @@ export default {
   beforeDestroy () {
     if (this.konamiHandler) {
       this.konamiHandler.unload()
+    }
+    // #109, when switch page, html scrollbar disabler is not reset for some reason
+    const html = document.querySelector('html')
+    if (html.classList.contains('is-clipped-touch')) {
+      html.classList.remove('is-clipped-touch')
     }
   },
   methods: {
