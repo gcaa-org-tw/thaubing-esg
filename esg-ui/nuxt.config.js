@@ -114,6 +114,8 @@ export default {
 
   generate: {
     routes: [
+      // '/industry/03/',
+      // '/industry/10/'
       ...industries.map(industry => `/industry/${industry.code}/`)
     ],
     concurrency: 10,
