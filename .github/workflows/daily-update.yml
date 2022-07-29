@@ -1,0 +1,58 @@
+name: daily-update
+
+defaults:
+  run:
+    working-directory: esg-ui
+
+on:
+  schedule:
+    - cron: '0 21 * * *'
+
+jobs:
+  cd:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        node: [14]
+
+    steps:
+      - name: Checkout 🛎
+        uses: actions/checkout@master
+
+      - name: Setup node env 🏗
+        uses: actions/setup-node@v2.4.1
+        with:
+          node-version: ${{ matrix.node }}
+          check-latest: true
+
+      - name: Cache node_modules 📦
+        uses: actions/cache@v2.1.6
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies 👨🏻‍💻
+        run: npm ci --prefer-offline --no-audit
+
+      - name: Sync latest ESG data shet
+        run: ./tools/extractAll.sh
+      
+      - name: Push latest council data 
+        uses: EndBug/add-and-commit@v8
+        with:
+          default_author: github_actions
+          message: Sync to latest ESG data
+
+      - name: Build ui
+        run: npm run generate:gh 
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3.8.0
+        with:
+          DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+          PUBLISH_BRANCH: gh-pages
+          PUBLISH_DIR: ./esg-ui/dist
