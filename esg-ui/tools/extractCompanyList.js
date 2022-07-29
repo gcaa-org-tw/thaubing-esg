@@ -23,9 +23,11 @@ function main () {
         label: normalizedIndustry,
         code: data.industry_code
       }
+      // prevent abbr from invalid file name
+      const abbr = data.name_abbr.replace('*', '＊')
       appendCompanyList({
         name: data.name,
-        abbr: data.name_abbr,
+        abbr,
         stockCode: data.stock_code,
         id: data.tax_code,
         industry: data.industry,
