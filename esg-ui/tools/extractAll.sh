@@ -6,3 +6,4 @@ node extractEnvironment.js
 node extractSocial.js
 node extractGov.js
 node aggregateMetrics.js
+node extractNetZeroRoadmap.js
