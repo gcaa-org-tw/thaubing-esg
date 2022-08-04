@@ -28,8 +28,6 @@ const INDUSTRY_HEADER = [
   { id: 'value', title: '數值' }
 ]
 
-const INDUSTRY_MAP = header2map(INDUSTRY_HEADER)
-
 const COMPANY_HEADER = [
   { id: 'esgCategory', title: '分類' },
   { id: 'category', title: '子分類' },
@@ -39,8 +37,6 @@ const COMPANY_HEADER = [
   { id: 'year', title: '年份' },
   { id: 'value', title: '數值' }
 ]
-
-const COMPANY_MAP = header2map(COMPANY_HEADER)
 
 const WRITERS = { companyList: null, industry: {}, company: {} }
 
@@ -83,6 +79,52 @@ class CsvWriter {
   }
 }
 
+class IndustryDetailLogger {
+  constructor ({ industryHeader = INDUSTRY_HEADER, companyHeader = COMPANY_HEADER, filePostfix = '' }) {
+    this.industryHeader = industryHeader
+    this.industryMap = header2map(industryHeader)
+    this.companyHeader = companyHeader
+    this.companyMap = header2map(companyHeader)
+    this.filePostfix = filePostfix
+  }
+
+  appendIndustry (industry, row) {
+    const id = `${industry}${this.filePostfix}`
+    if (!WRITERS.industry[id]) {
+      WRITERS.industry[id] = new CsvWriter(this.industryHeader, `industry/${id}.csv`)
+    }
+    const undefinedColumn = findUndefinedColumn(this.industryMap, row)
+    if (undefinedColumn) {
+      throw new Error(`Undefined industry header: ${undefinedColumn}`)
+    }
+    // TODO: better encapsulation, no global variable
+    WRITERS.industry[id].append(row)
+  }
+
+  appendCompany (company, row) {
+    const id = `${company}${this.filePostfix}`
+    if (!WRITERS.company[id]) {
+      WRITERS.company[id] = new CsvWriter(this.companyHeader, `company/${id}.csv`)
+    }
+    const undefinedColumn = findUndefinedColumn(this.companyMap, row)
+    if (undefinedColumn) {
+      throw new Error(`Undefined company header: ${undefinedColumn}`)
+    }
+    WRITERS.company[id].append(row)
+  }
+
+  appendToBoth (company, row) {
+    if ('value' in row && (Number.isNaN(row.value) || row.value === undefined)) {
+      throw new Error(`Get NaN or undefined on company: ${company.公司簡稱}:${company.股票代碼}, year: ${row.year}, measure: ${row.measure}, value: ${row.value}`)
+    }
+    this.appendIndustry(company.上市上櫃產業編碼, {
+      ...row,
+      id: company.統編
+    })
+    this.appendCompany(company.公司簡稱, row)
+  }
+}
+
 function header2map (header) {
   return header.reduce((map, item) => {
     map[item.id] = item.title
@@ -105,28 +147,6 @@ function appendCompanyList (row) {
   WRITERS.companyList.append(row)
 }
 
-function appendIndustry (industry, row) {
-  if (!WRITERS.industry[industry]) {
-    WRITERS.industry[industry] = new CsvWriter(INDUSTRY_HEADER, `industry/${industry}.csv`)
-  }
-  const undefinedColumn = findUndefinedColumn(INDUSTRY_MAP, row)
-  if (undefinedColumn) {
-    throw new Error(`Undefined industry header: ${undefinedColumn}`)
-  }
-  WRITERS.industry[industry].append(row)
-}
-
-function appendCompany (company, row) {
-  if (!WRITERS.company[company]) {
-    WRITERS.company[company] = new CsvWriter(COMPANY_HEADER, `company/${company}.csv`)
-  }
-  const undefinedColumn = findUndefinedColumn(COMPANY_MAP, row)
-  if (undefinedColumn) {
-    throw new Error(`Undefined company header: ${undefinedColumn}`)
-  }
-  WRITERS.company[company].append(row)
-}
-
 function waitAllFinished () {
   const promises = []
   if (WRITERS.companyList) {
@@ -141,21 +161,15 @@ function waitAllFinished () {
   return Promise.all(promises)
 }
 
-function appendToBoth (company, row) {
-  if ('value' in row && (Number.isNaN(row.value) || row.value === undefined)) {
-    throw new Error(`Get NaN or undefined on company: ${company.公司簡稱}:${company.股票代碼}, year: ${row.year}, measure: ${row.measure}, value: ${row.value}`)
-  }
-  appendIndustry(company.上市上櫃產業編碼, {
-    ...row,
-    id: company.統編
-  })
-  appendCompany(company.公司簡稱, row)
-}
+const defaultCompondLogger = new IndustryDetailLogger({
+  industryHeader: INDUSTRY_HEADER,
+  companyHeader: COMPANY_HEADER
+})
 
 module.exports = {
   appendCompanyList,
-  appendIndustry,
-  appendCompany,
-  appendToBoth,
+  appendIndustry: defaultCompondLogger.appendIndustry.bind(defaultCompondLogger),
+  appendCompany: defaultCompondLogger.appendCompany.bind(defaultCompondLogger),
+  appendToBoth: defaultCompondLogger.appendToBoth.bind(defaultCompondLogger),
   finished: waitAllFinished
 }
