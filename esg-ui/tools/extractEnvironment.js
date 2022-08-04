@@ -407,9 +407,9 @@ async function extractGhGas (incomeMap) {
           // console.warn(`Company not found, ID: ${data.companyno}, name: ${data.companyname}`)
           return
         }
-        const year = Number.parseInt(data.App_year) + 1911
+        const year = Number.parseInt(data.app_year) + 1911
         const tot = Number.parseFloat(data.tot)
-        const tot2 = Number.parseFloat(data.Tot2)
+        const tot2 = Number.parseFloat(data.tot2)
 
         if (!annualSum[year]) {
           annualSum[year] = {}
