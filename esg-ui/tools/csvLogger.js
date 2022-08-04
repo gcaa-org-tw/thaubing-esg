@@ -167,6 +167,8 @@ const defaultCompondLogger = new IndustryDetailLogger({
 })
 
 module.exports = {
+  CsvWriter,
+  IndustryDetailLogger,
   appendCompanyList,
   appendIndustry: defaultCompondLogger.appendIndustry.bind(defaultCompondLogger),
   appendCompany: defaultCompondLogger.appendCompany.bind(defaultCompondLogger),
