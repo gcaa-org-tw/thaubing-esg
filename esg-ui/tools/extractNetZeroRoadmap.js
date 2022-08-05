@@ -1,9 +1,8 @@
 const fs = require('fs')
 const path = require('path')
-const { get } = require('lodash')
 const CsvReadableStream = require('csv-reader')
 const AutoDetectDecoderStream = require('autodetect-decoder-stream')
-const { companyMap, mergeCompanyReportStream } = require('./utils')
+const { companyMap } = require('./utils')
 const { CsvWriter, IndustryDetailLogger, finished } = require('./csvLogger')
 
 const DATA_DIR = path.join(__dirname, '../../data')
