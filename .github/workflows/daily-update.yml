@@ -39,7 +39,7 @@ jobs:
         run: npm ci --prefer-offline --no-audit
 
       - name: Restore git lfs
-        run: git lfs checkout
+        run: git lfs fetch
 
       - name: Sync latest ESG data shet
         run: ./tools/extractAll.sh
