@@ -24,7 +24,7 @@ jobs:
           lfs: true
 
       - name: Setup node env 🏗
-        uses: actions/setup-node@v2.4.1
+        uses: actions/setup-node@v3.4.1
         with:
           node-version: ${{ matrix.node }}
           check-latest: true
