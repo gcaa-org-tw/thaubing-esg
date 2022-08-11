@@ -5,6 +5,8 @@ const CsvReadableStream = require('csv-reader')
 const AutoDetectDecoderStream = require('autodetect-decoder-stream')
 const { appendCompanyList, finished } = require('./csvLogger')
 
+// pending new list
+// const LIST_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQZKLX4OEhYrQQYEY-l_1W9Ig5Q6_y3f-2u1KBk2xwtB-cMrNdMbCfAuSyoK0iDrpztZtHItvai88IZ/pub?gid=0&single=true&output=csv'
 const LIST_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRzr0lFprPJzQvjsEHhbaCrxjwYsNqwd53iUzkf3A9kSHSxoJFiQ5Lt1ukSuREu8A/pub?gid=1322020199&single=true&output=csv'
 
 const INDUSTRY_MAP = {
@@ -19,9 +21,10 @@ function main () {
     .pipe(new CsvReadableStream({ asObject: true }))
     .on('data', (data) => {
       const normalizedIndustry = INDUSTRY_MAP[data.industry] || data.industry
-      industries[data.industry_code] = {
+      const code = `${data.industry_code}`.padStart(2, 0)
+      industries[code] = {
         label: normalizedIndustry,
-        code: data.industry_code
+        code
       }
       // prevent abbr from invalid file name
       const abbr = data.name_abbr.replace('*', '＊')
@@ -31,7 +34,7 @@ function main () {
         stockCode: data.stock_code,
         id: data.tax_code,
         industry: data.industry,
-        industryCode: data.industry_code,
+        industryCode: code,
         normalizedIndustry
       })
     })
