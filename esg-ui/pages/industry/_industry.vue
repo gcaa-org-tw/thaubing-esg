@@ -1,16 +1,5 @@
 <template lang="pug">
   .industry
-    .industry__header.esgContainer.pv3.relative.no-repeat.cover
-      .industry__about.flex.justify-end
-        nuxt-link.mr3.dim(to="/about/") 關於計畫
-        nuxt-link.dim(to="/terms-of-service/") 免責聲明
-      nuxt-link(to="/")
-        h1.industry__title.fw7 ESG 檢測儀
-      p.industry__desp
-        | 打造永續環境資料庫，推動企業永續發展。
-      .industry__year.f6.o-70 資料年份：{{year}}
-      a.industry__officialSite.absolute(href="https://thaubing.gcaa.org.tw/")
-        img(src="~/assets/logo.png")
     .industry__nav.esgContainer.flex.items-end
       .mr5
         .f6.o-60.mb1 產業
@@ -39,7 +28,7 @@
       gcaa-footer
 </template>
 <script>
-import Konami from 'konami'
+import { mapState } from 'vuex'
 import { friendlyHeader } from '~/libs/crawlerFriendly'
 import industries from '~/assets/industries.json'
 
@@ -61,12 +50,7 @@ export default {
       }
     } catch {
       redirect('/')
-    }
-  },
-  data () {
-    return {
-      isGuanshiyinn: false,
-      konamiHandler: null
+      return { stats: [], companyList: [], quartile: {} }
     }
   },
   head: friendlyHeader({
@@ -75,6 +59,7 @@ export default {
     }
   }),
   computed: {
+    ...mapState({ isGuanshiyinn: 'isGuanshiyinn' }),
     industry () {
       // default 石化業
       const code = this.$route.params.industry || '03'
@@ -123,13 +108,7 @@ export default {
       return this.quartile[this.year] || {}
     }
   },
-  mounted () {
-    this.konamiHandler = new Konami(() => { this.toggleGuanshiyinn() })
-  },
   beforeDestroy () {
-    if (this.konamiHandler) {
-      this.konamiHandler.unload()
-    }
     // #109, when switch page, html scrollbar disabler is not reset for some reason
     const html = document.querySelector('html')
     if (html.classList.contains('is-clipped-touch')) {
@@ -156,9 +135,6 @@ export default {
         },
         params: this.$route.params
       }
-    },
-    toggleGuanshiyinn () {
-      this.isGuanshiyinn = !this.isGuanshiyinn
     }
   }
 }
@@ -166,14 +142,7 @@ export default {
 <style lang="scss" scoped>
 
 .industry {
-  &__header {
-    background-image: url('~/assets/tree-bg.png');
-    color: white;
-    line-height: 1.4;
-    a {
-      color: white;
-    }
-  }
+
   &__nav {
     margin-top: 2.25rem;
     margin-bottom: 1.125rem;
@@ -182,14 +151,6 @@ export default {
     font-size: 3rem;
     margin-top: 1rem;
     margin-bottom: 0;
-  }
-  &__desp {
-    font-size: 1.5rem;
-    margin: 1rem 0 1.75rem;
-  }
-  &__officialSite {
-    right: 1.5rem;
-    bottom: 1rem;
   }
 
   &__typeSelector {

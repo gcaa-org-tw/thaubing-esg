@@ -16,12 +16,12 @@ const REL_PRECISSION = 100
 const INDUSTRY_HEADER = [
   { id: 'id', title: '統編' },
   { id: 'year', title: '年份' },
-  { id: 'totAbs', title: 'Tot 數值' },
-  { id: 'totRel', title: 'Tot 變化' },
-  { id: 'tot1Abs', title: 'Tot1 數值' },
-  { id: 'tot1Rel', title: 'Tot1 變化' },
-  { id: 'tot2Abs', title: 'Tot2 數值' },
-  { id: 'tot2Rel', title: 'Tot2 變化' },
+  { id: 'totAbs', title: 'Tot數值' },
+  { id: 'totRel', title: 'Tot變化' },
+  { id: 'tot1Abs', title: 'Tot1數值' },
+  { id: 'tot1Rel', title: 'Tot1變化' },
+  { id: 'tot2Abs', title: 'Tot2數值' },
+  { id: 'tot2Rel', title: 'Tot2變化' },
   { id: 'isPredicted', title: '是預測值' }
 ]
 

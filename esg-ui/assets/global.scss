@@ -17,18 +17,16 @@ a {
 }
 
 .esgContainer {
-  padding-left: $nl-space;
-  padding-right: $nl-space;
+  --screen-space: 1rem;
+  padding-left: var(--screen-space);
+  padding-right: var(--screen-space);
   @include xxl-screen {
-    padding-left: $xxl-space;
-    padding-right: $xxl-space;
+    --screen-space: 8.125rem;
   }
   @include xl-screen {
-    padding-left: $xl-space;
-    padding-right: $xl-space;
+    --screen-space: 5rem;
   }
   @include l-screen {
-    padding-left: $l-space;
-    padding-right: $l-space;
+    --screen-space: 2rem;
   }
 }

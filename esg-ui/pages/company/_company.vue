@@ -1,11 +1,5 @@
 <template lang="pug">
   .company
-    .company__nav.pv3.no-repeat.cover
-      .mw8.ph3.flex.justify-between.center
-        nuxt-link.f3.fw5.white(to="/") ESG 檢測儀
-        .flex.items-center
-          nuxt-link.mr3.white.dim(to="/about/") 關於計畫
-          nuxt-link.white.dim(to="/terms-of-service/") 免責聲明
     .mw8.center.mt4.ph3
       h1.green.fw5.f3 {{company.公司名稱}}
       .green {{company.自訂產業別}} · 資本額 {{capital}} 元
@@ -46,7 +40,7 @@
 <script>
 import { friendlyHeader } from '~/libs/crawlerFriendly'
 export default {
-  async asyncData ({ $content, params, redirect }) {
+  async asyncData ({ $content, params, redirect, store }) {
     let stats = null
     const companyList = await $content('companyList').fetch()
     const company = companyList.body.find(item => item.統編 === params.company)
@@ -58,6 +52,8 @@ export default {
     if (!stats) {
       return
     }
+
+    store.commit('setCompany', company)
 
     return {
       stats,
@@ -84,13 +80,6 @@ export default {
 </script>
 <style lang="scss" scoped>
 .company {
-  &__nav {
-    background-image: url('~/assets/tree-bg.png');
-
-    a:hover {
-      color: white;
-    }
-  }
   &__subtitle {
     margin: 3.25rem 0 1rem;
     color: #373737;
