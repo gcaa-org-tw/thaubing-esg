@@ -18,7 +18,10 @@
           :class="{'netZero__filterItem--active': filter === 'all'}"
           :to="filterLink('all')"
         ) 所有公司 ({{companyCount}})
-    .mw8.center.pa3.mv4 {{stats}}
+    .netZero__legend
+    .netZero__chart
+      h2 企業維持原狀的碳排成長
+      net-zero-industry-bau(:bau-stats="bauStats" :company-map="companyMap")
 </template>
 <script>
 import { uniqBy } from 'lodash'
@@ -64,7 +67,13 @@ export default {
     companyCount () {
       return Object.keys(this.companyList).length
     },
-    top5Company () {
+    companyMap () {
+      return this.companyList.reduce((sum, company) => {
+        sum[company.統編] = company
+        return sum
+      }, {})
+    },
+    top5CompanyMap () {
       const lastRecordPerCompany = this.stats.body.reduce((sum, row) => {
         if (row.是預測值) {
           return sum
@@ -82,9 +91,21 @@ export default {
       return Object.values(lastRecordPerCompany)
         .sort((a, b) => b.value - a.value)
         .slice(0, 5)
+        .reduce((ret, company) => {
+          ret[company.id] = company
+          return ret
+        }, {})
+    },
+    bauStats () {
+      if (this.filter === VALID_FILTER.all) {
+        return this.stats.body
+      }
+      return this.stats.body.filter((row) => {
+        return row.統編 in this.top5CompanyMap
+      })
     },
     top5Count () {
-      return this.top5Company.length
+      return Object.values(this.top5CompanyMap).length
     }
   },
   beforeDestroy () {
@@ -173,6 +194,17 @@ export default {
 
     &:not(:last-child) {
       margin-right: 1.75rem;
+    }
+  }
+
+  &__chart {
+    margin: 2.5rem auto;
+    max-width: 60rem;
+
+    h2 {
+      font-size: 1.375rem;
+      margin-bottom: 1.75rem;
+      color: #000;
     }
   }
 }
