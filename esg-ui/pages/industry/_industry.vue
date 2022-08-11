@@ -28,7 +28,7 @@
       gcaa-footer
 </template>
 <script>
-import Konami from 'konami'
+import { mapState } from 'vuex'
 import { friendlyHeader } from '~/libs/crawlerFriendly'
 import industries from '~/assets/industries.json'
 
@@ -53,18 +53,13 @@ export default {
       return { stats: [], companyList: [], quartile: {} }
     }
   },
-  data () {
-    return {
-      isGuanshiyinn: false,
-      konamiHandler: null
-    }
-  },
   head: friendlyHeader({
     title () {
       return this.industry.label
     }
   }),
   computed: {
+    ...mapState({ isGuanshiyinn: 'isGuanshiyinn' }),
     industry () {
       // default 石化業
       const code = this.$route.params.industry || '03'
@@ -113,13 +108,7 @@ export default {
       return this.quartile[this.year] || {}
     }
   },
-  mounted () {
-    this.konamiHandler = new Konami(() => { this.toggleGuanshiyinn() })
-  },
   beforeDestroy () {
-    if (this.konamiHandler) {
-      this.konamiHandler.unload()
-    }
     // #109, when switch page, html scrollbar disabler is not reset for some reason
     const html = document.querySelector('html')
     if (html.classList.contains('is-clipped-touch')) {
@@ -146,9 +135,6 @@ export default {
         },
         params: this.$route.params
       }
-    },
-    toggleGuanshiyinn () {
-      this.isGuanshiyinn = !this.isGuanshiyinn
     }
   }
 }

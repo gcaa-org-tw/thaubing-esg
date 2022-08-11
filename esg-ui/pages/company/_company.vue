@@ -40,7 +40,7 @@
 <script>
 import { friendlyHeader } from '~/libs/crawlerFriendly'
 export default {
-  async asyncData ({ $content, params, redirect }) {
+  async asyncData ({ $content, params, redirect, store }) {
     let stats = null
     const companyList = await $content('companyList').fetch()
     const company = companyList.body.find(item => item.統編 === params.company)
@@ -52,6 +52,8 @@ export default {
     if (!stats) {
       return
     }
+
+    store.commit('setCompany', company)
 
     return {
       stats,
