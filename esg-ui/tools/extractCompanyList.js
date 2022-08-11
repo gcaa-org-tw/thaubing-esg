@@ -5,9 +5,7 @@ const CsvReadableStream = require('csv-reader')
 const AutoDetectDecoderStream = require('autodetect-decoder-stream')
 const { appendCompanyList, finished } = require('./csvLogger')
 
-// pending new list
-// const LIST_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQZKLX4OEhYrQQYEY-l_1W9Ig5Q6_y3f-2u1KBk2xwtB-cMrNdMbCfAuSyoK0iDrpztZtHItvai88IZ/pub?gid=0&single=true&output=csv'
-const LIST_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRzr0lFprPJzQvjsEHhbaCrxjwYsNqwd53iUzkf3A9kSHSxoJFiQ5Lt1ukSuREu8A/pub?gid=1322020199&single=true&output=csv'
+const LIST_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQZKLX4OEhYrQQYEY-l_1W9Ig5Q6_y3f-2u1KBk2xwtB-cMrNdMbCfAuSyoK0iDrpztZtHItvai88IZ/pub?gid=0&single=true&output=csv'
 
 const INDUSTRY_MAP = {
   塑膠工業: '石化業'
