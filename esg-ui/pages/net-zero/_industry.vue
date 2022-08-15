@@ -51,6 +51,7 @@ export default {
       bauStats = bauStats.body.map((row) => {
         return {
           ...row,
+          年份: row.年份 - 0,
           Tot變化: row.Tot變化 - 0
         }
       })
@@ -64,6 +65,7 @@ export default {
       ciStats = ciStats.body.map((row) => {
         return {
           ...row,
+          年份: row.年份 - 0,
           Tot變化: row.Tot變化 - 0
         }
       })
