@@ -1,3 +1,7 @@
+/* eslint-disable import/first */
+// in case we need env var in this file
+require('dotenv').config()
+
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { friendlyHeader } from './libs/crawlerFriendly'
@@ -83,7 +87,33 @@ export default {
   ],
 
   sentry: {
-    dsn: isProd ? 'https://ed8ec34f968e493fac0f02d3e9f9c331@o190111.ingest.sentry.io/6402639' : ''
+    dsn: isProd ? process.env.SENTRY_DSN : '',
+    disableServerSide: true,
+    clientIntegrations: {
+      CaptureConsole: { levels: ['error', 'warn'] }
+    },
+
+    // always inject sentry methods in all env
+    logMockCalls: true,
+    disabled: !isProd,
+    publishRelease: {
+      authToken: process.env.SENTRY_AUTH_TOKEN,
+      org: process.env.SENTRY_ORG,
+      project: process.env.SENTRY_PROJECT,
+      // Attach commits to the release (requires that the build triggered within a git repository).
+      setCommits: {
+        auto: true,
+        ignoreMissing: true,
+        ignoreEmpty: true
+      }
+    },
+    sourceMapStyle: 'hidden-source-map',
+
+    config: {
+      // Add native Sentry config here
+      // https://docs.sentry.io/platforms/javascript/guides/vue/configuration/options/
+      release: process.env.GITHUB_SHA || 'dev'
+    }
   },
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
@@ -109,7 +139,8 @@ export default {
   },
 
   env: {
-    buildTime: dayjs.utc().format()
+    buildTime: dayjs.utc().format(),
+    isProd
   },
 
   generate: {
