@@ -1,6 +1,6 @@
 export const state = () => {
   return {
-    isGuanshiyinn: false,
+    isGuanshiyinn: !process.env.isProd,
     company: {}
   }
 }

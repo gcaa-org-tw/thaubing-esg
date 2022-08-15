@@ -21,7 +21,11 @@
     .netZero__legend
     .netZero__chart
       h2 企業維持原狀的碳排成長
-      net-zero-industry-bau(:bau-stats="bauStats" :company-map="companyMap")
+      net-zero-industry-bau(:bau-stats="visibleBauStats" :company-map="companyMap")
+    .netZero__chart
+      h2 企業淨零目標路線
+      net-zero-industry-commitment(:ci-stats="visibleCiStats" :company-map="companyMap")
+
 </template>
 <script>
 import { uniqBy } from 'lodash'
@@ -31,24 +35,36 @@ const VALID_FILTER = { top5: 'top5', all: 'all' }
 
 export default {
   async asyncData ({ $content, params, redirect }) {
+    let bauStats = []
+    let companyList = []
+    let ciStats = []
+
     try {
-      const stats = await $content('industry', `${params.industry}-bau`).fetch()
-      const existedCompany = uniqBy(stats.body, '統編').reduce((sum, company) => {
+      bauStats = await $content('industry', `${params.industry}-bau`).fetch()
+      bauStats = bauStats.body
+    } catch {
+      redirect('/')
+      return { bauStats, ciStats, companyList }
+    }
+
+    try {
+      ciStats = await $content('industry', `${params.industry}-net-zero-commitment`).fetch()
+      ciStats = ciStats.body
+    } catch {
+      // it's ok
+    }
+
+    const existedCompany = uniqBy([...bauStats, ...ciStats], '統編')
+      .reduce((sum, company) => {
         sum[company.統編] = true
         return sum
       }, {})
-      const allCompanyList = await $content('companyList').fetch()
-      const companyList = allCompanyList.body.filter((company) => {
-        return company.統編 in existedCompany
-      })
-      return {
-        stats,
-        companyList
-      }
-    } catch {
-      redirect('/')
-      return { stats: [], companyList: [] }
-    }
+
+    const allCompanyList = await $content('companyList').fetch()
+    companyList = allCompanyList.body.filter((company) => {
+      return company.統編 in existedCompany
+    })
+    return { bauStats, ciStats, companyList }
   },
   computed: {
     industry () {
@@ -74,7 +90,7 @@ export default {
       }, {})
     },
     top5CompanyMap () {
-      const lastRecordPerCompany = this.stats.body.reduce((sum, row) => {
+      const lastRecordPerCompany = this.bauStats.reduce((sum, row) => {
         if (row.是預測值) {
           return sum
         }
@@ -96,12 +112,20 @@ export default {
           return ret
         }, {})
     },
-    bauStats () {
+    activeCompanyMap () {
       if (this.filter === VALID_FILTER.all) {
-        return this.stats.body
+        return this.companyMap
       }
-      return this.stats.body.filter((row) => {
-        return row.統編 in this.top5CompanyMap
+      return this.top5CompanyMap
+    },
+    visibleBauStats () {
+      return this.bauStats.filter((row) => {
+        return row.統編 in this.activeCompanyMap
+      })
+    },
+    visibleCiStats () {
+      return this.ciStats.filter((row) => {
+        return row.統編 in this.activeCompanyMap
       })
     },
     top5Count () {
