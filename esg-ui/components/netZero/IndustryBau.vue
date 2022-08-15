@@ -221,7 +221,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 .indBau {
-  &__chart ::v-deep {
+  &__chart ::v-deep() {
     .c3-grid {
       .c3-ygrid {
         stroke: #bbb;
@@ -286,7 +286,7 @@ export default {
     }
   }
 
-  ::v-deep {
+  ::v-deep() {
     .esgTp {
       padding: 0.75rem 2rem 1.25rem 1rem;
       border: 1px solid #555;

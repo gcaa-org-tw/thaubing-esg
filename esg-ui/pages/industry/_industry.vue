@@ -155,7 +155,7 @@ export default {
 
   &__typeSelector {
     width: 8rem;
-    ::v-deep {
+    ::v-deep() {
       .dropdown-menu {
         min-width: 8rem;
       }

@@ -54,7 +54,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 .chartPanel {
-  ::v-deep {
+  ::v-deep() {
     .c3-chart-line .c3-line {
       stroke-width: 3px;
     }
