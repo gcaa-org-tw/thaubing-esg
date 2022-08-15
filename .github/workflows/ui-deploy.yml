@@ -8,7 +8,7 @@ on:
   push:
     paths:
       - 'esg-ui/**'
-      - '.github/workflow/**'
+      - '.github/workflows/**'
     branches:
       - main
       - master
