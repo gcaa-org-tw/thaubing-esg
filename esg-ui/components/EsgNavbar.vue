@@ -11,7 +11,7 @@
       .esgNavbar__articles.flex.items-center
         nuxt-link.dn.db-ns.dim(to="/about/") 關於計畫
         nuxt-link.dn.db-ns.dim(to="/terms-of-service/") 免責聲明
-        a.esgNavbar__cta.dim.db(href="https://gcaa.neticrm.tw/civicrm/contribute/transact?reset=1&id=41") 捐款支持
+        a.esgNavbar__cta.dim.db(href="https://gcaa.neticrm.tw/civicrm/contribute/transact?reset=1&id=41&utm_source=Web&utm_content=ESG_donate&utm_campaign=TB3") 捐款支持
     .esgNavbar__toolbar.flex(v-if="isGuanshiyinn")
       .esgMenu
         .esgMenu__item.flex
