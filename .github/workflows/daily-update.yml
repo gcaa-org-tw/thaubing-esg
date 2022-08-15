@@ -39,6 +39,9 @@ jobs:
 
       - name: Install dependencies 👨🏻‍💻
         run: npm ci --prefer-offline --no-audit
+      
+      - name: Prepare env
+        run: touch .env
 
       - name: Restore git lfs
         run: git lfs checkout
