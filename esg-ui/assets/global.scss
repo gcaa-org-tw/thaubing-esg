@@ -16,10 +16,8 @@ a {
   color: $green-primary;
 }
 
-.esgContainer {
+:root {
   --screen-space: 1rem;
-  padding-left: var(--screen-space);
-  padding-right: var(--screen-space);
   @include xxl-screen {
     --screen-space: 8.125rem;
   }
@@ -29,4 +27,15 @@ a {
   @include l-screen {
     --screen-space: 2rem;
   }
+}
+
+.esgContainer {
+  padding-left: var(--screen-space);
+  padding-right: var(--screen-space);
+}
+
+.thinContainer {
+  max-width: calc(60rem + var(--screen-space) * 2);
+  padding-left: var(--screen-space);
+  padding-right: var(--screen-space);
 }
