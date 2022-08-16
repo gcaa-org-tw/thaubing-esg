@@ -1,0 +1,75 @@
+.esgLegend {
+  &__label {
+    height: 0.125rem;
+    width: 1rem;
+    margin-right: 0.375rem;
+  }
+
+  &__name {
+    font-size: 0.875rem;
+    line-height: 1rem;
+  }
+
+  &__value {
+    font-size: 0.875rem;
+    line-height: 1rem;
+    color: #000;
+    white-space: nowrap;
+    text-align: right;
+
+    &--raise {
+      color: #F20000;
+    }
+
+    &--reduce {
+      color: #35811C;
+    }
+  }
+
+  &--ci .esgLegend {
+    &__label {
+      position: relative;
+      &:before,
+      &:after {
+        content: " ";
+        position: absolute;
+        width: 3px;
+        height: 0.125rem;
+        background: white;
+      }
+      &:before {
+        left: 3px;
+      }
+      &:after {
+        right: 3px;
+      }
+    }
+  }
+
+  &--roadmap .esgLegend {
+    &__label {
+      height: 0.625rem;
+      opacity: 0.25;
+    }
+    &__value {
+      color: #000;
+    }
+  }
+}
+
+.esgTp {
+  padding: 0.75rem 2rem 1.25rem 1rem;
+  border: 1px solid #555;
+  border-radius: 0.25rem;
+  box-shadow: 0px 2px 14px rgba(0, 0, 0, 0.08);
+  background: #ffffffd9;
+  width: 14rem;
+
+  &__year {
+    font-weight: 600;
+  }
+
+  &__company {
+    margin: 1.25rem 0;
+  }
+}

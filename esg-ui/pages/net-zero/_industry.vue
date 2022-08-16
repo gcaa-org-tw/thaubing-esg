@@ -19,23 +19,34 @@
           :to="filterLink('all')"
         ) 所有公司 ({{companyCount}})
     .netZero__legend
+      .netZero__legendRow
+        net-zero-legend(
+          v-for="company in activeCompanyList"
+          :key="company.統編"
+          :title="company.公司簡稱"
+          :color="company.color"
+        )
+      .netZero__legendRow
+        net-zero-legend(title="IPCC" :color="chartColors.IPCC" type="roadmap")
+        net-zero-legend(title="PNNL" :color="chartColors.PNNL" type="roadmap")
     .netZero__chart
       h2 企業維持原狀的碳排成長
       net-zero-industry-bau(
         :bau-stats="visibleBauStats"
         :ci-stats="visibleCiStats"
-        :company-map="companyMap"
+        :company-map="activeCompanyMap"
         :y-max="yMax"
       )
     .netZero__chart
       h2 企業淨零目標路線
-      net-zero-industry-commitment(:ci-stats="visibleCiStats" :bau-stats="visibleBauStats" :company-map="companyMap")
+      net-zero-industry-commitment(:ci-stats="visibleCiStats" :bau-stats="visibleBauStats" :company-map="activeCompanyMap")
 
 </template>
 <script>
 import { interpolateCividis } from 'd3'
 import { uniqBy } from 'lodash'
 import industries from '~/assets/industries.json'
+import { COLORS } from '~/components/netZero/utils'
 
 const VALID_FILTER = { top5: 'top5', all: 'all' }
 const DEFAULT_Y_MAX = 150
@@ -136,7 +147,7 @@ export default {
         .sort((a, b) => b.value - a.value)
         .slice(0, 5)
         .reduce((ret, company) => {
-          ret[company.id] = company
+          ret[company.id] = this.companyMap[company.id]
           return ret
         }, {})
     },
@@ -145,6 +156,9 @@ export default {
         return this.companyMap
       }
       return this.top5CompanyMap
+    },
+    activeCompanyList () {
+      return Object.values(this.activeCompanyMap)
     },
     yMax () {
       return [...this.visibleBauStats, ...this.visibleCiStats].reduce((max, row) => {
@@ -167,6 +181,9 @@ export default {
     },
     top5Count () {
       return Object.values(this.top5CompanyMap).length
+    },
+    chartColors () {
+      return COLORS
     }
   },
   beforeDestroy () {
@@ -255,6 +272,22 @@ export default {
 
     &:not(:last-child) {
       margin-right: 1.75rem;
+    }
+  }
+
+  &__legend {
+    margin: 2.25rem auto 2.5rem;
+    max-width: 60rem;
+  }
+
+  &__legendRow {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, 6rem);
+    row-gap: 0.5rem;
+    column-gap: 1rem;
+
+    + .netZero__legendRow {
+      margin-top: 1.25rem;
     }
   }
 
