@@ -10,10 +10,12 @@ import roadmap from '~/static/content/overview/net-zero-roadmap.json'
 const COLOR_PNNL = '#358D53'
 const COLOR_IPCC = '#FACB3D'
 
-function yFormatter () {
-  const formatter = format('.1%')
+function yFormatter (isPrecise) {
+  const formatter = format(isPrecise ? '.1%' : '.0%')
   return val => formatter(val / 100)
 }
+
+const yValueFormatter = yFormatter(true)
 
 export default {
   props: {
@@ -160,16 +162,16 @@ export default {
         columns: this.chartData.columns
       })
     },
-    genTooltipValueLabel (value, formatter) {
+    genTooltipValueLabel (value) {
       const diff = value - 100
       if (diff > 0) {
-        return `<div class="esgTp__value esgTp__value--raise">↑ ${formatter(diff)}</div>`
+        return `<div class="esgTp__value esgTp__value--raise">↑ ${yValueFormatter(diff)}</div>`
       } else if (diff < 0) {
-        return `<div class="esgTp__value esgTp__value--reduce">↓ ${formatter(diff * -1)}</div>`
+        return `<div class="esgTp__value esgTp__value--reduce">↓ ${yValueFormatter(diff * -1)}</div>`
       }
       return '<div class="esgTp__value flex-none">&nbsp; 0</div>'
     },
-    genTooltipRow (title, color, value, formatter, type = '') {
+    genTooltipRow (title, color, value, type = '') {
       let rowClass = 'esgTp__row'
       if (type) {
         rowClass += ` esgTp__row--${type}`
@@ -178,7 +180,7 @@ export default {
 <div class="${rowClass} flex items-center">
   <div class="esgTp__legend flex-none" style="background: ${color}"></div>
   <div class="esgTp__name flex-auto truncate">${title}</div>
-  ${this.genTooltipValueLabel(value, formatter)}
+  ${this.genTooltipValueLabel(value)}
 </div>
 `
     },
@@ -205,13 +207,13 @@ export default {
 <div class="esgTp">
   <div class="esgTp__year lh-title">${year}</div>
   <div class="esgTp__company">
-    ${this.genTooltipRow(bauTitle, company.color, bau, valueFormat, 'bau')}
-    ${ciRow ? this.genTooltipRow(ciTitle, company.color, ciRow.Tot變化, valueFormat, 'ci') : ''}
+    ${this.genTooltipRow(bauTitle, company.color, bau, 'bau')}
+    ${ciRow ? this.genTooltipRow(ciTitle, company.color, ciRow.Tot變化, 'ci') : ''}
   </div>
   <div class="esgTp__roadmap">
     <div class="esgTp__roadmapTitle lh-title mb2">目標</div>
-    ${this.genTooltipRow('PNNL', COLOR_PNNL, roadmapRow.PNNL, valueFormat, 'roadmap')}
-    ${this.genTooltipRow('IPCC', COLOR_IPCC, roadmapRow.IPCC, valueFormat, 'roadmap')}
+    ${this.genTooltipRow('PNNL', COLOR_PNNL, roadmapRow.PNNL, 'roadmap')}
+    ${this.genTooltipRow('IPCC', COLOR_IPCC, roadmapRow.IPCC, 'roadmap')}
   <div>
 </div>
 `
