@@ -5,7 +5,7 @@
     .esgLegend__value.flex-none(v-if="value >= 0" :class="valueClass") {{valueLabel}}
 </template>
 <script>
-import { yValueFormatter } from './utils'
+import { yValueFormatter } from '~/libs/netZeroUtils'
 
 export default {
   props: {

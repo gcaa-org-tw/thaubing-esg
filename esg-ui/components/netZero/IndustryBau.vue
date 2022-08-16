@@ -4,7 +4,7 @@
 </template>
 <script>
 import { get } from 'lodash'
-import { yFormatter, yValueFormatter, COLORS } from './utils'
+import { yFormatter, yValueFormatter, COLORS, DEFAULT_ZOOM_RANGE } from '~/libs/netZeroUtils'
 import roadmap from '~/static/content/overview/net-zero-roadmap.json'
 
 export default {
@@ -107,7 +107,7 @@ export default {
           x: {
             type: 'timeseries',
             tick: {
-              count: 8,
+              count: 12,
               format: '%Y'
             }
           },
@@ -120,6 +120,11 @@ export default {
         },
         legend: {
           show: false
+        },
+        subchart: { show: true },
+        zoom: {
+          enabled: true,
+          extent: [1, 100]
         }
       }
     }
@@ -140,6 +145,7 @@ export default {
         ...this.c3Config,
         bindto: this.$refs.chart
       })
+      this.c3Handler.zoom(DEFAULT_ZOOM_RANGE)
     },
     updateChart () {
       if (!this.c3Handler) {
@@ -213,6 +219,11 @@ export default {
 </script>
 <style lang="scss" scoped>
 .indBau {
+  overflow: hidden;
+  height: 22.5rem;
+  &__chart {
+    height: 126%;
+  }
   &__chart ::v-deep() {
     .c3-grid {
       .c3-ygrid {
@@ -257,6 +268,13 @@ export default {
       .tick {
         line {
           stroke: #bbb;
+        }
+      }
+      &.c3-axis-x {
+        .tick {
+          text {
+            display: block !important;
+          }
         }
       }
       &.c3-axis-y {

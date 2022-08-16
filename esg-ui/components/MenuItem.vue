@@ -49,7 +49,6 @@ export default {
   border-top-right-radius: 0.875rem;
   padding: 0.375rem 1rem;
 
-  font-size: 1.625rem;
   line-height: 1.5;
   color: #fff;
 
@@ -65,6 +64,10 @@ export default {
 
   &:not(:last-child) {
     margin-right: 0.375rem;
+  }
+
+  @include ns-screen {
+    font-size: 1.625rem;
   }
 }
 </style>

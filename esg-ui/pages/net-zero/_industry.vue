@@ -18,7 +18,7 @@
           :class="{'netZero__filterItem--active': filter === 'all'}"
           :to="filterLink('all')"
         ) 所有公司 ({{companyCount}})
-    .netZero__legend
+    .netZero__legend.thinContainer
       .netZero__legendRow
         net-zero-legend(
           v-for="company in activeCompanyList"
@@ -29,7 +29,7 @@
       .netZero__legendRow
         net-zero-legend(title="IPCC" :color="chartColors.IPCC" type="roadmap")
         net-zero-legend(title="PNNL" :color="chartColors.PNNL" type="roadmap")
-    .netZero__chart
+    .netZero__chart.thinContainer
       h2 企業維持原狀的碳排成長
       net-zero-industry-bau(
         :bau-stats="visibleBauStats"
@@ -37,7 +37,7 @@
         :company-map="activeCompanyMap"
         :y-max="yMax"
       )
-    .netZero__chart
+    .netZero__chart.thinContainer
       h2 企業淨零目標路線
       net-zero-industry-commitment(:ci-stats="visibleCiStats" :bau-stats="visibleBauStats" :company-map="activeCompanyMap")
 
@@ -46,7 +46,7 @@
 import { interpolateCividis } from 'd3'
 import { uniqBy } from 'lodash'
 import industries from '~/assets/industries.json'
-import { COLORS } from '~/components/netZero/utils'
+import { COLORS } from '~/libs/netZeroUtils'
 
 const VALID_FILTER = { top5: 'top5', all: 'all' }
 const DEFAULT_Y_MAX = 150
@@ -163,7 +163,6 @@ export default {
     yMax () {
       return [...this.visibleBauStats, ...this.visibleCiStats].reduce((max, row) => {
         if (row.Tot變化 > max) {
-          console.warn('change', row.Tot變化, max, row)
           return row.Tot變化
         }
         return max
@@ -259,7 +258,6 @@ export default {
   }
 
   &__filterItem {
-    font-size: 1.375rem;
     line-height: 1.18;
     color: #4A7F2EB3;
     padding-bottom: 0.375rem;
@@ -273,11 +271,14 @@ export default {
     &:not(:last-child) {
       margin-right: 1.75rem;
     }
+
+    @include ns-screen {
+      font-size: 1.375rem;
+    }
   }
 
   &__legend {
     margin: 2.25rem auto 2.5rem;
-    max-width: 60rem;
   }
 
   &__legendRow {
@@ -293,7 +294,6 @@ export default {
 
   &__chart {
     margin: 2.5rem auto;
-    max-width: 60rem;
 
     h2 {
       font-size: 1.375rem;
