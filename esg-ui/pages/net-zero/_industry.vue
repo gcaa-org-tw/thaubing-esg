@@ -39,7 +39,12 @@
       )
     .netZero__chart.thinContainer
       h2 企業淨零目標路線
-      net-zero-industry-commitment(:ci-stats="visibleCiStats" :bau-stats="visibleBauStats" :company-map="activeCompanyMap")
+      net-zero-industry-commitment(
+        :ci-stats="visibleCiStats"
+        :bau-stats="visibleBauStats"
+        :company-map="activeCompanyMap"
+        :y-max="yMax"
+      )
 
 </template>
 <script>
