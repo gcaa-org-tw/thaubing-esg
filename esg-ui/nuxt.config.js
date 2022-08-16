@@ -88,9 +88,6 @@ export default {
 
   sentry: {
     dsn: isProd ? process.env.SENTRY_DSN : '',
-  },
-  // disable sentry for now to pass CICD
-  doLater: {
     disableServerSide: true,
     clientIntegrations: {
       CaptureConsole: { levels: ['error', 'warn'] }
