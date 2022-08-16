@@ -198,7 +198,13 @@ export default {
         return row.年份 === year && row.統編 === company.統編
       })
 
-      const roadmapRow = roadmap.find(row => row.year === year)
+      let roadmapRow = roadmap.find(row => row.year === year)
+
+      roadmapRow = {
+        ...roadmapRow,
+        PNNL: roadmapRow.PNNL * 100,
+        IPCC: roadmapRow.IPCC * 100
+      }
 
       return `
 <div class="esgTp">
