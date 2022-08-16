@@ -3,6 +3,8 @@
     .indCom__chart.h-100(ref="chart")
 </template>
 <script>
+import { get } from 'lodash'
+import { COLORS, yFormatter } from '~/libs/netZeroUtils'
 import roadmap from '~/static/content/overview/net-zero-roadmap.json'
 
 export default {
@@ -14,6 +16,10 @@ export default {
     companyMap: {
       type: Object,
       required: true
+    },
+    yMax: {
+      type: Number,
+      required: true
     }
   },
   data () {
@@ -22,19 +28,30 @@ export default {
     }
   },
   computed: {
+    companyAbbrMap () {
+      return Object.keys(this.companyMap).reduce((ret, id) => {
+        const company = this.companyMap[id]
+        ret[company.公司簡稱] = company
+        return ret
+      }, {})
+    },
     chartData () {
       const data = {}
+      const colors = {}
       const annualData = this.ciStats.reduce((sum, row) => {
         const year = row.年份
         const company = this.companyMap[row.統編]
         if (!sum[year]) {
           sum[year] = {}
         }
-        sum[year][company.公司簡稱] = row.Tot變化 - 0
+        sum[year][company.公司簡稱] = row.Tot變化
         return sum
       }, {})
 
       roadmap.forEach((row) => {
+        if (!annualData[row.year]) {
+          annualData[row.year] = {}
+        }
         annualData[row.year].PNNL = row.PNNL * 100
         annualData[row.year].IPCC = row.IPCC * 100
       })
@@ -44,7 +61,11 @@ export default {
 
       allCompanies.forEach((companyName) => {
         data[companyName] = [companyName]
+        colors[companyName] = get(this.companyAbbrMap, `${companyName}.color`, '#000')
       })
+
+      colors.PNNL = COLORS.PNNL
+      colors.IPCC = COLORS.IPCC
 
       const yearList = Object.keys(annualData).sort()
 
@@ -55,7 +76,7 @@ export default {
         })
       })
 
-      const xData = ['x', ...yearList]
+      const xData = ['x', ...yearList.map(y => `${y}-01-01`)]
 
       return {
         x: 'x',
@@ -67,7 +88,8 @@ export default {
         types: {
           IPCC: 'area',
           PNNL: 'area'
-        }
+        },
+        colors
       }
     },
     c3Config () {
@@ -77,6 +99,12 @@ export default {
             type: 'timeseries',
             tick: {
               format: '%Y'
+            }
+          },
+          y: {
+            max: this.yMax,
+            tick: {
+              format: yFormatter()
             }
           }
         }
@@ -96,7 +124,7 @@ export default {
       const c3 = require('c3')
       this.c3Handler = c3.generate({
         data: this.chartData,
-        ...this.c3config,
+        ...this.c3Config,
         bindto: this.$refs.chart
       })
     },

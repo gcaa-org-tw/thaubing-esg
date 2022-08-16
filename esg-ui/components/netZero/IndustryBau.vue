@@ -107,7 +107,7 @@ export default {
           x: {
             type: 'timeseries',
             tick: {
-              count: 12,
+              count: 24,
               format: '%Y'
             }
           },
@@ -121,6 +121,7 @@ export default {
         legend: {
           show: false
         },
+        // workaround, zoom behave correctly only when subchart is enabled
         subchart: { show: true },
         zoom: {
           enabled: true,
@@ -219,12 +220,16 @@ export default {
 </script>
 <style lang="scss" scoped>
 .indBau {
-  overflow: hidden;
   height: 22.5rem;
   &__chart {
     height: 126%;
   }
   &__chart ::v-deep() {
+    svg > g:nth-child(3) {
+      // workaround, zoom behave correctly only when subchart is enabled
+      // hide subchart by ourselves
+      display: none;
+    }
     .c3-grid {
       .c3-ygrid {
         stroke: #bbb;
