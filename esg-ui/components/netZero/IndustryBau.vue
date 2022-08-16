@@ -3,19 +3,9 @@
     .indBau__chart.h-100(ref="chart")
 </template>
 <script>
-import { format } from 'd3'
 import { get } from 'lodash'
+import { yFormatter, yValueFormatter, COLORS } from './utils'
 import roadmap from '~/static/content/overview/net-zero-roadmap.json'
-
-const COLOR_PNNL = '#358D53'
-const COLOR_IPCC = '#FACB3D'
-
-function yFormatter (isPrecise) {
-  const formatter = format(isPrecise ? '.1%' : '.0%')
-  return val => formatter(val / 100)
-}
-
-const yValueFormatter = yFormatter(true)
 
 export default {
   props: {
@@ -74,8 +64,8 @@ export default {
         data[companyName] = [companyName]
         colors[companyName] = get(this.companyAbbrMap, `${companyName}.color`, '#000')
       })
-      colors.PNNL = COLOR_PNNL
-      colors.IPCC = COLOR_IPCC
+      colors.PNNL = COLORS.PNNL
+      colors.IPCC = COLORS.IPCC
 
       const yearList = Object.keys(annualData).sort()
 
@@ -165,21 +155,21 @@ export default {
     genTooltipValueLabel (value) {
       const diff = value - 100
       if (diff > 0) {
-        return `<div class="esgTp__value esgTp__value--raise">↑ ${yValueFormatter(diff)}</div>`
+        return `<div class="esgLegend__value esgLegend__value--raise">↑ ${yValueFormatter(diff)}</div>`
       } else if (diff < 0) {
-        return `<div class="esgTp__value esgTp__value--reduce">↓ ${yValueFormatter(diff * -1)}</div>`
+        return `<div class="esgLegend__value esgLegend__value--reduce">↓ ${yValueFormatter(diff * -1)}</div>`
       }
-      return '<div class="esgTp__value flex-none">&nbsp; 0</div>'
+      return '<div class="esgLegend__value flex-none">&nbsp; 0</div>'
     },
     genTooltipRow (title, color, value, type = '') {
-      let rowClass = 'esgTp__row'
+      let rowClass = 'esgLegend'
       if (type) {
-        rowClass += ` esgTp__row--${type}`
+        rowClass += ` esgLegend--${type}`
       }
       return `
 <div class="${rowClass} flex items-center">
-  <div class="esgTp__legend flex-none" style="background: ${color}"></div>
-  <div class="esgTp__name flex-auto truncate">${title}</div>
+  <div class="esgLegend__label flex-none" style="background: ${color}"></div>
+  <div class="esgLegend__name flex-auto truncate">${title}</div>
   ${this.genTooltipValueLabel(value)}
 </div>
 `
@@ -212,8 +202,8 @@ export default {
   </div>
   <div class="esgTp__roadmap">
     <div class="esgTp__roadmapTitle lh-title mb2">目標</div>
-    ${this.genTooltipRow('PNNL', COLOR_PNNL, roadmapRow.PNNL, 'roadmap')}
-    ${this.genTooltipRow('IPCC', COLOR_IPCC, roadmapRow.IPCC, 'roadmap')}
+    ${this.genTooltipRow('PNNL', COLORS.PNNL, roadmapRow.PNNL, 'roadmap')}
+    ${this.genTooltipRow('IPCC', COLORS.IPCC, roadmapRow.IPCC, 'roadmap')}
   <div>
 </div>
 `
@@ -288,84 +278,8 @@ export default {
     }
   }
 
-  ::v-deep() {
-    .esgTp {
-      padding: 0.75rem 2rem 1.25rem 1rem;
-      border: 1px solid #555;
-      border-radius: 0.25rem;
-      box-shadow: 0px 2px 14px rgba(0, 0, 0, 0.08);
-      background: #ffffffd9;
-      width: 14rem;
-
-      &__year {
-        font-weight: 600;
-      }
-
-      &__company {
-        margin: 1.25rem 0;
-      }
-
-      &__row + .esgTp__row {
-        margin-top: 0.75rem;
-      }
-
-      &__legend {
-        height: 0.125rem;
-        width: 1rem;
-        margin-right: 0.375rem;
-      }
-
-      &__name {
-        font-size: 0.875rem;
-        line-height: 1rem;
-      }
-
-      &__value {
-        font-size: 0.875rem;
-        line-height: 1rem;
-        color: #000;
-        white-space: nowrap;
-        text-align: right;
-
-        &--raise {
-          color: #F20000;
-        }
-
-        &--reduce {
-          color: #35811C;
-        }
-      }
-
-      &__row--ci .esgTp {
-        &__legend {
-          position: relative;
-          &:before,
-          &:after {
-            content: " ";
-            position: absolute;
-            width: 3px;
-            height: 0.125rem;
-            background: white;
-          }
-          &:before {
-            left: 3px;
-          }
-          &:after {
-            right: 3px;
-          }
-        }
-      }
-
-      &__row--roadmap .esgTp {
-        &__legend {
-          height: 0.875rem;
-          opacity: 0.25;
-        }
-        &__value {
-          color: #000;
-        }
-      }
-    }
+  ::v-deep(.esgLegend) + .esgLegend {
+    margin-top: 0.75rem;
   }
 }
 </style>

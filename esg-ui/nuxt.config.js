@@ -53,7 +53,8 @@ export default {
     'tachyons/css/tachyons.css',
     '@fortawesome/fontawesome-free/css/all.min.css',
     'c3/c3.min.css',
-    '~/assets/global'
+    '~/assets/global',
+    '~/assets/chart'
   ],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
