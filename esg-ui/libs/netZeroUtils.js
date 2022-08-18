@@ -4,6 +4,11 @@ import industries from '~/assets/industries.json'
 
 export const DEFAULT_ZOOM_RANGE = [new Date('2013-01-01'), new Date('2023-01-01')]
 
+export const Y_MAX = {
+  MIN: 120,
+  MAX: 200
+}
+
 export const YEAR = {
   START: 2013,
   BASE: 2019,

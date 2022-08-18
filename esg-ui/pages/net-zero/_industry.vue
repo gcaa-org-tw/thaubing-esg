@@ -30,7 +30,7 @@
         net-zero-legend(title="IPCC" :color="chartColors.IPCC" type="roadmap")
         net-zero-legend(title="PNNL" :color="chartColors.PNNL" type="roadmap")
     .netZero__chart.thinContainer
-      h2 企業維持原狀的碳排成長
+      h2 企業維持原狀的碳排成長 {{yMax}}
       net-zero-industry-bau(
         :bau-stats="visibleBauStats"
         :ci-stats="visibleCiStats"
@@ -50,10 +50,9 @@
 <script>
 import { interpolateCividis } from 'd3'
 import { uniqBy } from 'lodash'
-import { COLORS, industryMixin, PER_INDUSTRY_KEY } from '~/libs/netZeroUtils'
+import { COLORS, industryMixin, PER_INDUSTRY_KEY, Y_MAX } from '~/libs/netZeroUtils'
 
 const VALID_FILTER = { top5: 'top5', all: 'all' }
-const DEFAULT_Y_MAX = 150
 
 export default {
   mixins: [industryMixin],
@@ -168,11 +167,15 @@ export default {
     },
     yMax () {
       return [...this.visibleBauStats, ...this.visibleCiStats].reduce((max, row) => {
+        if (max === Y_MAX.MAX) {
+          return max
+        }
         if (row.Tot變化 > max) {
-          return row.Tot變化
+          console.warn(`max ${max} -> ${row.Tot變化}`, row)
+          return Math.min(row.Tot變化, Y_MAX.MAX)
         }
         return max
-      }, DEFAULT_Y_MAX)
+      }, Y_MAX.MIN)
     },
     visibleBauStats () {
       return this.bauStats.filter((row) => {

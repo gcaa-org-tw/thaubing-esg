@@ -104,9 +104,6 @@ export default {
   watch: {
     bauStats () {
       this.updateChart()
-    },
-    ciStats () {
-      this.updateChart()
     }
   },
   mounted () {
