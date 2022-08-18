@@ -152,10 +152,6 @@ function aggregateCommitment (ciRow) {
 
   breakpointList.unshift({ year: ciBaseYear, ratio: 100, ciTot: ciBaseTot })
 
-  if (ciRow.companyname === '華夏海灣塑膠股份有限公司') {
-    console.warn('qq', ciRow, breakpointList)
-  }
-
   if (breakpointList.length < 2) {
     // should contain at least 2 points, so to draw line
     return null

@@ -4,7 +4,7 @@
 </template>
 <script>
 import { get } from 'lodash'
-import { yValueFormatter, COLORS, DEFAULT_ZOOM_RANGE, genC3Config, companyMixin } from '~/libs/netZeroUtils'
+import { yValueFormatter, COLORS, genC3Config, companyMixin } from '~/libs/netZeroUtils'
 import roadmap from '~/static/content/overview/net-zero-roadmap.json'
 
 export default {
@@ -120,7 +120,7 @@ export default {
         ...this.c3Config,
         bindto: this.$refs.chart
       })
-      this.c3Handler.zoom(DEFAULT_ZOOM_RANGE)
+      // this.c3Handler.zoom(DEFAULT_ZOOM_RANGE)
     },
     updateChart () {
       if (!this.c3Handler) {
