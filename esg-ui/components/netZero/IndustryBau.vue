@@ -4,7 +4,7 @@
 </template>
 <script>
 import { get } from 'lodash'
-import { yValueFormatter, COLORS, genC3Config, companyMixin } from '~/libs/netZeroUtils'
+import { yValueFormatter, COLORS, genC3Config, companyMixin, YEAR } from '~/libs/netZeroUtils'
 import roadmap from '~/static/content/overview/net-zero-roadmap.json'
 
 export default {
@@ -55,7 +55,7 @@ export default {
       })
 
       // use 基準年 as basis
-      const allCompanies = Object.keys(annualData['2019'])
+      const allCompanies = Object.keys(annualData[YEAR.BASE])
 
       allCompanies.forEach((companyName) => {
         data[companyName] = [companyName]
