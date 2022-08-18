@@ -292,7 +292,7 @@ export default {
 
   &__legendRow {
     display: grid;
-    grid-template-columns: repeat(auto-fit, 6rem);
+    grid-template-columns: repeat(auto-fit, 9.5rem);
     row-gap: 0.5rem;
     column-gap: 1rem;
 
