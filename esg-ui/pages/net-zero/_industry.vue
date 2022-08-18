@@ -171,7 +171,6 @@ export default {
           return max
         }
         if (row.Tot變化 > max) {
-          console.warn(`max ${max} -> ${row.Tot變化}`, row)
           return Math.min(row.Tot變化, Y_MAX.MAX)
         }
         return max

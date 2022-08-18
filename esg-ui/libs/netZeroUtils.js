@@ -1,8 +1,11 @@
 import { format, interpolateCividis } from 'd3'
 import { range } from 'lodash'
 import industries from '~/assets/industries.json'
+import roadmap from '~/static/content/overview/net-zero-roadmap.json'
 
 export const DEFAULT_ZOOM_RANGE = [new Date('2013-01-01'), new Date('2023-01-01')]
+
+export const CI_SUFFIX = '-ci'
 
 export const Y_MAX = {
   MIN: 120,
@@ -32,6 +35,88 @@ const xTickValues = [
   ...range(2015, YEAR.END, 5),
   YEAR.END
 ].map(year => new Date(`${year}-01-01`))
+
+/**
+ *
+ * @param {Array} stats - [{ Tot變化, 年份, <idColumn>}]
+ * @param {Function} getUnitLabel - function (statsRow), return label to be used in chart
+ * @param {Function} getUnitColor - function (unitLabel), return color code
+ * @param {Function} isDashed  - function (statsRow), return whether this row is predicted / commitment
+ */
+export function genNetZeroCompanyChartData ({ stats, getUnitLabel, getUnitColor, isDashed }) {
+  const data = {}
+  const colors = {}
+  const annualData = stats.reduce((sum, row) => {
+    const year = row.年份
+    const unitLabel = getUnitLabel(row)
+    if (!sum[year]) {
+      sum[year] = {}
+    }
+    sum[year][unitLabel] = { tot: row.Tot變化, isDashed: isDashed(row) }
+    return sum
+  }, {})
+
+  roadmap.forEach((row) => {
+    if (!annualData[row.year]) {
+      annualData[row.year] = {}
+    }
+    annualData[row.year].PNNL = { tot: row.PNNL * 100, isDashed: false }
+    annualData[row.year].IPCC = { tot: row.IPCC * 100, isDashed: false }
+  })
+
+  // use 基準年 as basis
+  const allUnits = Object.keys(annualData[YEAR.BASE])
+
+  allUnits.forEach((unitLabel) => {
+    data[unitLabel] = [unitLabel]
+    colors[unitLabel] = getUnitColor(unitLabel)
+  })
+  colors.PNNL = COLORS.PNNL
+  colors.IPCC = COLORS.IPCC
+
+  const yearList = Object.keys(annualData).sort()
+
+  yearList.forEach((year) => {
+    allUnits.forEach((unitLabel) => {
+      const row = annualData[year][unitLabel]
+      const value = !row || row.tot === undefined ? null : row.tot
+      if (!row) {
+        data[unitLabel].push(null)
+      } else if (!row.isDashed) {
+        data[unitLabel].push(value)
+      } else {
+        const ciUnitLabel = `${unitLabel}${CI_SUFFIX}`
+        if (!data[ciUnitLabel]) {
+          // preserve dashed line in years before it begin
+          const emptyValues = data[unitLabel].slice(1).fill(null)
+          const factLen = data[unitLabel].length - 1
+          // connect fact and commitment line
+          emptyValues[factLen - 1] = data[unitLabel][factLen]
+          data[ciUnitLabel] = [ciUnitLabel, ...emptyValues]
+          colors[ciUnitLabel] = colors[unitLabel]
+        }
+        data[unitLabel].push(null)
+        data[ciUnitLabel].push(value)
+      }
+    })
+  })
+
+  const xData = ['x', ...yearList.map(y => `${y}-01-01`)]
+
+  return {
+    x: 'x',
+    columns: [
+      xData,
+      ...Object.values(data)
+    ],
+    type: 'line',
+    types: {
+      IPCC: 'area',
+      PNNL: 'area'
+    },
+    colors
+  }
+}
 
 export function genC3Config (yMax, ext) {
   return {

@@ -19,13 +19,16 @@
   }
   .c3-chart-lines {
     .c3-circle {
-      opacity: 0.5 !important;
       &._expanded_ {
         display: inline;
         fill: currentColor;
         stroke: none;
-        opacity: 1 !important;
         // stroke-width: 2px;
+      }
+    }
+    .c3-chart-line[class*="-ci"] {
+      .c3-lines path {
+        stroke-dasharray: 7 5;
       }
     }
   }
@@ -99,7 +102,7 @@
     }
   }
 
-  &--ci .esgLegend {
+  &--bau .esgLegend {
     &__label {
       position: relative;
       &:before,
@@ -116,6 +119,12 @@
       &:after {
         right: 3px;
       }
+    }
+  }
+
+  &--noLabel .esgLegend {
+    &__label {
+      opacity: 0;
     }
   }
 
