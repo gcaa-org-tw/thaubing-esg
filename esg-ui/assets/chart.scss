@@ -13,29 +13,18 @@
   }
   .c3-xgrid-focus {
     stroke-dasharray: 5 4;
-    .c3-chart-lines {
-      .c3-circle {
-        display: none;
-      }
-
-      &._expanded_ {
-        display: inline;
-        fill: #fff;
-        stroke: currentColor;
-        stroke-width: 2px;
-      }
-    }
     .c3-line {
       stroke-width: 2px;
     }
   }
   .c3-chart-lines {
     .c3-circle {
-      display: none;
+      opacity: 0.5 !important;
       &._expanded_ {
         display: inline;
         fill: currentColor;
         stroke: none;
+        opacity: 1 !important;
         // stroke-width: 2px;
       }
     }
@@ -65,13 +54,17 @@
       }
     }
   }
-  .c3-lines-IPCC,
-  .c3-lines-PNNL {
-    display: none;
-  }
-  .c3-area-IPCC,
-  .c3-area-PNNL {
-    opacity: 0.25 !important;
+  .c3-target-IPCC,
+  .c3-target-PNNL {
+    .c3-lines {
+      display: none;
+    }
+    .c3-areas path {
+      opacity: 0.25 !important;
+    }
+    .c3-circles {
+      display: none;
+    }
   }
   .esgLegend + .esgLegend {
     margin-top: 0.75rem;
