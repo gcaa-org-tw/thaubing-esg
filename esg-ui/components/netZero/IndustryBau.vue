@@ -47,6 +47,9 @@ export default {
       }, {})
 
       roadmap.forEach((row) => {
+        if (!annualData[row.year]) {
+          annualData[row.year] = {}
+        }
         annualData[row.year].PNNL = row.PNNL * 100
         annualData[row.year].IPCC = row.IPCC * 100
       })
@@ -100,6 +103,9 @@ export default {
   },
   watch: {
     bauStats () {
+      this.updateChart()
+    },
+    ciStats () {
       this.updateChart()
     }
   },
