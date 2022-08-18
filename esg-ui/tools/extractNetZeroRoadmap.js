@@ -71,8 +71,8 @@ function aggregateTot (id, year, stats, { tot, tot1, tot2 }) {
 
 function genTotColumn (current, base, field = 'tot') {
   // make it xx.yy% instead of 0.xxyy
-  const rel = Math.round(current[field] * 100 * REL_PRECISSION / base[field]) / REL_PRECISSION
-  const abs = Math.round(current[field] * REL_PRECISSION) / REL_PRECISSION
+  const rel = simplifyValue(current[field] * 100 / base[field])
+  const abs = simplifyValue(current[field])
   return {
     [`${field}Abs`]: abs,
     [`${field}Rel`]: rel
@@ -194,7 +194,7 @@ function calculateCommitment (companyBauList) {
         const factBase = companyBau.find(row => row.year === BASE_YEAR)
         const factList = companyBau
           .filter(row => !row.isPredicted)
-          .sort((a, b) => b.year - a.year)
+          .sort((a, b) => a.year - b.year)
 
         const commitmentMap = aggregateCommitment(data)
 
@@ -216,13 +216,13 @@ function calculateCommitment (companyBauList) {
         for (let year = lastFact.year + 1; year <= END_YEAR; year++) {
           const commitment = commitmentMap[year]
           if (!(year in commitmentMap)) {
-            return
+            continue
           }
           const row = { year, isPredicted: 'T' }
 
           // commitmentRatio(year) = commitment(year) / exactTot(2019)
-          row.totAbs = commitment
-          row.totRel = commitment / factBase.totAbs
+          row.totAbs = simplifyValue(commitment)
+          row.totRel = simplifyValue(commitment * 100 / factBase.totAbs)
 
           CI_LOGGER.appendToBoth(company, row)
         }
@@ -233,9 +233,12 @@ function calculateCommitment (companyBauList) {
   })
 }
 
+function simplifyValue (value) {
+  return Math.round(value * REL_PRECISSION) / REL_PRECISSION
+}
+
 function calculateBau () {
-  // 溫室氣體排放
-  //   範疇一直接排放data/ghg_p_01.csv#tot
+  // 溫室氣體排放  //   範疇一直接排放data/ghg_p_01.csv#tot
   //   範疇二間接排放data/ghg_p_01.csv#tot2
   const companyStats = {}
   const industryStats = {}
