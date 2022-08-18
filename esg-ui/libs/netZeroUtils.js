@@ -1,11 +1,11 @@
 import { format, interpolateCividis } from 'd3'
-import { range } from 'lodash'
+import { range, get } from 'lodash'
 import industries from '~/assets/industries.json'
 import roadmap from '~/static/content/overview/net-zero-roadmap.json'
 
 export const DEFAULT_ZOOM_RANGE = [new Date('2013-01-01'), new Date('2023-01-01')]
 
-export const CI_SUFFIX = '-ci'
+export const PREDICT_SUFFIX = '-predict'
 
 export const Y_MAX = {
   MIN: 120,
@@ -85,7 +85,7 @@ export function genNetZeroCompanyChartData ({ stats, getUnitLabel, getUnitColor,
       } else if (!row.isDashed) {
         data[unitLabel].push(value)
       } else {
-        const ciUnitLabel = `${unitLabel}${CI_SUFFIX}`
+        const ciUnitLabel = `${unitLabel}${PREDICT_SUFFIX}`
         if (!data[ciUnitLabel]) {
           // preserve dashed line in years before it begin
           const emptyValues = data[unitLabel].slice(1).fill(null)
@@ -147,6 +147,90 @@ export function genC3Config (yMax, ext) {
     //   extent: [1, 100]
     // },
     ...ext
+  }
+}
+
+function genTooltipValueLabel (value, ipccValue) {
+  const diff = value - 100
+  if (diff > 0) {
+    return `<div class="esgLegend__value esgLegend__value--raise">↑ ${yValueFormatter(diff)}</div>`
+  } else if (diff === 0) {
+    return '<div class="esgLegend__value flex-none">&nbsp; --</div>'
+  } else if (value >= ipccValue) {
+    return `<div class="esgLegend__value esgLegend__value">↓ ${yValueFormatter(diff * -1)}</div>`
+  } else {
+    return `<div class="esgLegend__value esgLegend__value--reduce">↓ ${yValueFormatter(diff * -1)}</div>`
+  }
+}
+
+function genTooltipRow (title, color, value, ipccValue, type = '') {
+  let rowClass = 'esgLegend'
+  if (type) {
+    rowClass += ` esgLegend--${type}`
+  }
+  return `
+<div class="${rowClass} flex items-center">
+<div class="esgLegend__label flex-none" style="background: ${color}"></div>
+<div class="esgLegend__name flex-auto truncate">${title}</div>
+${genTooltipValueLabel(value, ipccValue)}
+</div>
+`
+}
+
+/**
+ *
+ * @param {Boolean} isBau - whether data is bau
+ * @param {Function} findUnit - function (unitLabel), return unit
+ * @param {Function} findAnotherRow - function (year, unit), if isBau, return ciRow, or return bauRow.
+ *                                    Return falsy to hide 2nd row
+ * @returns
+ */
+export function genTooltip ({ isBau, findAnotherRow, findUnit }) {
+  return function (data) {
+    const year = data[0].x.getFullYear()
+    let unitLabel = data[0].id
+    let isDashed = false
+    if (unitLabel.endsWith(PREDICT_SUFFIX)) {
+      isDashed = true
+      unitLabel = unitLabel.slice(0, PREDICT_SUFFIX.length * -1)
+    }
+    const unit = findUnit(unitLabel)
+
+    if (!unit || !unit.color) {
+      // IPCC or PNNL
+      return ''
+    }
+
+    const anotherRow = findAnotherRow(year, unit)
+    const thisValue = data[0].value
+
+    const bau = isBau ? thisValue : get(anotherRow, 'Tot變化')
+    const bauTitle = `${unitLabel}${isDashed ? ' BAU' : ''}`
+    const ciTitle = `${unitLabel} 目標`
+    const ci = isBau ? get(anotherRow, 'Tot變化') : thisValue
+
+    let roadmapRow = roadmap.find(row => row.year === year)
+
+    roadmapRow = {
+      ...roadmapRow,
+      PNNL: roadmapRow.PNNL * 100,
+      IPCC: roadmapRow.IPCC * 100
+    }
+
+    return `
+<div class="esgTp">
+<div class="esgTp__year lh-title">${year}</div>
+<div class="esgTp__company">
+${genTooltipRow(bauTitle, unit.color, bau, roadmapRow.IPCC, isDashed ? 'bau' : 'fact')}
+${ci !== undefined ? genTooltipRow(ciTitle, unit.color, ci, roadmapRow.IPCC, 'noLabel') : ''}
+</div>
+<div class="esgTp__roadmap">
+<div class="esgTp__roadmapTitle lh-title mb2">目標</div>
+${genTooltipRow('IPCC', COLORS.IPCC, roadmapRow.IPCC, roadmapRow.IPCC, 'roadmap')}
+${genTooltipRow('PNNL', COLORS.PNNL, roadmapRow.PNNL, roadmapRow.IPCC, 'roadmap')}
+<div>
+</div>
+`
   }
 }
 
