@@ -4,10 +4,8 @@
 </template>
 <script>
 import { get } from 'lodash'
-import { yValueFormatter, COLORS, genC3Config, companyMixin, YEAR } from '~/libs/netZeroUtils'
+import { yValueFormatter, COLORS, genC3Config, companyMixin, genNetZeroCompanyChartData } from '~/libs/netZeroUtils'
 import roadmap from '~/static/content/overview/net-zero-roadmap.json'
-
-const CI_SUFFIX = '-ci'
 
 export default {
   mixins: [companyMixin],
@@ -36,78 +34,18 @@ export default {
   },
   computed: {
     chartData () {
-      const data = {}
-      const colors = {}
-      const annualData = this.ciStats.reduce((sum, row) => {
-        const year = row.年份
-        const company = this.companyMap[row.統編]
-        if (!sum[year]) {
-          sum[year] = {}
-        }
-        sum[year][company.公司簡稱] = { tot: row.Tot變化, isCi: !!row.是承諾值 }
-        return sum
-      }, {})
-
-      roadmap.forEach((row) => {
-        if (!annualData[row.year]) {
-          annualData[row.year] = {}
-        }
-        annualData[row.year].PNNL = { tot: row.PNNL * 100 }
-        annualData[row.year].IPCC = { tot: row.IPCC * 100 }
-      })
-
-      // use 基準年 as basis
-      const allCompanies = Object.keys(annualData[YEAR.BASE])
-
-      allCompanies.forEach((companyName) => {
-        data[companyName] = [companyName]
-        colors[companyName] = get(this.companyAbbrMap, `${companyName}.color`, '#000')
-      })
-      colors.PNNL = COLORS.PNNL
-      colors.IPCC = COLORS.IPCC
-
-      const yearList = Object.keys(annualData).sort()
-
-      yearList.forEach((year) => {
-        allCompanies.forEach((companyName) => {
-          const row = annualData[year][companyName]
-          const value = !row || row.tot === undefined ? null : row.tot
-          if (!row) {
-            data[companyName].push(null)
-          } else if (!row.isCi) {
-            data[companyName].push(value)
-          } else {
-            const ciCompanyName = `${companyName}${CI_SUFFIX}`
-            if (!data[ciCompanyName]) {
-              // preserve commitment line in years before it begin
-              const emptyValues = data[companyName].slice(1).fill(null)
-              const factLen = data[companyName].length - 1
-              // connect fact and commitment line
-              emptyValues[factLen - 1] = data[companyName][factLen]
-              data[ciCompanyName] = [ciCompanyName, ...emptyValues]
-              colors[ciCompanyName] = colors[companyName]
-            }
-            data[companyName].push(null)
-            data[ciCompanyName].push(value)
-          }
-        })
-      })
-
-      const xData = ['x', ...yearList.map(y => `${y}-01-01`)]
-
-      return {
-        x: 'x',
-        columns: [
-          xData,
-          ...Object.values(data)
-        ],
-        type: 'line',
-        types: {
-          IPCC: 'area',
-          PNNL: 'area'
+      return genNetZeroCompanyChartData({
+        stats: this.ciStats,
+        getUnitLabel: (row) => {
+          return this.companyMap[row.統編].公司簡稱
         },
-        colors
-      }
+        getUnitColor: (companyAbbr) => {
+          return get(this.companyAbbrMap, `${companyAbbr}.color`, '#000')
+        },
+        isDashed (row) {
+          return !!row.是承諾值
+        }
+      })
     },
     c3Config () {
       return genC3Config(this.yMax, {
@@ -215,12 +153,5 @@ export default {
 <style lang="scss" scoped>
 .indCom {
   height: 22.5rem;
-  ::v-deep(.netZeroChart) {
-    .c3-chart-line[class*="-ci"] {
-      .c3-lines path {
-        stroke-dasharray: 7 5;
-      }
-    }
-  }
 }
 </style>

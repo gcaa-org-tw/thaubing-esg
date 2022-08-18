@@ -4,7 +4,7 @@
 </template>
 <script>
 import { get } from 'lodash'
-import { yValueFormatter, COLORS, genC3Config, companyMixin, YEAR } from '~/libs/netZeroUtils'
+import { yValueFormatter, COLORS, genC3Config, companyMixin, genNetZeroCompanyChartData, CI_SUFFIX } from '~/libs/netZeroUtils'
 import roadmap from '~/static/content/overview/net-zero-roadmap.json'
 
 export default {
@@ -34,63 +34,18 @@ export default {
   },
   computed: {
     chartData () {
-      const data = {}
-      const colors = {}
-      const annualData = this.bauStats.reduce((sum, row) => {
-        const year = row.年份
-        const company = this.companyMap[row.統編]
-        if (!sum[year]) {
-          sum[year] = {}
-        }
-        sum[year][company.公司簡稱] = row.Tot變化
-        return sum
-      }, {})
-
-      roadmap.forEach((row) => {
-        if (!annualData[row.year]) {
-          annualData[row.year] = {}
-        }
-        annualData[row.year].PNNL = row.PNNL * 100
-        annualData[row.year].IPCC = row.IPCC * 100
-      })
-
-      // use 基準年 as basis
-      const allCompanies = Object.keys(annualData[YEAR.BASE])
-
-      allCompanies.forEach((companyName) => {
-        data[companyName] = [companyName]
-        colors[companyName] = get(this.companyAbbrMap, `${companyName}.color`, '#000')
-      })
-      colors.PNNL = COLORS.PNNL
-      colors.IPCC = COLORS.IPCC
-
-      const yearList = Object.keys(annualData).sort()
-
-      yearList.forEach((year) => {
-        allCompanies.forEach((companyName) => {
-          let value = annualData[year][companyName]
-          if (value === undefined) {
-            value = null
-          }
-          data[companyName].push(value)
-        })
-      })
-
-      const xData = ['x', ...yearList.map(y => `${y}-01-01`)]
-
-      return {
-        x: 'x',
-        columns: [
-          xData,
-          ...Object.values(data)
-        ],
-        type: 'line',
-        types: {
-          IPCC: 'area',
-          PNNL: 'area'
+      return genNetZeroCompanyChartData({
+        stats: this.bauStats,
+        getUnitLabel: (row) => {
+          return this.companyMap[row.統編].公司簡稱
         },
-        colors
-      }
+        getUnitColor: (companyAbbr) => {
+          return get(this.companyAbbrMap, `${companyAbbr}.color`, '#000')
+        },
+        isDashed (row) {
+          return !!row.是預測值
+        }
+      })
     },
     c3Config () {
       return genC3Config(this.yMax, {
@@ -130,16 +85,19 @@ export default {
         columns: this.chartData.columns
       })
     },
-    genTooltipValueLabel (value) {
+    genTooltipValueLabel (value, ipccValue) {
       const diff = value - 100
       if (diff > 0) {
         return `<div class="esgLegend__value esgLegend__value--raise">↑ ${yValueFormatter(diff)}</div>`
-      } else if (diff < 0) {
+      } else if (diff === 0) {
+        return '<div class="esgLegend__value flex-none">&nbsp; --</div>'
+      } else if (value >= ipccValue) {
+        return `<div class="esgLegend__value esgLegend__value">↓ ${yValueFormatter(diff * -1)}</div>`
+      } else {
         return `<div class="esgLegend__value esgLegend__value--reduce">↓ ${yValueFormatter(diff * -1)}</div>`
       }
-      return '<div class="esgLegend__value flex-none">&nbsp; 0</div>'
     },
-    genTooltipRow (title, color, value, type = '') {
+    genTooltipRow (title, color, value, ipccValue, type = '') {
       let rowClass = 'esgLegend'
       if (type) {
         rowClass += ` esgLegend--${type}`
@@ -148,13 +106,18 @@ export default {
 <div class="${rowClass} flex items-center">
   <div class="esgLegend__label flex-none" style="background: ${color}"></div>
   <div class="esgLegend__name flex-auto truncate">${title}</div>
-  ${this.genTooltipValueLabel(value)}
+  ${this.genTooltipValueLabel(value, ipccValue)}
 </div>
 `
     },
     genTooltip (data, titleFormat, valueFormat, color) {
       const year = data[0].x.getFullYear()
-      const comAbbr = data[0].id
+      let comAbbr = data[0].id
+      let isDashed = false
+      if (comAbbr.endsWith(CI_SUFFIX)) {
+        isDashed = true
+        comAbbr = comAbbr.slice(0, CI_SUFFIX.length * -1)
+      }
       const company = this.companyAbbrMap[comAbbr] || {}
 
       if (!company.color) {
@@ -163,7 +126,7 @@ export default {
       }
 
       const bau = data[0].value
-      const bauTitle = `${comAbbr} BAU`
+      const bauTitle = `${comAbbr}${isDashed ? ' BAU' : ''}`
       const ciTitle = `${comAbbr} 目標`
       const ciRow = this.ciStats.find((row) => {
         return row.年份 === year && row.統編 === company.統編
@@ -181,13 +144,13 @@ export default {
 <div class="esgTp">
   <div class="esgTp__year lh-title">${year}</div>
   <div class="esgTp__company">
-    ${this.genTooltipRow(bauTitle, company.color, bau, 'bau')}
-    ${ciRow ? this.genTooltipRow(ciTitle, company.color, ciRow.Tot變化, 'ci') : ''}
+    ${this.genTooltipRow(bauTitle, company.color, bau, roadmapRow.IPCC, isDashed ? 'bau' : 'fact')}
+    ${ciRow ? this.genTooltipRow(ciTitle, company.color, ciRow.Tot變化, roadmapRow.IPCC, 'noLabel') : ''}
   </div>
   <div class="esgTp__roadmap">
     <div class="esgTp__roadmapTitle lh-title mb2">目標</div>
-    ${this.genTooltipRow('PNNL', COLORS.PNNL, roadmapRow.PNNL, 'roadmap')}
-    ${this.genTooltipRow('IPCC', COLORS.IPCC, roadmapRow.IPCC, 'roadmap')}
+    ${this.genTooltipRow('IPCC', COLORS.IPCC, roadmapRow.IPCC, roadmapRow.IPCC, 'roadmap')}
+    ${this.genTooltipRow('PNNL', COLORS.PNNL, roadmapRow.PNNL, roadmapRow.IPCC, 'roadmap')}
   <div>
 </div>
 `

@@ -26,9 +26,9 @@ export default {
     },
     type: {
       type: String,
-      default: 'bau',
+      default: 'fact',
       validator (val) {
-        return ['bau', 'ci', 'roadmap'].includes(val)
+        return ['bau', 'fact', 'noLabel', 'roadmap'].includes(val)
       }
     }
   },
