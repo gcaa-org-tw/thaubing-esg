@@ -29,9 +29,7 @@
       )
 </template>
 <script>
-import { COLORS, industryMixin, YEAR } from '~/libs/netZeroUtils'
-
-const DEFAULT_Y_MAX = 150
+import { Y_MAX, COLORS, industryMixin, YEAR } from '~/libs/netZeroUtils'
 
 export default {
   mixins: [industryMixin],
@@ -78,11 +76,14 @@ export default {
     },
     yMax () {
       return this.bauStats.reduce((max, row) => {
+        if (max === Y_MAX.MAX) {
+          return max
+        }
         if (row.Tot變化 > max) {
-          return row.Tot變化
+          return Math.min(row.Tot變化, Y_MAX.MAX)
         }
         return max
-      }, DEFAULT_Y_MAX)
+      }, Y_MAX.MIN)
     },
     chartColors () {
       return COLORS
@@ -93,17 +94,6 @@ export default {
     const html = document.querySelector('html')
     if (html.classList.contains('is-clipped-touch')) {
       html.classList.remove('is-clipped-touch')
-    }
-  },
-  methods: {
-    industryLink (industry) {
-      return {
-        name: this.$route.name,
-        params: {
-          industry
-        },
-        query: this.$route.query
-      }
     }
   }
 }

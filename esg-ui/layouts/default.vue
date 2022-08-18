@@ -30,5 +30,6 @@ export default {
 <style lang="scss">
 body {
   background: #EBEDEB;
+  min-height: 100vh;
 }
 </style>
