@@ -1,13 +1,14 @@
 <template lang="pug">
   .indBau.relative
-    .indBau__chart.h-100(ref="chart")
+    .netZeroChart.h-100(ref="chart")
 </template>
 <script>
 import { get } from 'lodash'
-import { yFormatter, yValueFormatter, COLORS, DEFAULT_ZOOM_RANGE } from '~/libs/netZeroUtils'
+import { yValueFormatter, COLORS, DEFAULT_ZOOM_RANGE, genC3Config, companyMixin } from '~/libs/netZeroUtils'
 import roadmap from '~/static/content/overview/net-zero-roadmap.json'
 
 export default {
+  mixins: [companyMixin],
   props: {
     bauStats: {
       type: Array,
@@ -32,13 +33,6 @@ export default {
     }
   },
   computed: {
-    companyAbbrMap () {
-      return Object.keys(this.companyMap).reduce((ret, id) => {
-        const company = this.companyMap[id]
-        ret[company.公司簡稱] = company
-        return ret
-      }, {})
-    },
     chartData () {
       const data = {}
       const colors = {}
@@ -96,38 +90,12 @@ export default {
       }
     },
     c3Config () {
-      return {
+      return genC3Config(this.yMax, {
         tooltip: {
           grouped: false,
           contents: this.genTooltip
-        },
-        point: { r: 2 },
-        grid: { y: { show: true } },
-        axis: {
-          x: {
-            type: 'timeseries',
-            tick: {
-              count: 24,
-              format: '%Y'
-            }
-          },
-          y: {
-            max: this.yMax,
-            tick: {
-              format: yFormatter()
-            }
-          }
-        },
-        legend: {
-          show: false
-        },
-        // workaround, zoom behave correctly only when subchart is enabled
-        subchart: { show: true },
-        zoom: {
-          enabled: true,
-          extent: [1, 100]
         }
-      }
+      })
     }
   },
   watch: {
@@ -227,88 +195,5 @@ export default {
 <style lang="scss" scoped>
 .indBau {
   height: 22.5rem;
-  &__chart {
-    height: 126%;
-  }
-  &__chart ::v-deep() {
-    svg > g:nth-child(3) {
-      // workaround, zoom behave correctly only when subchart is enabled
-      // hide subchart by ourselves
-      display: none;
-    }
-    .c3-grid {
-      .c3-ygrid {
-        stroke: #bbb;
-        stroke-dasharray: 0rem;
-      }
-    }
-    .c3-xgrid-focus {
-      stroke-dasharray: 5 4;
-      .c3-chart-lines {
-        .c3-circle {
-          display: none;
-
-        &._expanded_ {
-          display: inline;
-          fill: #fff;
-          stroke: currentColor;
-          stroke-width: 2px;
-        }
-      }
-      .c3-line {
-        stroke-width: 2px;
-      }
-    }
-    }
-    .c3-chart-lines {
-      .c3-circle {
-        display: none;
-
-        &._expanded_ {
-          display: inline;
-          fill: currentColor;
-          stroke: none;
-          // stroke-width: 2px;
-        }
-      }
-    }
-    .c3-axis{
-      path.domain {
-        stroke: #bbb;
-      }
-      .tick {
-        line {
-          stroke: #bbb;
-        }
-      }
-      &.c3-axis-x {
-        .tick {
-          text {
-            display: block !important;
-          }
-        }
-      }
-      &.c3-axis-y {
-        .tick {
-          line {
-            display: none;
-            stroke: #bbb;
-          }
-        }
-      }
-    }
-    .c3-lines-IPCC,
-    .c3-lines-PNNL {
-      display: none;
-    }
-    .c3-area-IPCC,
-    .c3-area-PNNL {
-      opacity: 0.25 !important;
-    }
-  }
-
-  ::v-deep(.esgLegend) + .esgLegend {
-    margin-top: 0.75rem;
-  }
 }
 </style>
