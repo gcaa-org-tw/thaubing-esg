@@ -1,3 +1,83 @@
+.netZeroChart {
+  height: 126%;
+  svg > g:nth-child(3) {
+    // workaround, zoom behave correctly only when subchart is enabled
+    // hide subchart by ourselves
+    display: none;
+  }
+  .c3-grid {
+    .c3-ygrid {
+      stroke: #bbb;
+      stroke-dasharray: 0rem;
+    }
+  }
+  .c3-xgrid-focus {
+    stroke-dasharray: 5 4;
+    .c3-chart-lines {
+      .c3-circle {
+        display: none;
+      }
+
+      &._expanded_ {
+        display: inline;
+        fill: #fff;
+        stroke: currentColor;
+        stroke-width: 2px;
+      }
+    }
+    .c3-line {
+      stroke-width: 2px;
+    }
+  }
+  .c3-chart-lines {
+    .c3-circle {
+      display: none;
+      &._expanded_ {
+        display: inline;
+        fill: currentColor;
+        stroke: none;
+        // stroke-width: 2px;
+      }
+    }
+  }
+  .c3-axis{
+    path.domain {
+      stroke: #bbb;
+    }
+    .tick {
+      line {
+        stroke: #bbb;
+      }
+    }
+    &.c3-axis-x {
+      .tick {
+        text {
+          display: block !important;
+        }
+      }
+    }
+    &.c3-axis-y {
+      .tick {
+        line {
+          display: none;
+          stroke: #bbb;
+        }
+      }
+    }
+  }
+  .c3-lines-IPCC,
+  .c3-lines-PNNL {
+    display: none;
+  }
+  .c3-area-IPCC,
+  .c3-area-PNNL {
+    opacity: 0.25 !important;
+  }
+  .esgLegend + .esgLegend {
+    margin-top: 0.75rem;
+  }
+}
+
 .esgLegend {
   &__label {
     height: 0.125rem;
