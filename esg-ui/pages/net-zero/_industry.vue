@@ -2,7 +2,7 @@
   .netZero
     .netZero__nav.esgContainer
       .f6.o-60.mb1 產業
-      b-dropdown.netZero__typeSelector(aria-role="menu")
+      b-dropdown.netZero__typeSelector(aria-role="menu" :scrollable="true" max-height="22rem")
         template(slot="trigger")
           button.flex.justify-between.items-center.w-100.pointer
             .black.f3.flex-auto.tl {{industry.label}}
