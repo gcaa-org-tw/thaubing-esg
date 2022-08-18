@@ -50,13 +50,13 @@
 <script>
 import { interpolateCividis } from 'd3'
 import { uniqBy } from 'lodash'
-import industries from '~/assets/industries.json'
-import { COLORS } from '~/libs/netZeroUtils'
+import { COLORS, industryMixin, PER_INDUSTRY_KEY } from '~/libs/netZeroUtils'
 
 const VALID_FILTER = { top5: 'top5', all: 'all' }
 const DEFAULT_Y_MAX = 150
 
 export default {
+  mixins: [industryMixin],
   async asyncData ({ $content, params, redirect }) {
     let bauStats = []
     let companyList = []
@@ -64,17 +64,21 @@ export default {
 
     try {
       bauStats = await $content('industry', `${params.industry}-bau`).fetch()
-      bauStats = bauStats.body.map((row) => {
-        return {
-          ...row,
-          年份: row.年份 - 0,
-          Tot變化: row.Tot變化 - 0
-        }
-      })
     } catch {
-      redirect('/')
+      if (params.industry !== PER_INDUSTRY_KEY) {
+        redirect('/')
+      }
       return { bauStats, ciStats, companyList }
     }
+
+    bauStats = bauStats.body.map((row) => {
+      return {
+        ...row,
+        年份: row.年份 - 0,
+        Tot數值: row.Tot數值 - 0,
+        Tot變化: row.Tot變化 - 0
+      }
+    })
 
     try {
       ciStats = await $content('industry', `${params.industry}-net-zero-commitment`).fetch()
@@ -114,11 +118,8 @@ export default {
     industry () {
       // default 石化業
       const code = this.$route.params.industry || '03'
-      const industry = industries.find(needle => needle.code === code)
-      return industry || industries[0]
-    },
-    industries () {
-      return industries
+      const industry = this.industries.find(needle => needle.code === code)
+      return industry || this.industries[0]
     },
     filter () {
       const code = this.$route.query.filter

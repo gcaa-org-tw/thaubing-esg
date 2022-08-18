@@ -1,6 +1,12 @@
-import { format } from 'd3'
+import { format, interpolateCividis } from 'd3'
+import industries from '~/assets/industries.json'
 
 export const DEFAULT_ZOOM_RANGE = [new Date('2013-01-01'), new Date('2023-01-01')]
+
+export const YEAR = {
+  BASE: 2019,
+  END: 2050
+}
 
 export const COLORS = {
   PNNL: '#358D53',
@@ -54,6 +60,26 @@ export const companyMixin = {
         ret[company.公司簡稱] = company
         return ret
       }, {})
+    }
+  }
+}
+
+export const PER_INDUSTRY_KEY = 'per-industry'
+
+export const industryMixin = {
+  computed: {
+    industries () {
+      const industryList = [
+        { label: '跨產業', code: PER_INDUSTRY_KEY },
+        ...industries
+      ]
+      const nIndustry = industryList.length
+      return industryList.map((industry, i) => {
+        return {
+          ...industry,
+          color: interpolateCividis(i / nIndustry)
+        }
+      })
     }
   }
 }
