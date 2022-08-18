@@ -3,6 +3,8 @@
     .mw8.center.mt4.ph3
       h1.green.fw5.f3 {{company.公司名稱}}
       .green {{company.自訂產業別}} · 資本額 {{capital}} 元
+      .company__subtitle
+        net-zero-single-company(:bau-stats="bauStats" :ci-stats="ciStats" :company="company")
       .company__subtitle Environment 環境保護相關數據
       .charts
         .charts__item
@@ -39,13 +41,15 @@
 </template>
 <script>
 import { friendlyHeader } from '~/libs/crawlerFriendly'
+import { cleanupRawStats } from '~/libs/netZeroUtils'
 export default {
   async asyncData ({ $content, params, redirect, store }) {
     let stats = null
     const companyList = await $content('companyList').fetch()
-    const company = companyList.body.find(item => item.統編 === params.company)
+    const company = companyList.body.find(item => item.統編 === params.company) || {}
+    const companyAbbr = company.公司簡稱
     try {
-      stats = await $content('company', company.公司簡稱).fetch()
+      stats = await $content('company', companyAbbr).fetch()
     } catch {
       redirect('/')
     }
@@ -53,11 +57,26 @@ export default {
       return
     }
 
+    let bauStats = []
+    let ciStats = []
+    try {
+      bauStats = await $content('company', `${companyAbbr}-bau`).fetch()
+      ciStats = await $content('company', `${companyAbbr}-net-zero-commitment`).fetch()
+    } catch {
+      // it's ok
+    }
+
+    bauStats = cleanupRawStats(bauStats)
+    ciStats = cleanupRawStats(ciStats)
+
+    // for last industry traversal
     store.commit('setCompany', company)
 
     return {
       stats,
-      company
+      company,
+      bauStats,
+      ciStats
     }
   },
   head: friendlyHeader({

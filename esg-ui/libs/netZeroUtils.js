@@ -150,7 +150,18 @@ export function genC3Config (yMax, ext) {
   }
 }
 
-function genTooltipValueLabel (value, ipccValue) {
+export function cleanupRawStats (rawStats) {
+  return rawStats.body.map((row) => {
+    return {
+      ...row,
+      年份: row.年份 - 0,
+      Tot數值: row.Tot數值 - 0,
+      Tot變化: row.Tot變化 - 0
+    }
+  })
+}
+
+export function genTooltipValueLabel (value, ipccValue) {
   const diff = value - 100
   if (diff > 0) {
     return `<div class="esgLegend__value esgLegend__value--raise">↑ ${yValueFormatter(diff)}</div>`
@@ -163,7 +174,7 @@ function genTooltipValueLabel (value, ipccValue) {
   }
 }
 
-function genTooltipRow (title, color, value, ipccValue, type = '') {
+export function genTooltipRow (title, color, value, ipccValue, type = '') {
   let rowClass = 'esgLegend'
   if (type) {
     rowClass += ` esgLegend--${type}`
