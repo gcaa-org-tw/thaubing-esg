@@ -50,7 +50,7 @@
 <script>
 import { interpolateCividis } from 'd3'
 import { uniqBy } from 'lodash'
-import { COLORS, industryMixin, PER_INDUSTRY_KEY, Y_MAX } from '~/libs/netZeroUtils'
+import { cleanupRawStats, COLORS, industryMixin, PER_INDUSTRY_KEY, Y_MAX } from '~/libs/netZeroUtils'
 
 const VALID_FILTER = { top5: 'top5', all: 'all' }
 
@@ -70,24 +70,11 @@ export default {
       return { bauStats, ciStats, companyList }
     }
 
-    bauStats = bauStats.body.map((row) => {
-      return {
-        ...row,
-        年份: row.年份 - 0,
-        Tot數值: row.Tot數值 - 0,
-        Tot變化: row.Tot變化 - 0
-      }
-    })
+    bauStats = cleanupRawStats(bauStats)
 
     try {
       ciStats = await $content('industry', `${params.industry}-net-zero-commitment`).fetch()
-      ciStats = ciStats.body.map((row) => {
-        return {
-          ...row,
-          年份: row.年份 - 0,
-          Tot變化: row.Tot變化 - 0
-        }
-      })
+      ciStats = cleanupRawStats(ciStats)
     } catch {
       // it's ok
     }

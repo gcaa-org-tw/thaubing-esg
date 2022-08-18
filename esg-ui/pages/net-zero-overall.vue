@@ -29,7 +29,7 @@
       )
 </template>
 <script>
-import { Y_MAX, COLORS, industryMixin, YEAR } from '~/libs/netZeroUtils'
+import { Y_MAX, COLORS, industryMixin, YEAR, cleanupRawStats } from '~/libs/netZeroUtils'
 
 export default {
   mixins: [industryMixin],
@@ -37,14 +37,7 @@ export default {
     let bauStats = []
 
     bauStats = await $content('overview/bau').fetch()
-    bauStats = bauStats.body.map((row) => {
-      return {
-        ...row,
-        年份: row.年份 - 0,
-        Tot數值: row.Tot數值 - 0,
-        Tot變化: row.Tot變化 - 0
-      }
-    })
+    bauStats = cleanupRawStats(bauStats)
 
     const top5Industries = bauStats
       .filter(row => row.年份 === YEAR.BASE)
