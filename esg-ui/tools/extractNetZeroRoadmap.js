@@ -148,9 +148,13 @@ function aggregateCommitment (ciRow) {
         ciTot: ciBaseTot * ratio / 100
       }
     })
-    .filter(row => !!row.ratio)
+    .filter(row => !Number.isNaN(row.ratio))
 
   breakpointList.unshift({ year: ciBaseYear, ratio: 100, ciTot: ciBaseTot })
+
+  if (ciRow.companyname === '華夏海灣塑膠股份有限公司') {
+    console.warn('qq', ciRow, breakpointList)
+  }
 
   if (breakpointList.length < 2) {
     // should contain at least 2 points, so to draw line
