@@ -2,7 +2,7 @@ const fs = require('fs')
 const path = require('path')
 const CsvReadableStream = require('csv-reader')
 const AutoDetectDecoderStream = require('autodetect-decoder-stream')
-const { companyMap } = require('./utils')
+const { companyMap, createCompanyReportStream } = require('./utils')
 const { CsvWriter, IndustryDetailLogger, finished } = require('./csvLogger')
 
 const DATA_DIR = path.join(__dirname, '../../data')
@@ -13,7 +13,7 @@ const BASE_YEAR = 2019
 const MAX_LOOK_AHEAD = 4
 const REL_PRECISSION = 100
 
-const INDUSTRY_HEADER = [
+const BAU_HEADER = [
   { id: 'id', title: '統編' },
   { id: 'year', title: '年份' },
   { id: 'totAbs', title: 'Tot數值' },
@@ -25,20 +25,36 @@ const INDUSTRY_HEADER = [
   { id: 'isPredicted', title: '是預測值' }
 ]
 
-const COMPANY_HEADER = INDUSTRY_HEADER.slice(1)
+const COMPANY_BAU_HEADER = BAU_HEADER.slice(1)
+
+const COMMITMENT_HEADER = [
+  { id: 'id', title: '統編' },
+  { id: 'year', title: '年份' },
+  { id: 'totAbs', title: 'Tot數值' },
+  { id: 'totRel', title: 'Tot變化' },
+  { id: 'isPredicted', title: '是承諾值' }
+]
+
+const COMPANY_COMMITMENT_HEADER = COMMITMENT_HEADER.slice(1)
 
 const BAU_LOGGER = new IndustryDetailLogger({
-  industryHeader: INDUSTRY_HEADER,
-  companyHeader: COMPANY_HEADER,
+  industryHeader: BAU_HEADER,
+  companyHeader: COMPANY_BAU_HEADER,
   filePostfix: '-bau'
 })
 
-const OVERVIEW_HEADER = [
+const CI_LOGGER = new IndustryDetailLogger({
+  industryHeader: COMMITMENT_HEADER,
+  companyHeader: COMPANY_COMMITMENT_HEADER,
+  filePostfix: '-net-zero-commitment'
+})
+
+const BAU_OVERVIEW_HEADER = [
   { id: 'id', title: '產業別' },
-  ...COMPANY_HEADER
+  ...COMPANY_BAU_HEADER
 ]
 
-const OVERVIEW_LOGGER = new CsvWriter(OVERVIEW_HEADER, 'overview/bau.csv')
+const BAU_OVERVIEW_LOGGER = new CsvWriter(BAU_OVERVIEW_HEADER, 'overview/bau.csv')
 
 function aggregateTot (id, year, stats, { tot, tot1, tot2 }) {
   if (!stats[id]) {
@@ -119,13 +135,111 @@ function predictBau (annualStats) {
   return rows
 }
 
-async function calculateTot () {
+function aggregateCommitment (ciRow) {
+  const ciBaseYear = ciRow.base_year
+  const ciBaseTot = ciRow.base_year_ems
+
+  const breakpointList = ['2025', '2030', '2035', '2040', '2045', '2050']
+    .map((year) => {
+      const ratio = Number.parseFloat(ciRow[year].slice(0, -1))
+      return {
+        year: year - 0,
+        ratio,
+        ciTot: ciBaseTot * ratio / 100
+      }
+    })
+    .filter(row => !!row.ratio)
+
+  breakpointList.unshift({ year: ciBaseYear, ratio: 100, ciTot: ciBaseTot })
+
+  if (breakpointList.length < 2) {
+    // should contain at least 2 points, so to draw line
+    return null
+  }
+
+  const ratioList = { [ciBaseYear]: ciBaseTot }
+  let currentRatio = 0
+  let currentBase = breakpointList[0]
+
+  for (let year = ciBaseYear + 1; year <= END_YEAR; year++) {
+    if (!currentRatio || year > breakpointList[0].year) {
+      // in new segment, calculate new ratio
+      if (breakpointList.length < 2) {
+        // no further commitment
+        break
+      }
+      const ratioDiff = (breakpointList[1].ratio - breakpointList[0].ratio) / 100
+      const yearDiff = breakpointList[1].year - breakpointList[0].year
+      currentRatio = ratioDiff / yearDiff
+      currentBase = breakpointList.shift()
+    }
+    ratioList[year] = ciBaseTot * (currentBase.ratio / 100 + (year - currentBase.year) * currentRatio)
+  }
+
+  return ratioList
+}
+
+function calculateCommitment (companyBauList) {
+  return new Promise((resolve) => {
+    // source:
+    // https://docs.google.com/spreadsheets/d/1MWuY0UNQS-0O-ogelG81Vfh7AAeqrxynKPAnPjRH-qs/edit#gid=0
+    createCompanyReportStream('0', 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQAlorxEbPJeBIaqY2jTvYiMKJoBFBysA2VHdJY_jYO3KBWhHe6pN86-TQRk7T24en2F6C4MJ5dlcEJ/pub?')
+      .on('data', (data) => {
+        const company = companyMap.findByStock(data.stock_code)
+        // TODO: if no 2019?!
+        const companyBau = companyBauList.filter(row => row.id === company.統編)
+        if (!companyBau.length) {
+          return
+        }
+        const factBase = companyBau.find(row => row.year === BASE_YEAR)
+        const factList = companyBau
+          .filter(row => !row.isPredicted)
+          .sort((a, b) => b.year - a.year)
+
+        const commitmentMap = aggregateCommitment(data)
+
+        if (!commitmentMap) {
+          console.error(`Cannot find commitment: ${company.公司名稱} (${company.統編})`)
+          return
+        }
+
+        factList.forEach((row) => {
+          CI_LOGGER.appendToBoth(company, {
+            year: row.year,
+            totAbs: row.totAbs,
+            totRel: row.totRel
+          })
+        })
+
+        const lastFact = factList[factList.length - 1]
+
+        for (let year = lastFact.year + 1; year <= END_YEAR; year++) {
+          const commitment = commitmentMap[year]
+          if (!(year in commitmentMap)) {
+            return
+          }
+          const row = { year, isPredicted: 'T' }
+
+          // commitmentRatio(year) = commitment(year) / exactTot(2019)
+          row.totAbs = commitment
+          row.totRel = commitment / factBase.totAbs
+
+          CI_LOGGER.appendToBoth(company, row)
+        }
+      })
+      .on('end', () => {
+        resolve()
+      })
+  })
+}
+
+function calculateBau () {
   // 溫室氣體排放
   //   範疇一直接排放data/ghg_p_01.csv#tot
   //   範疇二間接排放data/ghg_p_01.csv#tot2
   const companyStats = {}
   const industryStats = {}
-  await new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
     fs
       .createReadStream(path.join(DATA_DIR, 'ghg_p_01.csv'))
       .pipe(new AutoDetectDecoderStream())
@@ -147,21 +261,26 @@ async function calculateTot () {
         aggregateTot(company.上市上櫃產業編碼, year, industryStats, totData)
       })
       .on('end', () => {
+        const companyBauList = []
         for (const comId in companyStats) {
           const company = companyMap.find(comId)
           predictBau(companyStats[comId]).forEach((row) => {
+            companyBauList.push({
+              id: company.統編,
+              ...row
+            })
             BAU_LOGGER.appendToBoth(company, row)
           })
         }
         for (const indId in industryStats) {
           predictBau(industryStats[indId]).forEach((row) => {
-            OVERVIEW_LOGGER.append({
+            BAU_OVERVIEW_LOGGER.append({
               id: indId,
               ...row
             })
           })
         }
-        resolve()
+        resolve(companyBauList)
       })
   })
 }
@@ -169,9 +288,10 @@ async function calculateTot () {
 async function main () {
   console.warn('[NetZero Roadmap] start')
   await companyMap.finished
-  await calculateTot()
+  const bauList = await calculateBau()
+  await calculateCommitment(bauList)
   await finished()
-  await OVERVIEW_LOGGER.finished()
+  await BAU_OVERVIEW_LOGGER.finished()
   console.warn('[NetZero Roadmap] done')
 }
 
