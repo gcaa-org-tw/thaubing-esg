@@ -42,12 +42,12 @@ export function genC3Config (yMax, ext) {
     legend: {
       show: false
     },
-    // workaround, zoom behave correctly only when subchart is enabled
-    subchart: { show: true },
-    zoom: {
-      enabled: true,
-      extent: [1, 100]
-    },
+    // // workaround, zoom behave correctly only when subchart is enabled
+    // subchart: { show: true },
+    // zoom: {
+    //   enabled: true,
+    //   extent: [1, 100]
+    // },
     ...ext
   }
 }
