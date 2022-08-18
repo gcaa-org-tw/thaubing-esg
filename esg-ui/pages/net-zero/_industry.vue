@@ -201,15 +201,6 @@ export default {
     }
   },
   methods: {
-    industryLink (industry) {
-      return {
-        name: this.$route.name,
-        params: {
-          industry
-        },
-        query: this.$route.query
-      }
-    },
     filterLink (filter) {
       return {
         name: this.$route.name,

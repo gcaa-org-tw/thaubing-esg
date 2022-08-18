@@ -263,5 +263,21 @@ export const industryMixin = {
         }
       })
     }
+  },
+  methods: {
+    industryLink (industryCode) {
+      if (industryCode === PER_INDUSTRY_KEY) {
+        return {
+          name: 'net-zero-overall'
+        }
+      }
+      return {
+        name: 'net-zero-industry',
+        params: {
+          industry: industryCode
+        },
+        query: this.$route.query
+      }
+    }
   }
 }
