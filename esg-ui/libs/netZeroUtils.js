@@ -1,9 +1,11 @@
 import { format, interpolateCividis } from 'd3'
+import { range } from 'lodash'
 import industries from '~/assets/industries.json'
 
 export const DEFAULT_ZOOM_RANGE = [new Date('2013-01-01'), new Date('2023-01-01')]
 
 export const YEAR = {
+  START: 2013,
   BASE: 2019,
   END: 2050
 }
@@ -20,6 +22,12 @@ export function yFormatter (isPrecise) {
 
 export const yValueFormatter = yFormatter(true)
 
+const xTickValues = [
+  2013,
+  ...range(2015, YEAR.END, 5),
+  YEAR.END
+].map(year => new Date(`${year}-01-01`))
+
 export function genC3Config (yMax, ext) {
   return {
     point: { r: 2 },
@@ -28,7 +36,7 @@ export function genC3Config (yMax, ext) {
       x: {
         type: 'timeseries',
         tick: {
-          count: 24,
+          values: xTickValues,
           format: '%Y'
         }
       },
