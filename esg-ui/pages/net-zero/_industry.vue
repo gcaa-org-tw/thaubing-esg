@@ -30,7 +30,7 @@
         net-zero-legend(title="IPCC" :color="chartColors.IPCC" type="roadmap")
         net-zero-legend(title="PNNL" :color="chartColors.PNNL" type="roadmap")
     .netZero__chart.thinContainer
-      h2 企業維持原狀的碳排成長 {{yMax}}
+      h2 企業維持原狀的碳排成長
       net-zero-industry-bau(
         :bau-stats="visibleBauStats"
         :ci-stats="visibleCiStats"
