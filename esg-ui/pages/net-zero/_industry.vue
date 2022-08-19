@@ -98,6 +98,8 @@ export default {
         color: interpolateCividis(i / nCompany)
       }
     })
+
+    console.warn('cc', companyList)
     return { bauStats, ciStats, companyList }
   },
   computed: {
@@ -138,8 +140,11 @@ export default {
       return Object.values(lastRecordPerCompany)
         .sort((a, b) => b.value - a.value)
         .slice(0, 5)
-        .reduce((ret, company) => {
-          ret[company.id] = this.companyMap[company.id]
+        .reduce((ret, company, i) => {
+          ret[company.id] = {
+            ...this.companyMap[company.id],
+            color: interpolateCividis((i + 0.7) / 5)
+          }
           return ret
         }, {})
     },
