@@ -32,7 +32,7 @@ const COMMITMENT_HEADER = [
   { id: 'year', title: '年份' },
   { id: 'totAbs', title: 'Tot數值' },
   { id: 'totRel', title: 'Tot變化' },
-  { id: 'isPredicted', title: '是承諾值' }
+  { id: 'isPredicted', title: '是推估值' }
 ]
 
 const COMPANY_COMMITMENT_HEADER = COMMITMENT_HEADER.slice(1)
@@ -157,7 +157,7 @@ function aggregateCommitment (ciRow) {
     return null
   }
 
-  const ratioList = { [ciBaseYear]: ciBaseTot }
+  const ratioList = { [ciBaseYear]: { value: ciBaseTot, isPredicted: false } }
   let currentRatio = 0
   let currentBase = breakpointList[0]
 
@@ -173,7 +173,11 @@ function aggregateCommitment (ciRow) {
       currentRatio = ratioDiff / yearDiff
       currentBase = breakpointList.shift()
     }
-    ratioList[year] = ciBaseTot * (currentBase.ratio / 100 + (year - currentBase.year) * currentRatio)
+    const isCommitted = year === breakpointList[0].year
+    ratioList[year] = {
+      value: ciBaseTot * (currentBase.ratio / 100 + (year - currentBase.year) * currentRatio),
+      isPredicted: !isCommitted
+    }
   }
 
   return ratioList
@@ -191,10 +195,12 @@ function calculateCommitment (companyBauList) {
         if (!companyBau.length) {
           return
         }
-        const factBase = companyBau.find(row => row.year === BASE_YEAR)
-        const factList = companyBau
-          .filter(row => !row.isPredicted)
-          .sort((a, b) => a.year - b.year)
+        const baseTot = data['2019_ems']
+        // const factBase = companyBau.find(row => row.year === BASE_YEAR)
+        // #161, no need to show fact data in ci chart
+        // const factList = companyBau
+        //   .filter(row => !row.isPredicted)
+        //   .sort((a, b) => a.year - b.year)
 
         const commitmentMap = aggregateCommitment(data)
 
@@ -203,26 +209,28 @@ function calculateCommitment (companyBauList) {
           return
         }
 
-        factList.forEach((row) => {
-          CI_LOGGER.appendToBoth(company, {
-            year: row.year,
-            totAbs: row.totAbs,
-            totRel: row.totRel
-          })
-        })
+        // #161, no need to show fact data in ci chart
+        // factList.forEach((row) => {
+        //   CI_LOGGER.appendToBoth(company, {
+        //     year: row.year,
+        //     totAbs: row.totAbs,
+        //     totRel: row.totRel
+        //   })
+        // })
 
-        const lastFact = factList[factList.length - 1]
+        // const lastFact = factList[factList.length - 1]
 
-        for (let year = lastFact.year + 1; year <= END_YEAR; year++) {
+        for (let year = BASE_YEAR; year <= END_YEAR; year++) {
           const commitment = commitmentMap[year]
+          // best effort, but company may commit after BASE_YEAR
           if (!(year in commitmentMap)) {
             continue
           }
-          const row = { year, isPredicted: 'T' }
+          const row = { year, isPredicted: commitment.isPredicted ? 'T' : '' }
 
           // commitmentRatio(year) = commitment(year) / exactTot(2019)
-          row.totAbs = simplifyValue(commitment)
-          row.totRel = simplifyValue(commitment * 100 / factBase.totAbs)
+          row.totAbs = simplifyValue(commitment.value)
+          row.totRel = simplifyValue(commitment.value * 100 / baseTot)
 
           CI_LOGGER.appendToBoth(company, row)
         }
