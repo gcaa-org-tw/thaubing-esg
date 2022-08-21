@@ -1,7 +1,9 @@
 <template lang="pug">
-  chart-panel(v-if="isVisible" title="淨零路徑")
-    .singleCompany__chart(slot="chart")
-      .netZeroChart(ref="chart")
+  chart-panel(title="淨零路徑")
+    .singleCompany__chart.relative(slot="chart")
+      .netZeroChart(ref="chart" :class="{'netZeroChart--blur': hasNoData}")
+      .aspect-ratio--object.flex.items-center.justify-center(v-if="hasNoData")
+        .f3.fw5.gray.pb4 無資料
 </template>
 <script>
 import { get } from 'lodash'
@@ -59,8 +61,8 @@ export default {
     }
   },
   computed: {
-    isVisible () {
-      return !!this.bauStats.length
+    hasNoData () {
+      return !this.bauStats.length
     },
     stats () {
       const richBauStats = this.bauStats.map((row) => {

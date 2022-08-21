@@ -1,5 +1,8 @@
 .netZeroChart {
-  // height: 126%;
+  &--blur {
+    filter: blur(3px);
+    opacity: 0.5;
+  }
   svg > g:nth-child(3) {
     // workaround, zoom behave correctly only when subchart is enabled
     // hide subchart by ourselves
