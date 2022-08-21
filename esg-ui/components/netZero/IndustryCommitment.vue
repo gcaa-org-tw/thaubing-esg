@@ -3,7 +3,7 @@
     .netZeroChart.h-100(ref="chart")
 </template>
 <script>
-import { get } from 'lodash'
+import { get, uniq } from 'lodash'
 import { genC3Config, companyMixin, genNetZeroCompanyChartData, genTooltip } from '~/libs/netZeroUtils'
 
 export default {
@@ -32,9 +32,19 @@ export default {
     }
   },
   computed: {
+    ciStatsWithoutPrediction () {
+      return this.ciStats.filter(row => !row.是推估值)
+    },
     chartData () {
+      let allUnits = uniq(this.ciStatsWithoutPrediction.map(row => row.統編))
+
+      allUnits = [
+        ...allUnits.map(id => this.companyMap[id].公司簡稱),
+        'IPCC',
+        'PNNL'
+      ]
       return genNetZeroCompanyChartData({
-        stats: this.ciStats,
+        stats: this.ciStatsWithoutPrediction,
         getUnitLabel: (row) => {
           return this.companyMap[row.統編].公司簡稱
         },
@@ -42,12 +52,15 @@ export default {
           return get(this.companyAbbrMap, `${companyAbbr}.color`, '#000')
         },
         isDashed (row) {
-          return !!row.是承諾值
-        }
+          return true
+        },
+        allUnits
       })
     },
     c3Config () {
       return genC3Config(this.yMax, {
+        point: { r: 3 },
+        line: { connectNull: true },
         tooltip: {
           grouped: false,
           contents: genTooltip({

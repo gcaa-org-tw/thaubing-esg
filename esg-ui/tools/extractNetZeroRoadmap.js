@@ -219,6 +219,7 @@ function calculateCommitment (companyBauList) {
         // })
 
         // const lastFact = factList[factList.length - 1]
+        let hasFirstRow = false
 
         for (let year = BASE_YEAR; year <= END_YEAR; year++) {
           const commitment = commitmentMap[year]
@@ -227,6 +228,12 @@ function calculateCommitment (companyBauList) {
             continue
           }
           const row = { year, isPredicted: commitment.isPredicted ? 'T' : '' }
+
+          if (!hasFirstRow) {
+            // first point must not be predicted, so we can draw the dot
+            row.isPredicted = ''
+            hasFirstRow = true
+          }
 
           // commitmentRatio(year) = commitment(year) / exactTot(2019)
           row.totAbs = simplifyValue(commitment.value)
