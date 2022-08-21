@@ -24,12 +24,12 @@
       h2 五大產業維持原狀的碳排成長
       net-zero-overview-bau(
         :bau-stats="bauStats"
-        :industry-map="industryMap"
+        :industry-map="top5IndustryMap"
         :y-max="yMax"
       )
 </template>
 <script>
-import { Y_MAX, COLORS, industryMixin, YEAR, cleanupRawStats } from '~/libs/netZeroUtils'
+import { Y_MAX, COLORS, industryMixin, YEAR, cleanupRawStats, interpolateTop5 } from '~/libs/netZeroUtils'
 
 export default {
   mixins: [industryMixin],
@@ -57,12 +57,20 @@ export default {
       return this.industries[0]
     },
     top5Industries () {
-      return this.top5IndustryCodes.map((code) => {
-        return this.industryMap[code]
+      const industryMap = this.industries.reduce((sum, industry) => {
+        sum[industry.code] = industry
+        return sum
+      }, {})
+
+      return this.top5IndustryCodes.map((code, i) => {
+        return {
+          ...industryMap[code],
+          color: interpolateTop5(i)
+        }
       })
     },
-    industryMap () {
-      return this.industries.reduce((sum, industry) => {
+    top5IndustryMap () {
+      return this.top5Industries.reduce((sum, industry) => {
         sum[industry.code] = industry
         return sum
       }, {})
