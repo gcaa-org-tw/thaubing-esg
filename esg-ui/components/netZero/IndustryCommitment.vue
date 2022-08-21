@@ -64,7 +64,6 @@ export default {
     },
     c3Config () {
       return genC3Config(this.yMax, {
-        point: { r: 3 },
         line: { connectNull: true },
         tooltip: {
           grouped: false,
