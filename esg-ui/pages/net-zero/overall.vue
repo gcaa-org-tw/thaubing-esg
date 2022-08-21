@@ -18,8 +18,8 @@
           :color="industry.color"
         )
       .netZero__legendRow
-        net-zero-legend(title="IPCC" :color="chartColors.IPCC" type="roadmap")
-        net-zero-legend(title="PNNL" :color="chartColors.PNNL" type="roadmap")
+        net-zero-legend(title="IPCC" :color="chartColors.IPCC" type="roadmap" :tip="legendLabel.IPCC")
+        net-zero-legend(title="PNNL" :color="chartColors.PNNL" type="roadmap" :tip="legendLabel.PNNL")
     .netZero__chart.thinContainer
       h2 五大產業維持原狀的碳排成長
       net-zero-overview-bau(
@@ -30,6 +30,7 @@
 </template>
 <script>
 import { Y_MAX, COLORS, industryMixin, YEAR, cleanupRawStats, interpolateTop5 } from '~/libs/netZeroUtils'
+import netZeroMeta from '~/static/content/meta/net-zero-meta.json'
 
 export default {
   mixins: [industryMixin],
@@ -53,6 +54,12 @@ export default {
     return { bauStats, top5IndustryCodes: Object.keys(top5Industries) }
   },
   computed: {
+    legendLabel () {
+      return {
+        IPCC: netZeroMeta.IPCC,
+        PNNL: netZeroMeta.PNNL
+      }
+    },
     industry () {
       return this.industries[0]
     },
