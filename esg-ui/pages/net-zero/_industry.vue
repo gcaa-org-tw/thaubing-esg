@@ -49,7 +49,7 @@
         :ci-stats="visibleCiStats"
         :bau-stats="visibleBauStats"
         :company-map="activeCompanyMap"
-        :y-max="yMax"
+        :y-max="120"
       )
       .mt4
         net-zero-remark(:fields="['BASE_YEAR', 'COMMITMENT']")
