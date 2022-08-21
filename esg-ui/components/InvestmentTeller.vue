@@ -1,5 +1,5 @@
 <template lang="pug">
-  .invTellerWrapper
+  .invTellerWrapper(v-if="!hasNoData")
     .invTeller(:style="invStyle" v-if="fundList.length")
       .invTeller__measureHead
         button.invTeller__switch.bg-transparent.w-100-ns.f3.fw6.mb2.pointer.db.pa0.tl(
@@ -50,6 +50,9 @@ export default {
     }
   },
   computed: {
+    hasNoData () {
+      return !this.quartile[this.year]
+    },
     unit () {
       return environment.find(column => column.measure === this.orderBy).unit
     },
