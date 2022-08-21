@@ -1,9 +1,12 @@
 <template lang="pug">
   chart-panel(title="淨零路徑")
-    .singleCompany__chart.relative(slot="chart")
-      .netZeroChart(ref="chart" :class="{'netZeroChart--blur': hasNoData}")
-      .aspect-ratio--object.flex.items-center.justify-center(v-if="hasNoData")
-        .f3.fw5.gray.pb4 無資料
+    .singleCompany(slot="chart")
+      .singleCompany__chart.relative
+        .netZeroChart(ref="chart" :class="{'netZeroChart--blur': hasNoData}")
+        .aspect-ratio--object.flex.items-center.justify-center(v-if="hasNoData")
+          .f3.fw5.gray.pb4 無資料
+      .mt2
+        net-zero-remark(:fields="['BASE_YEAR', 'BAU', 'COMMITMENT']")
 </template>
 <script>
 import { get } from 'lodash'

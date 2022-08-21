@@ -41,6 +41,8 @@
         :company-map="activeCompanyMap"
         :y-max="yMax"
       )
+      .mt4
+        net-zero-remark(:fields="['BASE_YEAR', 'BAU']")
     .netZero__chart.thinContainer
       h2 企業淨零目標路線
       net-zero-industry-commitment(
@@ -49,6 +51,8 @@
         :company-map="activeCompanyMap"
         :y-max="yMax"
       )
+      .mt4
+        net-zero-remark(:fields="['BASE_YEAR', 'COMMITMENT']")
 
 </template>
 <script>

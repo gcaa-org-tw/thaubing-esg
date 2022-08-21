@@ -27,6 +27,8 @@
         :industry-map="top5IndustryMap"
         :y-max="yMax"
       )
+      .mt4
+        net-zero-remark(:fields="['BASE_YEAR', 'BAU']")
 </template>
 <script>
 import { Y_MAX, COLORS, industryMixin, YEAR, cleanupRawStats, interpolateTop5 } from '~/libs/netZeroUtils'
