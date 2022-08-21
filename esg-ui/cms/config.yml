@@ -1,0 +1,29 @@
+# publish_mode: editorial_workflow
+backend:
+  name: github
+  repo: gcaa-org-tw/thaubing-esg
+  branch: main
+
+# used together with `npx netlify-cms-proxy-server`. https://www.netlifycms.org/docs/beta-features/#working-with-a-local-git-repository
+# local_backend: true
+
+media_folder: esg-ui/static/content-img
+public_folder: /content-img
+
+# Docs: https://www.netlifycms.org/docs/configuration-options/#collections
+collections:
+  - label: 淨零模擬器
+    name: 'net-zero'
+    files:
+      - label: '欄位說明'
+        name: 'meta'
+        file: 'esg-ui/static/content/meta/net-zero-meta.json'
+        format: 'json'
+        editor:
+          preview: false
+        fields:
+          - { label: IPCC, name: IPCC, widget: string }
+          - { label: PNNL, name: PNNL, widget: string }
+          - { label: 基準年, name: BASE_YEAR, widget: string }
+          - { label: BAU, name: BAU, widget: string }
+          - { label: 企業目標, name: COMMITMENT, widget: string }
