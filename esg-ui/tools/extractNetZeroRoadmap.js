@@ -138,30 +138,34 @@ function predictBau (annualStats) {
 function aggregateCommitment (ciRow) {
   const ciBaseYear = ciRow.base_year
   const ciBaseTot = ciRow.base_year_ems
+  const tot2019 = ciRow['2019_ems']
 
   const breakpointList = ['2025', '2030', '2035', '2040', '2045', '2050']
     .map((year) => {
       const ratio = Number.parseFloat(ciRow[year].slice(0, -1))
+      const ciTot = ciBaseTot * ratio / 100
       return {
         year: year - 0,
-        ratio,
-        ciTot: ciBaseTot * ratio / 100
+        // #159, normalize ratio by 2019_ems
+        ratio: ciTot * 100 / tot2019,
+        ciTot
       }
     })
     .filter(row => !Number.isNaN(row.ratio))
 
-  breakpointList.unshift({ year: ciBaseYear, ratio: 100, ciTot: ciBaseTot })
+  // #159, always starts from 2019
+  breakpointList.unshift({ year: BASE_YEAR, ratio: 100, ciTot: tot2019 })
 
   if (breakpointList.length < 2) {
     // should contain at least 2 points, so to draw line
     return null
   }
 
-  const ratioList = { [ciBaseYear]: { value: ciBaseTot, isPredicted: false } }
+  const ratioList = { [BASE_YEAR]: { value: tot2019, isPredicted: false } }
   let currentRatio = null
   let currentBase = breakpointList[0]
 
-  for (let year = ciBaseYear + 1; year <= END_YEAR; year++) {
+  for (let year = BASE_YEAR + 1; year <= END_YEAR; year++) {
     if (currentRatio === null || year > breakpointList[0].year) {
       // in new segment, calculate new ratio
       if (breakpointList.length < 2) {
@@ -175,7 +179,7 @@ function aggregateCommitment (ciRow) {
     }
     const isCommitted = year === breakpointList[0].year
     ratioList[year] = {
-      value: ciBaseTot * (currentBase.ratio / 100 + (year - currentBase.year) * currentRatio),
+      value: tot2019 * (currentBase.ratio / 100 + (year - currentBase.year) * currentRatio),
       isPredicted: !isCommitted
     }
   }
@@ -190,7 +194,6 @@ function calculateCommitment (companyBauList) {
     createCompanyReportStream('0', 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQAlorxEbPJeBIaqY2jTvYiMKJoBFBysA2VHdJY_jYO3KBWhHe6pN86-TQRk7T24en2F6C4MJ5dlcEJ/pub?')
       .on('data', (data) => {
         const company = companyMap.findByStock(data.stock_code)
-        // TODO: if no 2019?!
         const companyBau = companyBauList.filter(row => row.id === company.統編)
         if (!companyBau.length) {
           return
