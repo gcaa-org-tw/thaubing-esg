@@ -99,7 +99,6 @@ export default {
       }
     })
 
-    console.warn('cc', companyList)
     return { bauStats, ciStats, companyList }
   },
   computed: {
