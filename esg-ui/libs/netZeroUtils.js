@@ -42,8 +42,9 @@ const xTickValues = [
  * @param {Function} getUnitLabel - function (statsRow), return label to be used in chart
  * @param {Function} getUnitColor - function (unitLabel), return color code
  * @param {Function} isDashed  - function (statsRow), return whether this row is predicted / commitment
+ * @param {Array} allUnits - default use all companies in 2019
  */
-export function genNetZeroCompanyChartData ({ stats, getUnitLabel, getUnitColor, isDashed }) {
+export function genNetZeroCompanyChartData ({ stats, getUnitLabel, getUnitColor, isDashed, allUnits = null }) {
   const data = {}
   const colors = {}
   const annualData = stats.reduce((sum, row) => {
@@ -65,7 +66,7 @@ export function genNetZeroCompanyChartData ({ stats, getUnitLabel, getUnitColor,
   })
 
   // use 基準年 as basis
-  const allUnits = Object.keys(annualData[YEAR.BASE])
+  allUnits = allUnits || Object.keys(annualData[YEAR.BASE])
 
   allUnits.forEach((unitLabel) => {
     data[unitLabel] = [unitLabel]
@@ -78,11 +79,10 @@ export function genNetZeroCompanyChartData ({ stats, getUnitLabel, getUnitColor,
 
   yearList.forEach((year) => {
     allUnits.forEach((unitLabel) => {
-      const row = annualData[year][unitLabel]
-      const value = !row || row.tot === undefined ? null : row.tot
-      if (!row) {
-        data[unitLabel].push(null)
-      } else if (!row.isDashed) {
+      const row = annualData[year][unitLabel] || {}
+      const value = row.tot === undefined ? null : row.tot
+      const isDashedRow = 'isDashed' in row ? row.isDashed : isDashed(row)
+      if (!isDashedRow) {
         data[unitLabel].push(value)
       } else {
         const ciUnitLabel = `${unitLabel}${PREDICT_SUFFIX}`
@@ -91,7 +91,9 @@ export function genNetZeroCompanyChartData ({ stats, getUnitLabel, getUnitColor,
           const emptyValues = data[unitLabel].slice(1).fill(null)
           const factLen = data[unitLabel].length - 1
           // connect fact and commitment line
-          emptyValues[factLen - 1] = data[unitLabel][factLen]
+          if (factLen > 0) {
+            emptyValues[factLen - 1] = data[unitLabel][factLen]
+          }
           data[ciUnitLabel] = [ciUnitLabel, ...emptyValues]
           colors[ciUnitLabel] = colors[unitLabel]
         }
