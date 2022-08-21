@@ -104,12 +104,17 @@ export function genNetZeroCompanyChartData ({ stats, getUnitLabel, getUnitColor,
   })
 
   const xData = ['x', ...yearList.map(y => `${y}-01-01`)]
+  const baseSeries = [data.IPCC, data.PNNL]
+  const restSeries = Object.keys(data)
+    .filter(key => key !== 'IPCC' && key !== 'PNNL')
+    .map(key => data[key])
 
   return {
     x: 'x',
     columns: [
       xData,
-      ...Object.values(data)
+      ...baseSeries,
+      ...restSeries
     ],
     type: 'line',
     types: {

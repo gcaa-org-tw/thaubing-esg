@@ -75,13 +75,15 @@ export default {
           isPredicted: !!row.是預測值
         }
       })
-      const richCiStats = this.ciStats.map((row) => {
-        return {
-          ...row,
-          label: META.CI.LABEL,
-          isPredicted: !!row.是承諾值
-        }
-      })
+      const richCiStats = this.ciStats
+        .filter(row => !row.是推估值)
+        .map((row) => {
+          return {
+            ...row,
+            label: META.CI.LABEL,
+            isPredicted: true
+          }
+        })
       return [...richBauStats, ...richCiStats]
     },
     yMax () {
@@ -105,12 +107,15 @@ export default {
           return get(META, `${label}.COLOR`, '')
         },
         isDashed (row) {
-          return !!row.isPredicted
-        }
+          // commitment data contain hole
+          return !('isPredicted' in row) || !!row.isPredicted
+        },
+        allUnits: ['IPCC', 'PNNL', META.BAU.LABEL, META.CI.LABEL]
       })
     },
     c3Config () {
       return genC3Config(this.yMax, {
+        line: { connectNull: true },
         tooltip: {
           grouped: false,
           contents: this.genTooltip
