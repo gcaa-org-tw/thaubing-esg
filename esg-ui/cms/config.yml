@@ -24,6 +24,9 @@ collections:
         fields:
           - { label: IPCC, name: IPCC, widget: string }
           - { label: PNNL, name: PNNL, widget: string }
-          - { label: 基準年, name: BASE_YEAR, widget: string }
-          - { label: BAU, name: BAU, widget: string }
-          - { label: 企業目標, name: COMMITMENT, widget: string }
+          - { label: 基準年標題, name: BASE_YEAR_TITLE, widget: string }
+          - { label: 基準年說明, name: BASE_YEAR, widget: string }
+          - { label: BAU 標題, name: BAU_TITLE, widget: string }
+          - { label: BAU 說明, name: BAU, widget: string }
+          - { label: 企業目標標題, name: COMMITMENT_TITLE, widget: string }
+          - { label: 企業目標說明, name: COMMITMENT, widget: string }
