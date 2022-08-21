@@ -61,10 +61,10 @@ export default {
     let ciStats = []
     try {
       bauStats = await $content('company', `${companyAbbr}-bau`).fetch()
-      ciStats = await $content('company', `${companyAbbr}-net-zero-commitment`).fetch()
       bauStats = cleanupRawStats(bauStats)
+      ciStats = await $content('company', `${companyAbbr}-net-zero-commitment`).fetch()
       ciStats = cleanupRawStats(ciStats)
-    } catch {
+    } catch (err) {
       // it's ok
     }
 
