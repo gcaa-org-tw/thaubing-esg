@@ -50,7 +50,7 @@
 <script>
 import { interpolateCividis } from 'd3'
 import { uniqBy } from 'lodash'
-import { cleanupRawStats, COLORS, industryMixin, PER_INDUSTRY_KEY, Y_MAX } from '~/libs/netZeroUtils'
+import { cleanupRawStats, COLORS, industryMixin, interpolateTop5, PER_INDUSTRY_KEY, Y_MAX } from '~/libs/netZeroUtils'
 
 const VALID_FILTER = { top5: 'top5', all: 'all' }
 
@@ -143,7 +143,7 @@ export default {
         .reduce((ret, company, i) => {
           ret[company.id] = {
             ...this.companyMap[company.id],
-            color: interpolateCividis((i + 0.7) / 5)
+            color: interpolateTop5(i)
           }
           return ret
         }, {})

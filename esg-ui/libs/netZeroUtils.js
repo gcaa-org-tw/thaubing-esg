@@ -259,6 +259,10 @@ export const companyMixin = {
 
 export const PER_INDUSTRY_KEY = 'per-industry'
 
+export function interpolateTop5 (i) {
+  return interpolateCividis((i + 0.7) / 5)
+}
+
 export const industryMixin = {
   computed: {
     industries () {
@@ -266,12 +270,8 @@ export const industryMixin = {
         { label: '跨產業', code: PER_INDUSTRY_KEY },
         ...industries
       ]
-      const nIndustry = industryList.length
       return industryList.map((industry, i) => {
-        return {
-          ...industry,
-          color: interpolateCividis(i / nIndustry)
-        }
+        return { ...industry }
       })
     }
   },
