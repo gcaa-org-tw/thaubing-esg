@@ -1,6 +1,8 @@
 <template lang="pug">
   .indCom.relative
-    .netZeroChart.h-100(ref="chart")
+    .netZeroChart.h-100(:class="{'netZeroChart--blur': hasNoData}" ref="chart")
+    .indCom__noData.aspect-ratio--object.flex.items-center.justify-center(v-if="hasNoData")
+      .f3.fw5.gray.pb4 尚無目標
 </template>
 <script>
 import { get, uniq } from 'lodash'
@@ -32,6 +34,9 @@ export default {
     }
   },
   computed: {
+    hasNoData () {
+      return !this.ciStatsWithoutPrediction.length
+    },
     ciStatsWithoutPrediction () {
       return this.ciStats.filter(row => !row.是推估值)
     },
