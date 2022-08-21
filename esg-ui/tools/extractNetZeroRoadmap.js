@@ -158,11 +158,11 @@ function aggregateCommitment (ciRow) {
   }
 
   const ratioList = { [ciBaseYear]: { value: ciBaseTot, isPredicted: false } }
-  let currentRatio = 0
+  let currentRatio = null
   let currentBase = breakpointList[0]
 
   for (let year = ciBaseYear + 1; year <= END_YEAR; year++) {
-    if (!currentRatio || year > breakpointList[0].year) {
+    if (currentRatio === null || year > breakpointList[0].year) {
       // in new segment, calculate new ratio
       if (breakpointList.length < 2) {
         // no further commitment
