@@ -31,8 +31,8 @@
           :color="company.color"
         )
       .netZero__legendRow
-        net-zero-legend(title="IPCC" :color="chartColors.IPCC" type="roadmap")
-        net-zero-legend(title="PNNL" :color="chartColors.PNNL" type="roadmap")
+        net-zero-legend(title="IPCC" :color="chartColors.IPCC" type="roadmap" :tip="legendLabel.IPCC")
+        net-zero-legend(title="PNNL" :color="chartColors.PNNL" type="roadmap" :tip="legendLabel.PNNL")
     .netZero__chart.thinContainer
       h2 企業溫室氣體年排放量趨勢與推估
       net-zero-industry-bau(
@@ -54,6 +54,7 @@
 <script>
 import { interpolateCividis } from 'd3'
 import { uniqBy } from 'lodash'
+import netZeroMeta from '~/static/content/meta/net-zero-meta.json'
 import { cleanupRawStats, COLORS, industryMixin, interpolateTop5, PER_INDUSTRY_KEY, Y_MAX } from '~/libs/netZeroUtils'
 
 const VALID_FILTER = { top5: 'top5', all: 'all', agg5: 'agg5' }
@@ -106,6 +107,12 @@ export default {
     return { bauStats, ciStats, companyList }
   },
   computed: {
+    legendLabel () {
+      return {
+        IPCC: netZeroMeta.IPCC,
+        PNNL: netZeroMeta.PNNL
+      }
+    },
     industry () {
       // default 石化業
       const code = this.$route.params.industry || '03'
