@@ -10,9 +10,9 @@
     | {{beautyValue}}
 </template>
 <script>
-import QuartileCell from './QuartileCell'
+// import QuartileCell from './QuartileCell'
 import LongCell from './LongCell'
-import { MAJOR_MEASURE_LIST } from '~/assets/defs'
+// import { MAJOR_MEASURE_LIST } from '~/assets/defs'
 
 export default {
   props: {
@@ -31,10 +31,12 @@ export default {
   },
   computed: {
     widget () {
-      const majorMeasureList = MAJOR_MEASURE_LIST.E
-      if (this.columnMeta.isSelfReport && majorMeasureList.includes(this.columnMeta.measure)) {
-        return QuartileCell
-      } else if (this.columnMeta.measure === '工安意外') {
+      // #125, hide quartile-cell for now
+      // const majorMeasureList = MAJOR_MEASURE_LIST.E
+      // if (this.columnMeta.isSelfReport && majorMeasureList.includes(this.columnMeta.measure)) {
+      //   return QuartileCell
+      // } else
+      if (this.columnMeta.measure === '工安意外') {
         return LongCell
       } else {
         return 'span'
