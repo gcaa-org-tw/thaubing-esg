@@ -14,6 +14,10 @@
           :class="{'netZero__filterItem--active': filter === 'top5'}"
           :to="filterLink('top5')"
         ) {{industry.label}}碳排大戶 ({{top5Count}})
+        nuxt-link.netZero__filterItem(
+          :class="{'netZero__filterItem--active': filter === 'agg5', 'netZero__filterItem--disabled': !agg5Count}"
+          :to="filterLink('agg5')"
+        ) 目標積極企業 ({{agg5Count || '無'}})
         nuxt-link.netZero__filterItem.pointer(
           :class="{'netZero__filterItem--active': filter === 'all'}"
           :to="filterLink('all')"
@@ -30,7 +34,7 @@
         net-zero-legend(title="IPCC" :color="chartColors.IPCC" type="roadmap")
         net-zero-legend(title="PNNL" :color="chartColors.PNNL" type="roadmap")
     .netZero__chart.thinContainer
-      h2 企業維持原狀的碳排成長
+      h2 企業溫室氣體年排放量趨勢與推估
       net-zero-industry-bau(
         :bau-stats="visibleBauStats"
         :ci-stats="visibleCiStats"
@@ -52,7 +56,7 @@ import { interpolateCividis } from 'd3'
 import { uniqBy } from 'lodash'
 import { cleanupRawStats, COLORS, industryMixin, interpolateTop5, PER_INDUSTRY_KEY, Y_MAX } from '~/libs/netZeroUtils'
 
-const VALID_FILTER = { top5: 'top5', all: 'all' }
+const VALID_FILTER = { top5: 'top5', all: 'all', agg5: 'agg5' }
 
 export default {
   mixins: [industryMixin],
@@ -121,6 +125,24 @@ export default {
         return sum
       }, {})
     },
+    aggressive5CompanyMap () {
+      // get top 5 2030 commitment company
+      const targetYear = 2030
+      return this.ciStats
+        .filter((row) => {
+          return row.年份 === targetYear
+        })
+        .sort((a, b) => b.Tot變化 - a.Tot變化)
+        .slice(0, 5)
+        .reduce((sum, row, i) => {
+          const id = row.統編
+          sum[id] = {
+            ...this.companyMap[id],
+            color: interpolateTop5(i)
+          }
+          return sum
+        }, {})
+    },
     top5CompanyMap () {
       const lastRecordPerCompany = this.bauStats.reduce((sum, row) => {
         if (row.是預測值) {
@@ -150,6 +172,8 @@ export default {
     activeCompanyMap () {
       if (this.filter === VALID_FILTER.all) {
         return this.companyMap
+      } else if (this.filter === VALID_FILTER.agg5) {
+        return this.aggressive5CompanyMap
       }
       return this.top5CompanyMap
     },
@@ -176,6 +200,9 @@ export default {
       return this.ciStats.filter((row) => {
         return row.統編 in this.activeCompanyMap
       })
+    },
+    agg5Count () {
+      return Object.values(this.aggressive5CompanyMap).length
     },
     top5Count () {
       return Object.values(this.top5CompanyMap).length
@@ -256,6 +283,10 @@ export default {
     &--active {
       color: #35811C;
       border-color: #35811C;
+    }
+
+    &--disabled {
+      pointer-events: none;
     }
 
     &:not(:last-child) {
