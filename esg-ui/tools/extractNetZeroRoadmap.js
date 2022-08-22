@@ -136,7 +136,6 @@ function predictBau (annualStats) {
 }
 
 function aggregateCommitment (ciRow) {
-  const ciBaseYear = ciRow.base_year
   const ciBaseTot = ciRow.base_year_ems
   const tot2019 = ciRow['2019_ems']
 
