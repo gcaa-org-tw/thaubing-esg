@@ -29,6 +29,9 @@
           :key="company.統編"
           :title="company.公司簡稱"
           :color="company.color"
+          @mouseenter.native="focusCompany(company)"
+          @mouseleave.native="focusOutCompany"
+          @click.native="toggleCompany(company)"
         )
           .ml1(slot="tooltip")
             nuxt-link.netZero__comLink.br-100.flex.items-center.justify-center(target="_blank" :style="{background: company.color}" :to="companyLink(company)")
@@ -43,6 +46,7 @@
         :ci-stats="visibleCiStats"
         :company-map="activeCompanyMap"
         :y-max="yMax"
+        :active-company="activeCompany"
       )
       .mt4
         net-zero-remark(:fields="['BASE_YEAR', 'BAU']")
@@ -53,6 +57,7 @@
         :bau-stats="visibleBauStats"
         :company-map="activeCompanyMap"
         :y-max="120"
+        :active-company="activeCompany"
       )
       .mt4
         net-zero-remark(:fields="['BASE_YEAR', 'COMMITMENT']")
@@ -113,7 +118,16 @@ export default {
 
     return { bauStats, ciStats, companyList }
   },
+  data () {
+    return {
+      focusedCompany: null,
+      pinnedCompany: null
+    }
+  },
   computed: {
+    activeCompany () {
+      return this.focusedCompany || this.pinnedCompany
+    },
     legendLabel () {
       return {
         IPCC: netZeroMeta.IPCC,
@@ -225,6 +239,12 @@ export default {
       return COLORS
     }
   },
+  watch: {
+    bauStats () {
+      this.focusedCompany = null
+      this.pinnedCompany = null
+    }
+  },
   beforeDestroy () {
     // #109, when switch page, html scrollbar disabler is not reset for some reason
     const html = document.querySelector('html')
@@ -249,6 +269,19 @@ export default {
           company: company.統編
         }
       }
+    },
+    toggleCompany (company) {
+      if (this.pinnedCompany !== company) {
+        this.pinnedCompany = company
+      } else {
+        this.pinnedCompany = null
+      }
+    },
+    focusCompany (company) {
+      this.focusedCompany = company
+    },
+    focusOutCompany () {
+      this.focusedCompany = null
     }
   }
 }

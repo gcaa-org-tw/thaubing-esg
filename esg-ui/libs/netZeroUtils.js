@@ -1,4 +1,4 @@
-import { format, interpolateCividis } from 'd3'
+import { format, interpolateCividis, color } from 'd3'
 import { range, get } from 'lodash'
 import industries from '~/assets/industries.json'
 import roadmap from '~/static/content/overview/net-zero-roadmap.json'
@@ -35,6 +35,23 @@ const xTickValues = [
   ...range(2015, YEAR.END, 5),
   YEAR.END
 ].map(year => new Date(`${year}-01-01`))
+
+export function focusUnit (unitLabel, c3Handler) {
+  if (!c3Handler) {
+    return
+  }
+
+  const unitList = Object.keys(c3Handler.data.colors())
+  c3Handler.show()
+  if (unitLabel) {
+    const visibleLabels = {
+      [unitLabel]: true,
+      [`${unitLabel}${PREDICT_SUFFIX}`]: true,
+      ...COLORS
+    }
+    c3Handler.hide(unitList.filter(label => !visibleLabels[label]))
+  }
+}
 
 /**
  *
@@ -268,6 +285,12 @@ export const PER_INDUSTRY_KEY = 'per-industry'
 
 export function interpolateTop5 (i) {
   return interpolateCividis((i + 0.7) / 5)
+}
+
+export function setOpacity (rgbStr, opacity) {
+  const c = color(rgbStr)
+  c.opacity = opacity
+  return c.toString()
 }
 
 export const industryMixin = {
