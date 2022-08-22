@@ -16,6 +16,9 @@
           :key="industry.code"
           :title="industry.label"
           :color="industry.color"
+          @mouseenter.native="focusIndustry(industry)"
+          @mouseleave.native="focusOutIndustry"
+          @click.native="toggleIndustry(industry)"
         )
       .netZero__legendRow
         net-zero-legend(title="IPCC" :color="chartColors.IPCC" type="roadmap" :tip="legendLabel.IPCC")
@@ -26,6 +29,7 @@
         :bau-stats="bauStats"
         :industry-map="top5IndustryMap"
         :y-max="yMax"
+        :active-industry="activeIndustry"
       )
       .mt4
         net-zero-remark(:fields="['BASE_YEAR', 'BAU']")
@@ -55,7 +59,16 @@ export default {
 
     return { bauStats, top5IndustryCodes: Object.keys(top5Industries) }
   },
+  data () {
+    return {
+      focusedIndustry: null,
+      pinnedIndustry: null
+    }
+  },
   computed: {
+    activeIndustry () {
+      return this.focusedIndustry || this.pinnedIndustry
+    },
     legendLabel () {
       return {
         IPCC: netZeroMeta.IPCC,
@@ -104,6 +117,21 @@ export default {
     const html = document.querySelector('html')
     if (html.classList.contains('is-clipped-touch')) {
       html.classList.remove('is-clipped-touch')
+    }
+  },
+  methods: {
+    toggleIndustry (industry) {
+      if (this.pinnedIndustry !== industry) {
+        this.pinnedIndustry = industry
+      } else {
+        this.pinnedIndustry = null
+      }
+    },
+    focusIndustry (industry) {
+      this.focusedIndustry = industry
+    },
+    focusOutIndustry () {
+      this.focusedIndustry = null
     }
   }
 }
