@@ -31,10 +31,15 @@
           :color="company.color"
           @mouseenter.native="focusCompany(company)"
           @mouseleave.native="focusOutCompany"
-          @click.native="toggleCompany(company)"
+          @click.native="toggleCompany(company, $event)"
         )
           .ml1(slot="tooltip")
-            nuxt-link.netZero__comLink.br-100.flex.items-center.justify-center(target="_blank" :style="{background: company.color}" :to="companyLink(company)")
+            nuxt-link.netZero__comLink.br-100.flex.items-center.justify-center(
+              target="_blank"
+              :ref="`link-${company.公司簡稱}`"
+              :style="{background: company.color}"
+              :to="companyLink(company)"
+            )
               i.fas.fa-arrow-right
       .netZero__legendRow
         net-zero-legend(title="IPCC" :color="chartColors.IPCC" type="roadmap" :tip="legendLabel.IPCC")
@@ -47,6 +52,7 @@
         :company-map="activeCompanyMap"
         :y-max="yMax"
         :active-company="activeCompany"
+        @open-company="openCompany"
       )
       .mt4
         net-zero-remark(:fields="['BASE_YEAR', 'BAU']")
@@ -58,6 +64,7 @@
         :company-map="activeCompanyMap"
         :y-max="120"
         :active-company="activeCompany"
+        @open-company="openCompany"
       )
       .mt4
         net-zero-remark(:fields="['BASE_YEAR', 'COMMITMENT']")
@@ -253,6 +260,13 @@ export default {
     }
   },
   methods: {
+    openCompany (companyAbbr) {
+      const ref = this.$refs[`link-${companyAbbr}`]
+      if (!ref || !ref.length) {
+        return
+      }
+      ref[0].$el.click()
+    },
     filterLink (filter) {
       return {
         name: this.$route.name,
@@ -270,7 +284,11 @@ export default {
         }
       }
     },
-    toggleCompany (company) {
+    toggleCompany (company, $e) {
+      if ($e.target.tagName === 'A') {
+        // let link go default behaviour
+        return
+      }
       if (this.pinnedCompany !== company) {
         this.pinnedCompany = company
       } else {
