@@ -30,6 +30,9 @@
           :title="company.公司簡稱"
           :color="company.color"
         )
+          .ml1(slot="tooltip")
+            nuxt-link.netZero__comLink.br-100.flex.items-center.justify-center(target="_blank" :style="{background: company.color}" :to="companyLink(company)")
+              i.fas.fa-arrow-right
       .netZero__legendRow
         net-zero-legend(title="IPCC" :color="chartColors.IPCC" type="roadmap" :tip="legendLabel.IPCC")
         net-zero-legend(title="PNNL" :color="chartColors.PNNL" type="roadmap" :tip="legendLabel.PNNL")
@@ -238,6 +241,14 @@ export default {
           filter
         }
       }
+    },
+    companyLink (company) {
+      return {
+        name: 'company-company',
+        params: {
+          company: company.統編
+        }
+      }
     }
   }
 }
@@ -279,6 +290,14 @@ export default {
         }
       }
     }
+  }
+
+  &__comLink {
+    height: 0.875rem;
+    width: 0.875rem;
+    font-size: 0.625rem;
+    color: white;
+    transform: rotate(-45deg);
   }
 
   &__filter {

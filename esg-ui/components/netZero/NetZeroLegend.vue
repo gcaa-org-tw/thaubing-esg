@@ -3,15 +3,16 @@
     .esgLegend__label.flex-none(:style="{ background: color }")
     .esgLegend__name.flex-auto.flex.items-center
       .truncate {{title}}
-      .ml1
-        b-tooltip(
-          v-if="tip"
-          :label="tip"
-          type="is-dark"
-          multilined
-          position="is-right"
-        )
-          i.black.fas.fa-question-circle
+      slot(name="tooltip")
+        .ml1
+          b-tooltip(
+            v-if="tip"
+            :label="tip"
+            type="is-dark"
+            multilined
+            position="is-right"
+          )
+            i.black.fas.fa-question-circle
     .esgLegend__value.flex-none(v-if="value >= 0" :class="valueClass") {{valueLabel}}
 </template>
 <script>
