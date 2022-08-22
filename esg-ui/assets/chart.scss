@@ -34,6 +34,10 @@
         stroke-dasharray: 7 5;
       }
     }
+    .c3-chart-line[style*="opacity: 0"] {
+      opacity: 0.3 !important;
+      display: initial !important;
+    }
   }
   .c3-axis{
     path.domain {
@@ -70,6 +74,11 @@
     }
     .c3-circles {
       display: none;
+    }
+  }
+  &--hasFocused {
+    .c3-chart-lines .c3-chart-line[style*="opacity: 1"] .c3-lines path.c3-line {
+      stroke-width: 2px;
     }
   }
   .esgLegend + .esgLegend {

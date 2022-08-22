@@ -6,7 +6,7 @@
 </template>
 <script>
 import { get, uniq } from 'lodash'
-import { genC3Config, companyMixin, genNetZeroCompanyChartData, genTooltip } from '~/libs/netZeroUtils'
+import { genC3Config, companyMixin, genNetZeroCompanyChartData, genTooltip, focusUnit } from '~/libs/netZeroUtils'
 
 export default {
   mixins: [companyMixin],
@@ -26,6 +26,12 @@ export default {
     yMax: {
       type: Number,
       required: true
+    },
+    activeCompany: {
+      default: null,
+      validator (val) {
+        return !val || val.公司簡稱
+      }
     }
   },
   data () {
@@ -85,6 +91,16 @@ export default {
   watch: {
     ciStats () {
       this.updateChart()
+    },
+    activeCompany () {
+      const companyName = get(this.activeCompany, '公司簡稱')
+      focusUnit(companyName, this.c3Handler)
+
+      if (companyName) {
+        this.$refs.chart.classList.add('netZeroChart--hasFocused')
+      } else {
+        this.$refs.chart.classList.remove('netZeroChart--hasFocused')
+      }
     }
   },
   mounted () {
@@ -110,6 +126,7 @@ export default {
         unload: true,
         columns: this.chartData.columns
       })
+      focusUnit(null, this.c3Handler)
     }
   }
 }
