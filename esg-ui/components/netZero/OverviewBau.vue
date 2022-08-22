@@ -4,7 +4,7 @@
 </template>
 <script>
 import { get } from 'lodash'
-import { genC3Config, genNetZeroCompanyChartData, genTooltip } from '~/libs/netZeroUtils'
+import { focusUnit, genC3Config, genNetZeroCompanyChartData, genTooltip } from '~/libs/netZeroUtils'
 
 export default {
   props: {
@@ -19,6 +19,12 @@ export default {
     yMax: {
       type: Number,
       required: true
+    },
+    activeIndustry: {
+      default: null,
+      validator (val) {
+        return !val || val.label
+      }
     }
   },
   data () {
@@ -67,6 +73,16 @@ export default {
   watch: {
     bauStats () {
       this.updateChart()
+    },
+    activeIndustry () {
+      const industry = get(this.activeIndustry, 'label')
+      focusUnit(industry, this.c3Handler)
+
+      if (industry) {
+        this.$refs.chart.classList.add('netZeroChart--hasFocused')
+      } else {
+        this.$refs.chart.classList.remove('netZeroChart--hasFocused')
+      }
     }
   },
   mounted () {
