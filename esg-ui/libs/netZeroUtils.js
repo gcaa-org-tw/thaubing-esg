@@ -59,9 +59,10 @@ export function focusUnit (unitLabel, c3Handler) {
  * @param {Function} getUnitLabel - function (statsRow), return label to be used in chart
  * @param {Function} getUnitColor - function (unitLabel), return color code
  * @param {Function} isDashed  - function (statsRow), return whether this row is predicted / commitment
+ * @param {Function} handleClick - function (d, element)
  * @param {Array} allUnits - default use all companies in 2019
  */
-export function genNetZeroCompanyChartData ({ stats, getUnitLabel, getUnitColor, isDashed, allUnits = null }) {
+export function genNetZeroCompanyChartData ({ stats, getUnitLabel, getUnitColor, isDashed, allUnits = null, handleClick }) {
   const data = {}
   const colors = {}
   const annualData = stats.reduce((sum, row) => {
@@ -138,7 +139,12 @@ export function genNetZeroCompanyChartData ({ stats, getUnitLabel, getUnitColor,
       IPCC: 'area',
       PNNL: 'area'
     },
-    colors
+    colors,
+    onclick (d, element) {
+      if (handleClick) {
+        handleClick(d, element)
+      }
+    }
   }
 }
 

@@ -4,7 +4,7 @@
 </template>
 <script>
 import { get } from 'lodash'
-import { genC3Config, companyMixin, genNetZeroCompanyChartData, genTooltip, focusUnit } from '~/libs/netZeroUtils'
+import { genC3Config, companyMixin, genNetZeroCompanyChartData, genTooltip, focusUnit, PREDICT_SUFFIX } from '~/libs/netZeroUtils'
 
 export default {
   mixins: [companyMixin],
@@ -49,6 +49,13 @@ export default {
         },
         isDashed (row) {
           return !!row.是預測值
+        },
+        handleClick: (d, element) => {
+          let label = d.id
+          if (label.endsWith(PREDICT_SUFFIX)) {
+            label = label.slice(0, PREDICT_SUFFIX.length * -1)
+          }
+          this.$emit('open-company', label)
         }
       })
     },
