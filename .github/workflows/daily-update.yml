@@ -11,6 +11,7 @@ env:
   SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
 
 on:
+  workflow_dispatch:
   schedule:
     - cron: '0 21 * * *'
 
