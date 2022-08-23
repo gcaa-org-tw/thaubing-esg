@@ -1,5 +1,5 @@
 <template lang="pug">
-  chart-panel(title="淨零路徑")
+  chart-panel(title="企業溫室氣體年排放量趨勢與減碳目標")
     .singleCompany(slot="chart")
       .singleCompany__chart.relative
         .netZeroChart(ref="chart" :class="{'netZeroChart--blur': hasNoData}")
@@ -11,7 +11,7 @@
 <script>
 import { get } from 'lodash'
 import { interpolateCividis } from 'd3'
-import { genC3Config, companyMixin, genNetZeroCompanyChartData, genTooltip, Y_MAX } from '~/libs/netZeroUtils'
+import { genC3Config, companyMixin, genNetZeroCompanyChartData, genTooltip, Y_MAX, YEAR } from '~/libs/netZeroUtils'
 
 const META = {
   BAU: {
@@ -106,7 +106,11 @@ export default {
         getUnitColor: (label) => {
           return get(META, `${label}.COLOR`, '')
         },
-        isDashed (row) {
+        isDashed (row, year) {
+          // skip 2013
+          if (year - 0 === YEAR.START) {
+            return false
+          }
           // commitment data contain hole
           return !('isPredicted' in row) || !!row.isPredicted
         },
@@ -116,7 +120,7 @@ export default {
     c3Config () {
       return genC3Config(this.yMax, {
         line: { connectNull: true },
-        tooltip: {
+        ttooltip: {
           grouped: false,
           contents: this.genTooltip
         }

@@ -58,7 +58,7 @@ export function focusUnit (unitLabel, c3Handler) {
  * @param {Array} stats - [{ Tot變化, 年份, <idColumn>}]
  * @param {Function} getUnitLabel - function (statsRow), return label to be used in chart
  * @param {Function} getUnitColor - function (unitLabel), return color code
- * @param {Function} isDashed  - function (statsRow), return whether this row is predicted / commitment
+ * @param {Function} isDashed  - function (statsRow. year, unitLabel), return whether this row is predicted / commitment
  * @param {Function} handleClick - function (d, element)
  * @param {Array} allUnits - default use all companies in 2019
  */
@@ -71,7 +71,7 @@ export function genNetZeroCompanyChartData ({ stats, getUnitLabel, getUnitColor,
     if (!sum[year]) {
       sum[year] = {}
     }
-    sum[year][unitLabel] = { tot: row.Tot變化, isDashed: isDashed(row) }
+    sum[year][unitLabel] = { tot: row.Tot變化, isDashed: isDashed(row, year, unitLabel) }
     return sum
   }, {})
 
@@ -99,7 +99,7 @@ export function genNetZeroCompanyChartData ({ stats, getUnitLabel, getUnitColor,
     allUnits.forEach((unitLabel) => {
       const row = annualData[year][unitLabel] || {}
       const value = row.tot === undefined ? null : row.tot
-      const isDashedRow = 'isDashed' in row ? row.isDashed : isDashed(row)
+      const isDashedRow = 'isDashed' in row ? row.isDashed : isDashed(row, year, unitLabel)
       if (!isDashedRow) {
         data[unitLabel].push(value)
       } else {
