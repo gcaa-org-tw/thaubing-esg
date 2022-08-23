@@ -1,11 +1,13 @@
 <template lang="pug">
   dl.nzRemark.f6
-    .nzRemark__item.lh-copy.flex(v-for="field in fieldList" :key="field.key")
-      dt.fw5.nowrap {{field.title}}
-      span ：
-      dd(v-for="(token, i) in field.remark")
-        a(v-if="token.tag === 'a'" :href="token.href" target="_blank" ref="noopener") {{token.text}}
-        span(v-else) {{token.text}}
+    .nzRemark__item.lh-copy(v-for="field in fieldList" :key="field.key")
+      div
+        dt.di.fw5 {{field.title}}
+        span ：
+      dd
+        template(v-for="(token, i) in field.remark")
+          a(v-if="token.tag === 'a'" :href="token.href" target="_blank" ref="noopener") {{token.text}}
+          span(v-else) {{token.text}}
 </template>
 <script>
 import netZeroMeta from '~/static/content/meta/net-zero-meta.json'
