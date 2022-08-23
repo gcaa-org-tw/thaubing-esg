@@ -24,7 +24,10 @@
 import { mapState } from 'vuex'
 export default {
   computed: {
-    ...mapState({ isGuanshiyinn: 'isGuanshiyinn' })
+    ...mapState({ isReallyGuanshiyinn: 'isGuanshiyinn' }),
+    isGuanshiyinn () {
+      return true
+    }
   }
 }
 </script>
