@@ -11,15 +11,18 @@
 <script>
 import { get } from 'lodash'
 import { interpolateCividis } from 'd3'
-import { genC3Config, companyMixin, genNetZeroCompanyChartData, genTooltip, Y_MAX, YEAR } from '~/libs/netZeroUtils'
+import roadmap from '~/static/content/overview/net-zero-roadmap.json'
+import { genC3Config, companyMixin, genNetZeroCompanyChartData, genTooltip, Y_MAX, YEAR, genTooltipRow, COLORS, PREDICT_SUFFIX } from '~/libs/netZeroUtils'
 
 const META = {
   BAU: {
     LABEL: 'BAU',
+    PREDICT_LABEL: `BAU${PREDICT_SUFFIX}`,
     COLOR: interpolateCividis(0)
   },
   CI: {
     LABEL: 'CI',
+    PREDICT_LABEL: `CI${PREDICT_SUFFIX}`,
     COLOR: interpolateCividis(0.75)
   }
 }
@@ -120,8 +123,8 @@ export default {
     c3Config () {
       return genC3Config(this.yMax, {
         line: { connectNull: true },
-        ttooltip: {
-          grouped: false,
+        tooltip: {
+          // grouped: false,
           contents: this.genTooltip
         }
       })
@@ -156,21 +159,44 @@ export default {
       })
     },
     genTooltip (data) {
-      const label = data[0].id
-      if (label === 'IPCC' || label === 'PNNL') {
-        return ''
+      const year = data[0].x.getFullYear()
+      const valueMap = data.reduce((sum, value) => {
+        sum[value.id] = value.value
+        return sum
+      }, {})
+
+      let bauTitle = this.company.公司簡稱
+      let bauValue = valueMap[META.BAU.LABEL]
+      const isDashed = valueMap[META.BAU.PREDICT_LABEL] !== null
+      if (isDashed) {
+        bauTitle += ' BAU'
+        bauValue = valueMap[META.BAU.PREDICT_LABEL]
       }
-      const isBau = label.startsWith(META.BAU.LABEL)
-      const needle = isBau ? META.BAU.LABEL : META.CI.LABEL
-      const mockId = label.replace(needle, this.company.公司簡稱)
-      const mockData = [{
-        ...data[0],
-        id: mockId
-      }]
-      if (isBau) {
-        return this.genBauTooltip(mockData)
+
+      const ciTitle = `${this.company.公司簡稱} 目標`
+      const ci = this.ciStats.find(row => row.年份 === year)
+
+      let roadmapRow = roadmap.find(row => row.year === year)
+
+      roadmapRow = {
+        ...roadmapRow,
+        PNNL: roadmapRow.PNNL * 100,
+        IPCC: roadmapRow.IPCC * 100
       }
-      return this.genCiTooltip(mockData)
+      return `
+<div class="esgTp">
+<div class="esgTp__year lh-title">${year}</div>
+<div class="esgTp__company">
+${genTooltipRow(bauTitle, META.BAU.COLOR, bauValue, roadmapRow.IPCC, isDashed ? 'bau' : 'fact')}
+${ci ? genTooltipRow(ciTitle, META.CI.COLOR, ci.Tot變化, roadmapRow.IPCC, 'noLabel') : ''}
+</div>
+<div class="esgTp__roadmap">
+<div class="esgTp__roadmapTitle lh-title mb2">目標</div>
+${genTooltipRow('IPCC', COLORS.IPCC, roadmapRow.IPCC, roadmapRow.IPCC, 'roadmap')}
+${genTooltipRow('PNNL', COLORS.PNNL, roadmapRow.PNNL, roadmapRow.IPCC, 'roadmap')}
+<div>
+</div>
+`
     }
   }
 }
