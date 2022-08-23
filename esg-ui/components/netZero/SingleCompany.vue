@@ -5,13 +5,19 @@
         .netZeroChart(ref="chart" :class="{'netZeroChart--blur': hasNoData}")
         .aspect-ratio--object.flex.items-center.justify-center(v-if="hasNoData")
           .f3.fw5.gray.pb4 無資料
-      .mt2
+      .flex.items-center.justify-center
+        net-zero-legend.mr3(v-bind="legendMap.BAU")
+        net-zero-legend.mr3(v-if="legendMap.CI" v-bind="legendMap.CI")
+        net-zero-legend.mr3(v-bind="legendMap.IPCC")
+        net-zero-legend(v-bind="legendMap.PNNL")
+      .mt3
         net-zero-remark(:fields="['BASE_YEAR', 'BAU', 'COMMITMENT']")
 </template>
 <script>
 import { get } from 'lodash'
 import { interpolateCividis } from 'd3'
 import roadmap from '~/static/content/overview/net-zero-roadmap.json'
+import netZeroMeta from '~/static/content/meta/net-zero-meta.json'
 import { genC3Config, companyMixin, genNetZeroCompanyChartData, genTooltip, Y_MAX, YEAR, genTooltipRow, COLORS, PREDICT_SUFFIX } from '~/libs/netZeroUtils'
 
 const META = {
@@ -69,6 +75,35 @@ export default {
   computed: {
     hasNoData () {
       return !this.bauStats.length
+    },
+    legendMap () {
+      const ret = {
+        BAU: {
+          title: 'BAU',
+          color: META.BAU.COLOR,
+          type: 'bau'
+        },
+        IPCC: {
+          title: 'IPCC',
+          color: COLORS.IPCC,
+          tip: netZeroMeta.IPCC,
+          type: 'roadmap'
+        },
+        PNNL: {
+          title: 'PNNL',
+          color: COLORS.PNNL,
+          tip: netZeroMeta.PNNL,
+          type: 'roadmap'
+        }
+      }
+      if (this.ciStats.length) {
+        ret.CI = {
+          title: '減碳目標',
+          color: META.CI.COLOR,
+          type: 'bau'
+        }
+      }
+      return ret
     },
     stats () {
       const richBauStats = this.bauStats.map((row) => {
