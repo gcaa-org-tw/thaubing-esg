@@ -3,7 +3,7 @@
     .mw8.center.mt4.ph3
       h1.green.fw5.f3 {{company.公司名稱}}
       .green {{company.自訂產業別}} · 資本額 {{capital}} 元
-      .company__subtitle
+      .company__subtitle(v-if='isGuanshiyinn')
         net-zero-single-company(:bau-stats="bauStats" :ci-stats="ciStats" :company="company")
       .company__subtitle Environment 環境保護相關數據
       .charts
@@ -40,6 +40,7 @@
       gcaa-footer
 </template>
 <script>
+import { mapState } from 'vuex'
 import { friendlyHeader } from '~/libs/crawlerFriendly'
 import { cleanupRawStats } from '~/libs/netZeroUtils'
 export default {
@@ -84,6 +85,7 @@ export default {
     }
   }),
   computed: {
+    ...mapState({ isGuanshiyinn: 'isGuanshiyinn' }),
     capital () {
       const latestCapital = this.stats.body.reduce((latest, row) => {
         if (row.項目 === '資本額' && row.年份 > latest.年份) {
