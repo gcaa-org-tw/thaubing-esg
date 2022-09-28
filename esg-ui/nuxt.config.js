@@ -139,7 +139,8 @@ export default {
   },
 
   plausible: {
-    domain: 'thaubing-esg.gcaa.org.tw'
+    domain: 'thaubing-esg.gcaa.org.tw',
+    enableAutoOutboundTracking: true
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
