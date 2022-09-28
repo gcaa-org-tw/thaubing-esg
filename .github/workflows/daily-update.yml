@@ -12,9 +12,9 @@ env:
 
 on:
   workflow_dispatch:
-  // no need for keep rebuilding as it's stable now
-  // schedule:
-  //   - cron: '0 21 * * *'
+  # no need for keep rebuilding as it's stable now
+  # schedule:
+  #   - cron: '0 21 * * *'
 
 jobs:
   cd:
@@ -47,7 +47,7 @@ jobs:
 
       - name: Install dependencies 👨🏻‍💻
         run: npm ci --prefer-offline --no-audit
-      
+
       - name: Prepare env
         run: touch .env
 
@@ -56,8 +56,8 @@ jobs:
 
       - name: Sync latest ESG data shet
         run: ./tools/extractAll.sh
-      
-      - name: Push latest council data 
+
+      - name: Push latest council data
         uses: EndBug/add-and-commit@v8
         with:
           default_author: github_actions
