@@ -71,7 +71,8 @@ export default {
     '@nuxtjs/eslint-module',
     ['@nuxtjs/google-analytics', {
       id: 'G-LZPET9EHHH'
-    }]
+    }],
+    '~/modules/sitemapRouteGenerator'
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
@@ -84,7 +85,8 @@ export default {
     'vue-plausible',
     // https://go.nuxtjs.dev/content
     '@nuxt/content',
-    '@nuxtjs/sentry'
+    '@nuxtjs/sentry',
+    '@nuxtjs/sitemap'
   ],
 
   sentry: {
@@ -115,6 +117,11 @@ export default {
       // https://docs.sentry.io/platforms/javascript/guides/vue/configuration/options/
       release: process.env.GITHUB_SHA || 'dev'
     }
+  },
+
+  sitemap: {
+    hostname: 'https://thaubing-esg.gcaa.org.tw',
+    gzip: true
   },
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
