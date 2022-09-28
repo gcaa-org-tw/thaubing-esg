@@ -12,8 +12,9 @@ env:
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '0 21 * * *'
+  // no need for keep rebuilding as it's stable now
+  // schedule:
+  //   - cron: '0 21 * * *'
 
 jobs:
   cd:
