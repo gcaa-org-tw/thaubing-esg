@@ -23,7 +23,7 @@
       investment-teller(:stats="stats.body" :quartile="quartile" :company-map="companyMap" :year="year")
     annual-stats-table(:company-stats="companyStats" :quartile="activeQuartile")
     .industry__footer.flex.items-center.justify-end.esgContainer
-      a.industry__cta.db.br2.pv2.ph3.fw7.white(:href="downloadLink") 下載此頁資料
+      a.industry__cta.db.br2.pv2.ph3.fw7.white(:href="downloadLink" @click="trackDownload") 下載此頁資料
     .esgContainer
       gcaa-footer
 </template>
@@ -135,6 +135,14 @@ export default {
         },
         params: this.$route.params
       }
+    },
+    trackDownload () {
+      this.$plausible.trackEvent('download', {
+        props: {
+          type: 'industry',
+          id: this.industry.code
+        }
+      })
     }
   }
 }
