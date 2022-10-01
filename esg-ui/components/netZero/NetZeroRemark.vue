@@ -6,7 +6,7 @@
         span ：
       dd
         template(v-for="(token, i) in field.remark")
-          a(v-if="token.tag === 'a'" :href="token.href" target="_blank" ref="noopener") {{token.text}}
+          a(v-if="token.tag === 'a'" :href="token.href" target="_blank" rel="noopener") {{token.text}}
           span(v-else) {{token.text}}
 </template>
 <script>

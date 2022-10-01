@@ -23,7 +23,7 @@
       investment-teller(:stats="stats.body" :quartile="quartile" :company-map="companyMap" :year="year")
     annual-stats-table(:company-stats="companyStats" :quartile="activeQuartile")
     .industry__footer.flex.items-center.justify-end.esgContainer
-      a.industry__cta.db.br2.pv2.ph3.fw7.white(:href="downloadLink" @click="trackDownload") 下載此頁資料
+      a.industry__cta.db.br2.pv2.ph3.fw7.white(:href="downloadLink" @click="trackDownload" target="_blank" rel="noopener") 下載此頁資料
     .esgContainer
       gcaa-footer
 </template>
