@@ -140,7 +140,8 @@ export default {
       this.$plausible.trackEvent('download', {
         props: {
           type: 'industry',
-          id: this.industry.code
+          id: `industry-${this.industry.code}`,
+          link: this.downloadLink
         }
       })
     }
