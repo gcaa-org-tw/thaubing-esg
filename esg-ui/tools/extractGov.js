@@ -52,7 +52,8 @@ function extractISOFromCom () {
     [
       { id: '1256605170', industry: '塑膠' },
       { id: '1680588036', industry: '化學' },
-      { id: '1680588036', industry: '水泥鋼鐵半導體' }
+      { id: '1680588036', industry: '水泥鋼鐵半導體' },
+      { id: '2033120021', industry: '金融保險' }
     ],
     (data) => {
       const company = companyMap.findByStock(data.證券代號)
@@ -92,7 +93,8 @@ function extractHasCsrFromCom () {
     [
       { id: '1762045206', industry: '塑膠' },
       { id: '567687738', industry: '化學' },
-      { id: '967180348', industry: '水泥鋼鐵半導體' }
+      { id: '967180348', industry: '水泥鋼鐵半導體' },
+      { id: '0', industry: '金融保險' }
     ],
     (data) => {
       const company = companyMap.findByStock(data.證券代號)
@@ -119,7 +121,8 @@ function extractTransparencyFromCom () {
     [
       { id: '721116469', industry: '塑膠' },
       { id: '1634361752', industry: '化學' },
-      { id: '1634361752', industry: '水泥鋼鐵半導體' }
+      { id: '1634361752', industry: '水泥鋼鐵半導體' },
+      { id: '2033120021', industry: '金融保險' }
     ],
     (data) => {
       const company = companyMap.findByStock(data.證券代號)
@@ -205,10 +208,10 @@ function extractFinance (toFile = true) {
         }
         const year = Number.parseInt(data.year)
         const measures = [
-          { measure: '營業收入', value: Number.parseFloat(data.total_operating_revenue) },
-          { measure: '營業成本', value: Number.parseFloat(data.total_operating_costs) },
-          { measure: '營業費用', value: Number.parseFloat(data.total_operating_expenses) },
-          { measure: '淨利', value: Number.parseFloat(data.profit_or_loss) }
+          { measure: '營業收入', field: 'total_operating_revenue', parser: Number.parseFloat },
+          { measure: '營業成本', field: 'total_operating_costs', parser: Number.parseFloat },
+          { measure: '營業費用', field: 'total_operating_expenses', parser: Number.parseFloat },
+          { measure: '淨利', field: 'profit_or_loss', parser: Number.parseFloat },
         ]
         // check 公開資訊觀測站 for example data & unit
         // https://mops.twse.com.tw/mops/web/t146sb05
@@ -219,18 +222,24 @@ function extractFinance (toFile = true) {
           year
         }
         measures.forEach((item) => {
-          const data = {
+          const value = item.parser(data[item.field])
+          const existed = item.field in data && data[item.field] !== ''
+          const measureData = {
             ...ctx,
-            ...item
+            measure: item.measure,
+            value
           }
           if (toFile) {
-            if (Number.isNaN(data.value)) {
-              console.warn(`Field "${item.measure}" = NaN on ${company.公司名稱} / ${year}`)
+            if (Number.isNaN(value)) {
+              if (existed) {
+                // only log invalid number
+                console.warn(`Field "${item.measure}" = NaN on ${company.公司名稱} / ${year}`)
+              }
             } else {
-              appendToBoth(company, data)
+              appendToBoth(company, measureData)
             }
           } else {
-            stats.push({ company, data })
+            stats.push({ company, data: measureData })
           }
         })
       })
