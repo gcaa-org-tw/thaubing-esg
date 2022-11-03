@@ -8,7 +8,8 @@ const AutoDetectDecoderStream = require('autodetect-decoder-stream')
 const COMPANY_REPORT_URI = {
   塑膠: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRcO4BFSZGI6GGQExiWs__Y2tBu8Rs4GVTCdv6J-GDLx0CcdqD7jZMDKtDHK5nQ3A/pub?',
   化學: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQH2ytKMQE2RipT0rL4iYcNosbOs41XnSg5RRd4lwKcdgsDZfiSavBWvIqma-lIjxnWNQhb0MmVy6nx/pub?',
-  水泥鋼鐵半導體: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTQuA2j68_8X9Ywsb8uYYgkFdvIfsVbo-OWOGyxOvVAuU4X7SyWx1iW_9qwA-EGrcXj9FflHpKOgAWo/pub?'
+  水泥鋼鐵半導體: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTQuA2j68_8X9Ywsb8uYYgkFdvIfsVbo-OWOGyxOvVAuU4X7SyWx1iW_9qwA-EGrcXj9FflHpKOgAWo/pub?',
+  金融保險: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ5z5I4NiYF-5Dp8ASTgJm6ffVr_8hP1KW2Or6LoyaLMZepJcZ8Nr3gm3H2aOjrY89yb00elQEMNdP-/pub?'
 }
 
 class CompanyMap {
