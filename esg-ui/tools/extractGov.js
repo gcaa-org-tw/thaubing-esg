@@ -211,7 +211,7 @@ function extractFinance (toFile = true) {
           { measure: '營業收入', field: 'total_operating_revenue', parser: Number.parseFloat },
           { measure: '營業成本', field: 'total_operating_costs', parser: Number.parseFloat },
           { measure: '營業費用', field: 'total_operating_expenses', parser: Number.parseFloat },
-          { measure: '淨利', field: 'profit_or_loss', parser: Number.parseFloat },
+          { measure: '淨利', field: 'profit_or_loss', parser: Number.parseFloat }
         ]
         // check 公開資訊觀測站 for example data & unit
         // https://mops.twse.com.tw/mops/web/t146sb05
