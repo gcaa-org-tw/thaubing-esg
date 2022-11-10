@@ -55,6 +55,53 @@ function extractWasteFromCom () {
   )
 }
 
+function extractRawCarbonCommitment () {
+  let rawCommitmentIndex = -1
+
+  function parseSingleRow (data) {
+    if (rawCommitmentIndex < 0) {
+      // first line, find target column
+      rawCommitmentIndex = data.findIndex(header => header.includes('溫室氣體排放量減量目標'))
+      if (rawCommitmentIndex >= 0) {
+        // real column is after specified header
+        rawCommitmentIndex += 1
+      }
+      return
+    }
+    const rawCommitment = (data[rawCommitmentIndex] || '').trim()
+    // columns: 公司代號,公司名稱,資料年度
+    const company = companyMap.findByStock(data[0])
+    // example data: `資料年度：110`
+    const year = Number.parseInt(data[2].split('：')[1]) + 1911
+
+    if (company && rawCommitment) {
+      appendToBoth(company, {
+        esgCategory: 'E',
+        category: '溫室氣體排放',
+        isSelfReport: false,
+        year,
+        measure: '溫室氣體排放及減量資訊',
+        value: rawCommitment
+      })
+    }
+  }
+
+  // see data/README.md
+  // (sii = 上市、otc = 上櫃、rotc = 興櫃、pub = 公開發行)
+  return Promise.all(['sii', 'otc', 'rotc', 'pub'].map((companyType) => {
+    return new Promise((resolve, reject) => {
+      fs
+        .createReadStream(path.join(DATA_DIR, `${companyType}_company_target.csv`))
+        .pipe(new AutoDetectDecoderStream())
+        .pipe(new CsvReadableStream())
+        .on('data', parseSingleRow)
+        .on('end', () => {
+          resolve()
+        })
+    })
+  }))
+}
+
 function extractAirPollution () {
   // 空氣污染物申報
   //   空氣污染物 data/ems_p_08.csv
@@ -499,6 +546,8 @@ async function main () {
   //   總用電量
   //   再生能源用電量
   await extractPowerUsageFromCom(incomeMap)
+  // 淨零承諾
+  await extractRawCarbonCommitment()
   // 水資源
   await extractWaterUsageFromCom()
   // 廢棄物管理

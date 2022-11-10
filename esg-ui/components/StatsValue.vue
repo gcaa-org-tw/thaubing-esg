@@ -14,6 +14,8 @@
 import LongCell from './LongCell'
 // import { MAJOR_MEASURE_LIST } from '~/assets/defs'
 
+const PURE_TEXT_COLUMNS = new Set(['工安意外', '溫室氣體排放及減量資訊'])
+
 export default {
   props: {
     columnMeta: {
@@ -36,7 +38,7 @@ export default {
       // if (this.columnMeta.isSelfReport && majorMeasureList.includes(this.columnMeta.measure)) {
       //   return QuartileCell
       // } else
-      if (this.columnMeta.measure === '工安意外') {
+      if (PURE_TEXT_COLUMNS.has(this.columnMeta.measure)) {
         return LongCell
       } else {
         return 'span'
