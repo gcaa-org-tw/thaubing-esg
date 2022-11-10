@@ -78,7 +78,6 @@ function extractRawCarbonCommitment () {
       appendToBoth(company, {
         esgCategory: 'E',
         category: '溫室氣體排放',
-        isSelfReport: false,
         year,
         measure: '溫室氣體排放及減量資訊',
         value: rawCommitment
