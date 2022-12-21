@@ -14,7 +14,7 @@
 import LongCell from './LongCell'
 // import { MAJOR_MEASURE_LIST } from '~/assets/defs'
 
-const PURE_TEXT_COLUMNS = new Set(['工安意外', '溫室氣體排放及減量資訊'])
+const PURE_TEXT_COLUMNS = new Set(['工安意外', '溫室氣體減量目標說明', '溫室氣體減量承諾'])
 
 export default {
   props: {

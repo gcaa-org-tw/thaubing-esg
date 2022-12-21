@@ -55,50 +55,43 @@ function extractWasteFromCom () {
   )
 }
 
-function extractRawCarbonCommitment () {
-  let rawCommitmentIndex = -1
-
-  function parseSingleRow (data) {
-    if (rawCommitmentIndex < 0) {
-      // first line, find target column
-      rawCommitmentIndex = data.findIndex(header => header.includes('溫室氣體排放量減量目標'))
-      if (rawCommitmentIndex >= 0) {
-        // real column is after specified header
-        rawCommitmentIndex += 1
+function extractCarbonCommitment () {
+  return mergeCompanyReportStream(
+    [
+      { id: '0', industry: '上櫃溫室氣體' },
+      { id: '0', industry: '上市溫室氣體' }
+    ],
+    (data) => {
+      const company = companyMap.findByStock(data.公司代號)
+      if (!company) {
+        console.warn('company not found:', data)
+        return
       }
-      return
-    }
-    const rawCommitment = (data[rawCommitmentIndex] || '').trim()
-    // columns: 公司代號,公司名稱,資料年度
-    const company = companyMap.findByStock(data[0])
-    // example data: `資料年度：110`
-    const year = Number.parseInt(data[2].split('：')[1]) + 1911
+      const year = Number.parseInt(data.報告年度) + 1911
+      const fieldList = ['溫室氣體減量目標說明', '溫室氣體減量承諾'].map((name) => {
+        return {
+          name,
+          value: data[name]
+        }
+      })
 
-    if (company && rawCommitment) {
-      appendToBoth(company, {
+      const ctx = {
         esgCategory: 'E',
         category: '溫室氣體排放',
-        year,
-        measure: '溫室氣體排放及減量資訊',
-        value: rawCommitment
+        year
+      }
+
+      fieldList.forEach((row) => {
+        if (row.value !== '') {
+          appendToBoth(company, {
+            ...ctx,
+            measure: row.name,
+            value: row.value
+          })
+        }
       })
     }
-  }
-
-  // see data/README.md
-  // (sii = 上市、otc = 上櫃、rotc = 興櫃、pub = 公開發行)
-  return Promise.all(['sii', 'otc', 'rotc', 'pub'].map((companyType) => {
-    return new Promise((resolve, reject) => {
-      fs
-        .createReadStream(path.join(DATA_DIR, `${companyType}_company_target.csv`))
-        .pipe(new AutoDetectDecoderStream())
-        .pipe(new CsvReadableStream())
-        .on('data', parseSingleRow)
-        .on('end', () => {
-          resolve()
-        })
-    })
-  }))
+  )
 }
 
 function extractAirPollution () {
@@ -546,7 +539,7 @@ async function main () {
   //   再生能源用電量
   await extractPowerUsageFromCom(incomeMap)
   // 淨零承諾
-  await extractRawCarbonCommitment()
+  await extractCarbonCommitment()
   // 水資源
   await extractWaterUsageFromCom()
   // 廢棄物管理
