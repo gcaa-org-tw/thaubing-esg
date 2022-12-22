@@ -52,7 +52,7 @@ export default {
         return '-'
       }
       const field = this.row.stats[this.columnMeta.key]
-      if (!Number.isNaN(field.value)) {
+      if (!PURE_TEXT_COLUMNS.has(this.columnMeta.measure) && !Number.isNaN(field.value)) {
         const toFixed = 10 ** (this.columnMeta.toFixed || 0)
         const value = Math.round(field.value * toFixed) / toFixed
         return value.toLocaleString()
