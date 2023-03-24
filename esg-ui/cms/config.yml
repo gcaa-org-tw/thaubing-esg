@@ -48,14 +48,16 @@ collections:
     summary: '{{title}} / {{creationDate}}'
     identifier_field: slug
     sortable_fields: ['creationDate', 'title']
+    create: true
     editor:
       preview: false
     fields:
       - { label: '標題', name: 'title', widget: 'string' }
-      - { label: '網址名稱', name: 'slug', widget: 'string', hint: '建議以簡短的英文組成，並用 "-" 取代空白' }
-      - { label: '草稿', name: 'wip', widget: 'boolean', default: false, hint: '勾選後，將不會顯示在往站上' }
-      - { label: '總結', name: 'description', required: true, widget: 'string', hint: '給搜尋引擎、社群分享用的小短文，80 字以內' }
-      - { label: '封面圖片', name: 'coverImage', required: true, widget: 'image', allow_multiple: false, hint: '社群分享用的圖片，建議解析度：1200 x 628' }
+      - { label: '網址名稱', name: 'slug', widget: 'string', hint: '建議以簡短的英文組成，並用 "-" 取代空白，建立後就無法更改。你也可以用以下咒語，詢問 ChatGPT：「請將以下標題，轉為合適的網址名稱： xxxx （換行）合適的網址名稱，需以英文組成，並以 "-" 作為連結符號，避免空白，並盡量簡短，以十個單詞為上限」' }
+      - { label: '標為草稿', name: 'wip', widget: 'boolean', default: false, hint: '勾選後，將不會顯示在往站上' }
+      - { label: '總結', name: 'description', widget: 'string', hint: '給搜尋引擎、社群分享用的小短文，80 字以內' }
+      - { label: '封面圖片', name: 'coverImage', widget: 'image', allow_multiple: false, hint: '社群分享用的圖片，建議解析度：1200 x 628', required: false }
+      - { label: '作者', name: 'authors', widget: 'list', hint: '若有多名作者時，以半形逗號區隔' }
       - label: '文章建立時間'
         name: 'creationDate'
         widget: datetime
@@ -71,6 +73,7 @@ collections:
           name: tag
           widget: relation
           collection: 'blogTags'
+          display_fields: ['tagZh']
           value_field: 'tagEn'
           search_fields: ['tagZh']
       - { label: 'Body', name: 'body', widget: 'markdown' }
@@ -86,6 +89,6 @@ collections:
     editor:
       preview: false
     fields:
-      - { label: '華語標籤', name: 'tagZh', widget: 'string', required: true }
-      - { label: '英語標籤', name: 'tagEn', widget: 'string', required: true }
+      - { label: '華語標籤', name: 'tagZh', widget: 'string' }
+      - { label: '英語標籤', name: 'tagEn', widget: 'string' }
       - { label: 'Type', name: 'type', widget: 'hidden', default: 'blogTags' }
