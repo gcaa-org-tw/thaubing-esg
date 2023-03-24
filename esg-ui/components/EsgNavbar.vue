@@ -1,4 +1,4 @@
-<template lang="pug">
+ <template lang="pug">
   .esgNavbar.esgContainer.pt3.relative.no-repeat.cover(:class="{pb3: !isGuanshiyinn}")
     .flex.justify-between.items-start
       nuxt-link(to="/")
@@ -12,13 +12,14 @@
         nuxt-link.dn.db-ns.dim(to="/about/") 關於計畫
         nuxt-link.dn.db-ns.dim(to="/terms-of-service/") 免責聲明
         a.esgNavbar__cta.dim.db(href="https://gcaa.neticrm.tw/civicrm/contribute/transact?reset=1&id=41&utm_source=Web&utm_content=ESG_donate&utm_campaign=TB3") 捐款支持
-    a.esgNavbar__officialSite.absolute(href="https://thaubing.gcaa.org.tw/")
-      img(src="~/assets/logo.png")
-    .esgNavbar__toolbar.flex.relative(v-if="isGuanshiyinn")
-      .esgMenu
-        .esgMenu__item.flex
-          menu-item(title="ESG 資料庫" icon="db" route-name="industry-industry")
-          menu-item(title="淨零路徑模擬器" icon="net-zero" route-name="net-zero-industry")
+    slot
+      a.esgNavbar__officialSite.absolute(href="https://thaubing.gcaa.org.tw/")
+        img(src="~/assets/logo.png")
+      .esgNavbar__toolbar.flex.relative(v-if="isGuanshiyinn")
+        .esgMenu
+          .esgMenu__item.flex
+            menu-item(title="ESG 資料庫" icon="db" route-name="industry-industry")
+            menu-item(title="淨零路徑模擬器" icon="net-zero" route-name="net-zero-industry")
 </template>
 <script>
 import { mapState } from 'vuex'
