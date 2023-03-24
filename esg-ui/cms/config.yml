@@ -79,6 +79,7 @@ collections:
     folder: 'esg-ui/static/content/settings'
     filter: { field: "type", value: "blogTags"}
     identifier_field: 'tagEn'
+    summary: '{{tagZh}} / {{tagEn}}'
     slug: 'blog-tag-{{slug}}'
     format: 'frontmatter'
     create: true
