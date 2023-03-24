@@ -12,10 +12,21 @@ public_folder: /content-img
 
 # Docs: https://www.netlifycms.org/docs/configuration-options/#collections
 collections:
-  - label: 淨零模擬器
-    name: 'net-zero'
+  - label: 靜態資訊設定 | 華語
+    name: 'static'
     files:
-      - label: '欄位說明'
+      - label: '首頁'
+        name: 'landing'
+        file: 'esg-ui/static/content/meta/landing.json'
+        format: 'json'
+        editor:
+          preview: false
+        fields:
+          - { label: 標題, name: TITLE, widget: string }
+          - { label: 網站說明, name: DESP, widget: text }
+          - { label: 淨零模擬器說明, name: NET_ZERO_DESP, widget: text }
+          - { label: ESG 資料庫說明, name: ESG_DB_DESP, widget: text }
+      - label: '淨零模擬器'
         name: 'meta'
         file: 'esg-ui/static/content/meta/net-zero-meta.json'
         format: 'json'
@@ -30,3 +41,50 @@ collections:
           - { label: BAU 說明, name: BAU, widget: string }
           - { label: 企業目標標題, name: COMMITMENT_TITLE, widget: string }
           - { label: 企業目標說明, name: COMMITMENT, widget: string }
+  - label: 部落格文章 | 跨語系
+    name: 'blog'
+    folder: 'esg-ui/static/content/blog'
+    format: 'frontmatter'
+    summary: '{{title}} / {{creationDate}}'
+    identifier_field: slug
+    sortable_fields: ['creationDate', 'title']
+    editor:
+      preview: false
+    fields:
+      - { label: '標題', name: 'title', widget: 'string' }
+      - { label: '網址名稱', name: 'slug', widget: 'string', hint: '建議以簡短的英文組成，並用 "-" 取代空白' }
+      - { label: '草稿', name: 'wip', widget: 'boolean', default: false, hint: '勾選後，將不會顯示在往站上' }
+      - { label: '總結', name: 'description', required: true, widget: 'string', hint: '給搜尋引擎、社群分享用的小短文，80 字以內' }
+      - { label: '封面圖片', name: 'coverImage', required: true, widget: 'image', allow_multiple: false, hint: '社群分享用的圖片，建議解析度：1200 x 628' }
+      - label: '文章建立時間'
+        name: 'creationDate'
+        widget: datetime
+        date_format: true
+        time-format: false
+        format: YYYY-MM-DD HH:mm:ss
+      - label: 標籤
+        name: tags
+        widget: list
+        summary: '{{fields.tag}}'
+        field:
+          label: Tag
+          name: tag
+          widget: relation
+          collection: 'blogTags'
+          value_field: 'tagEn'
+          search_fields: ['tagZh']
+      - { label: 'Body', name: 'body', widget: 'markdown' }
+  - name: 'blogTags'
+    label: '部落格標籤 | 跨語系'
+    folder: 'esg-ui/static/content/settings'
+    filter: { field: "type", value: "blogTags"}
+    identifier_field: 'tagEn'
+    slug: 'blog-tag-{{slug}}'
+    format: 'frontmatter'
+    create: true
+    editor:
+      preview: false
+    fields:
+      - { label: '華語標籤', name: 'tagZh', widget: 'string', required: true }
+      - { label: '英語標籤', name: 'tagEn', widget: 'string', required: true }
+      - { label: 'Type', name: 'type', widget: 'hidden', default: 'blogTags' }
