@@ -28,6 +28,16 @@
       :cta-title="meta.NET_ZERO_CTA"
       route-name="net-zero-industry"
     )
+    .blog.esgContainer.pv4
+      h2.fw5.tc 專欄文章
+      .blog__list.mv4.mt5-ns
+        article-summary(
+          v-for="article in articles"
+          :key="article.path"
+          :article="article"
+          :tagMeta="tagDefs"
+          header-tag="h3"
+        )
     .esgContainer
       gcaa-footer
 </template>
@@ -37,10 +47,23 @@ import landingMeta from '~/static/content/meta/landing.json'
 
 export default {
   layout: 'empty',
-  // async asyncData ({ $content, params, redirect }) {
-  //   const meta = await $content('meta/landing').fetch()
-  //   return { meta }
-  // },
+  async asyncData ({ $content, params, redirect }) {
+    const articles = await $content('blog')
+      .where({
+        wip: false
+      })
+      .sortBy('creationDate', 'desc')
+      .only(['title', 'coverImage', 'tags', 'creationDate'])
+      .limit(3)
+      .fetch()
+
+    const tagDefs = await $content('settings')
+      .where({ type: 'blogTags' })
+      .only(['tagEn', 'tagZh'])
+      .fetch()
+
+    return { articles, tagDefs }
+  },
   head: friendlyHeader({
     title: landingMeta.TITLE,
     description: landingMeta.DESP
@@ -87,6 +110,30 @@ export default {
   &__cta {
     .menuItem {
       border-radius: 0.875rem;
+    }
+  }
+}
+
+.blog {
+  h2 {
+    font-size: 1.5rem;
+  }
+  &__list {
+    .articleSum + .articleSum {
+      margin-top: 1rem;
+    }
+  }
+
+  @include ns-screen {
+    &__list {
+      .articleSum + .articleSum {
+        margin-top: 0;
+      }
+      display: grid;
+      grid-template-columns: repeat(auto-fit, 19vw);
+      column-gap: 1.5rem;
+      row-gap: 2.625rem;
+      justify-content: center;
     }
   }
 }

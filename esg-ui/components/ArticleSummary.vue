@@ -4,7 +4,7 @@
       img.aspect-ratio--object(:src="coverImage" :alt="article.title")
     .mt2.flex.f6(v-if="tagList.length")
       .articleSum__tag(v-for="tag in tagList" :ke="tag") {{tag}}
-    h2.mt1.mb4.f5.f4-ns.fw5.black.lh-title {{article.title}}
+    component.mt1.mb4.f5.f4-ns.fw5.black.lh-title(:is="headerTag") {{article.title}}
     .articleSum__date.f6.lh-copy {{date}}
 </template>
 <script>
@@ -26,6 +26,10 @@ export default {
       default () {
         return []
       }
+    },
+    headerTag: {
+      type: String,
+      default: 'h2'
     }
   },
   computed: {
