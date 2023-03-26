@@ -23,7 +23,8 @@ export default {
     to () {
       let industry = this.$route.params.industry
       if (!industry) {
-        industry = this.$store.state.company.上市上櫃產業編碼
+        // default 石化業
+        industry = this.$store.state.company.上市上櫃產業編碼 || '03'
       }
       return {
         name: this.routeName,
