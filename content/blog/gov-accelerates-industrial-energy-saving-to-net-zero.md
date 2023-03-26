@@ -3,6 +3,7 @@ title: 趕上國際淨零腳步，政府要加速工業節能轉型！
 slug: gov-accelerates-industrial-energy-saving-to-net-zero
 wip: false
 description: 工業部門亟需加快腳步大幅節能！為了不讓節能政策流於政府的口號，相關規劃是否務實、施行的力度如何、能否趕上淨零轉型的急迫性，都需要社會各界積極檢視及監督。
+coverImage: /content-img/esg-db-screenshot.png
 authors:
   - 陳震遠（綠色公民行動聯盟研究員）
   - 王敏玲（地球公民基金會副執行長）
