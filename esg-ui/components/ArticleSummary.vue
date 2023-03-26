@@ -34,7 +34,7 @@ export default {
   },
   computed: {
     coverImage () {
-      return this.article.comverImage || defaultCover
+      return this.article.coverImage || defaultCover
     },
     tagList () {
       return getZhTags(this.article.tags || [], this.tagMeta)
