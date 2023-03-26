@@ -68,7 +68,8 @@
       )
       .mt4
         net-zero-remark(:fields="['BASE_YEAR', 'COMMITMENT']")
-
+    .esgContainer
+      gcaa-footer
 </template>
 <script>
 import { interpolateCividis } from 'd3'

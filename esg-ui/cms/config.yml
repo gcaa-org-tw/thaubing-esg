@@ -24,7 +24,9 @@ collections:
         fields:
           - { label: 標題, name: TITLE, widget: string }
           - { label: 網站說明, name: DESP, widget: text }
+          - { label: 淨零模擬器 CTA, name: NET_ZERO_CTA, widget: string }
           - { label: 淨零模擬器說明, name: NET_ZERO_DESP, widget: text }
+          - { label: ESG 資料庫 CTA, name: ESG_DB_CTA, widget: string }
           - { label: ESG 資料庫說明, name: ESG_DB_DESP, widget: text }
       - label: '淨零模擬器'
         name: 'meta'

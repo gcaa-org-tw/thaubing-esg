@@ -1,5 +1,5 @@
 <template lang="pug">
-  .esgFooter.bt.bw1.mv3.pv3.flex-ns.justify-between.tr.tl-ns
+  .esgFooter.bt.bw1.mt3.pt3.pb4.flex-ns.justify-between.tr.tl-ns
     .mid-gray
       .mb2
         | 由
