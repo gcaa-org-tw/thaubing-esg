@@ -27,7 +27,7 @@ export default {
         wip: false
       })
       .sortBy('creationDate', 'desc')
-      .only(['title', 'coverImage', 'tags', 'creationDate'])
+      .only(['title', 'coverImage', 'tags', 'creationDate', 'slug'])
       .fetch()
 
     const tagDefs = await $content('settings')

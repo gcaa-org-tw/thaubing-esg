@@ -53,7 +53,7 @@ export default {
         wip: false
       })
       .sortBy('creationDate', 'desc')
-      .only(['title', 'coverImage', 'tags', 'creationDate'])
+      .only(['title', 'coverImage', 'tags', 'creationDate', 'slug'])
       .limit(3)
       .fetch()
 

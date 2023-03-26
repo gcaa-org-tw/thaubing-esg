@@ -1,5 +1,5 @@
 <template lang="pug">
-  nuxt-link.articleSum(:to="article.path")
+  nuxt-link.articleSum(:to="{ name: 'blog-blog', params: { blog: article.slug } }")
     .aspect-ratio.aspect-ratio--16x9.br2.overflow-hidden.mb2
       img.aspect-ratio--object(:src="coverImage" :alt="article.title")
     .mt2.flex.f6(v-if="tagList.length")
