@@ -8,6 +8,8 @@ authors:
   - 王敏玲（地球公民基金會副執行長）
   - 林怡均（台灣氣候行動網絡研究中心研究員）
 creationDate: 2022-12-25 16:35:52
+tags:
+  - Energy Transition
 ---
 
 
