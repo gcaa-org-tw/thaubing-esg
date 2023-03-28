@@ -1,3 +1,33 @@
+landingSetting: &LANDING_SETTING
+  label: '首頁'
+  name: 'landing'
+  format: 'json'
+  editor:
+    preview: false
+  fields:
+    - { label: 標題, name: TITLE, widget: string }
+    - { label: 網站說明, name: DESP, widget: text }
+    - { label: 淨零模擬器 CTA, name: NET_ZERO_CTA, widget: string }
+    - { label: 淨零模擬器說明, name: NET_ZERO_DESP, widget: text }
+    - { label: ESG 資料庫 CTA, name: ESG_DB_CTA, widget: string }
+    - { label: ESG 資料庫說明, name: ESG_DB_DESP, widget: text }
+
+netZeroSetting: &NET_ZERO_SETTING
+  label: '淨零模擬器'
+  name: 'meta'
+  format: 'json'
+  editor:
+    preview: false
+  fields:
+    - { label: IPCC, name: IPCC, widget: string }
+    - { label: PNNL, name: PNNL, widget: string }
+    - { label: 基準年標題, name: BASE_YEAR_TITLE, widget: string }
+    - { label: 基準年說明, name: BASE_YEAR, widget: string }
+    - { label: BAU 標題, name: BAU_TITLE, widget: string }
+    - { label: BAU 說明, name: BAU, widget: string }
+    - { label: 企業目標標題, name: COMMITMENT_TITLE, widget: string }
+    - { label: 企業目標說明, name: COMMITMENT, widget: string }
+
 # publish_mode: editorial_workflow
 backend:
   name: github
@@ -15,34 +45,17 @@ collections:
   - label: 靜態資訊設定 | 華語
     name: 'static'
     files:
-      - label: '首頁'
-        name: 'landing'
+      - << : *LANDING_SETTING
         file: 'esg-ui/static/content/meta/landing.json'
-        format: 'json'
-        editor:
-          preview: false
-        fields:
-          - { label: 標題, name: TITLE, widget: string }
-          - { label: 網站說明, name: DESP, widget: text }
-          - { label: 淨零模擬器 CTA, name: NET_ZERO_CTA, widget: string }
-          - { label: 淨零模擬器說明, name: NET_ZERO_DESP, widget: text }
-          - { label: ESG 資料庫 CTA, name: ESG_DB_CTA, widget: string }
-          - { label: ESG 資料庫說明, name: ESG_DB_DESP, widget: text }
-      - label: '淨零模擬器'
-        name: 'meta'
+      - << : *NET_ZERO_SETTING
         file: 'esg-ui/static/content/meta/net-zero-meta.json'
-        format: 'json'
-        editor:
-          preview: false
-        fields:
-          - { label: IPCC, name: IPCC, widget: string }
-          - { label: PNNL, name: PNNL, widget: string }
-          - { label: 基準年標題, name: BASE_YEAR_TITLE, widget: string }
-          - { label: 基準年說明, name: BASE_YEAR, widget: string }
-          - { label: BAU 標題, name: BAU_TITLE, widget: string }
-          - { label: BAU 說明, name: BAU, widget: string }
-          - { label: 企業目標標題, name: COMMITMENT_TITLE, widget: string }
-          - { label: 企業目標說明, name: COMMITMENT, widget: string }
+  - label: 靜態資訊設定 | 英語
+    name: 'static-en'
+    files:
+      - << : *LANDING_SETTING
+        file: 'esg-ui/static/content/meta/landing-en.json'
+      - << : *NET_ZERO_SETTING
+        file: 'esg-ui/static/content/meta/net-zero-meta-en.json'
   - label: 部落格文章 | 跨語系
     name: 'blog'
     folder: 'esg-ui/static/content/blog'
