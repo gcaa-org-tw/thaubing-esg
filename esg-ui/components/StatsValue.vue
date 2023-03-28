@@ -12,9 +12,12 @@
 <script>
 // import QuartileCell from './QuartileCell'
 import LongCell from './LongCell'
+import MainSiteCell from './MainSiteCell'
 // import { MAJOR_MEASURE_LIST } from '~/assets/defs'
 
 const PURE_TEXT_COLUMNS = new Set(['工安意外', '溫室氣體減量目標說明', '溫室氣體減量承諾'])
+
+const MAIN_SITE_COLUMNS = new Set(['違反環境法規金額', '違反環境法規次數'])
 
 export default {
   props: {
@@ -40,6 +43,8 @@ export default {
       // } else
       if (PURE_TEXT_COLUMNS.has(this.columnMeta.measure)) {
         return LongCell
+      } else if (MAIN_SITE_COLUMNS.has(this.columnMeta.measure)) {
+        return MainSiteCell
       } else {
         return 'span'
       }
