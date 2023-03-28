@@ -1,22 +1,3 @@
-/*!
-  * vue-router v3.5.4
-  * (c) 2022 Evan You
-  * @license MIT
-  */
-
-/*!
- * Vue.js v2.7.8
- * (c) 2014-2022 Evan You
- * Released under the MIT License.
- */
-
-/*!
- * vuex v3.6.2
- * (c) 2021 Evan You
- * @license MIT
- */
-
-
 /**
  * @license
  * Lodash <https://lodash.com/>
@@ -25,6 +6,9 @@
  * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
  * Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
  */
+
+
+/* @license C3.js v0.7.20 | (c) C3 Team and other contributors | http://c3js.org/ */
 
 
 /*!
@@ -55,4 +39,20 @@ PERFORMANCE OF THIS SOFTWARE.
 ***************************************************************************** */
 
 
-/* @license C3.js v0.7.20 | (c) C3 Team and other contributors | http://c3js.org/ */
+/*!
+  * vue-router v3.5.4
+  * (c) 2022 Evan You
+  * @license MIT
+  */
+
+/*!
+ * Vue.js v2.7.8
+ * (c) 2014-2022 Evan You
+ * Released under the MIT License.
+ */
+
+/*!
+ * vuex v3.6.2
+ * (c) 2021 Evan You
+ * @license MIT
+ */
