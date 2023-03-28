@@ -343,9 +343,6 @@ $row-height: 3.5rem;
       &:hover {
         td, th {
           background: #f4f4f4;
-          a {
-            color: #35811C;
-          }
         }
       }
     }
