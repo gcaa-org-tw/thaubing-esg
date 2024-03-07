@@ -1,6 +1,7 @@
 # thaubing-esg > data
 
 政府端取得的公開資料說明如下
+另外儲存於：[ESG檢測儀雲端](https://drive.google.com/drive/folders/1Yq_3xqW0IQE9I0dGsmNoJRbCnd0YvX6M?usp=drive_link)
 
 - `company_twse.csv` — 公司基本資料。
   - 原始資料來源：政府資料開放平台；[上市公司基本資料](https://data.gov.tw/dataset/18419)、[上櫃公司基本資料](https://data.gov.tw/dataset/25036)、[興櫃公司基本資料](https://data.gov.tw/dataset/28568)、[公開發行公司基本資料](https://data.gov.tw/dataset/28567)
