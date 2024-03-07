@@ -1,5 +1,28 @@
 # thaubing-esg > data
 
+政府端取得的公開資料說明如下
+
+- `company_twse.csv` — 公司基本資料。
+  - 原始資料來源：政府資料開放平台；[上市公司基本資料](https://data.gov.tw/dataset/18419)、[上櫃公司基本資料](https://data.gov.tw/dataset/25036)、[興櫃公司基本資料](https://data.gov.tw/dataset/28568)、[公開發行公司基本資料](https://data.gov.tw/dataset/28567)
+  - 是否需要再整理：是，僅保留所需欄位
+  - 手動更新頻率：每季
+- `ems_s_01.csv` － 環境保護許可管理系統(暨解除列管)對象基本資料。
+  - 原始資料來源：環境資料開放平臺；[環境保護許可管理系統(暨解除列管)對象基本資料](https://data.moenv.gov.tw/dataset/detail/EMS_S_01)
+  - 是否需要再整理：否
+  - 手動更新頻率：每季
+- `ems_p_08.csv` － 各工廠空氣污染物排放資料。
+  - 原始資料來源：環境資料開放平臺；[各工廠空氣污染物排放資料](https://data.moenv.gov.tw/dataset/detail/EMS_P_08)
+  - 是否需要再整理：否
+  - 手動更新頻率：每季
+- `ems_p_46.csv` － 列管事業污染源裁處資料。
+  - 原始資料來源：環境資料開放平臺；[列管事業污染源裁處資料](https://data.moenv.gov.tw/dataset/detail/EMS_P_46)
+  - 是否需要再整理：是，移除不計入項目
+  - 手動更新頻率：每月
+- `ghg_p_01.csv` － 溫室氣體年排放量。
+  - 原始資料來源：環境資料開放平臺；[溫室氣體年排放量](https://data.moenv.gov.tw/dataset/detail/GHG_P_01)
+  - 是否需要再整理：否
+  - 手動更新頻率：每年
+
 爬蟲所得的未清理原始資料，另存放於[thaubing-esg-raw-data](https://github.com/gcaa-org-tw/thaubing-esg-raw-data)
 
 - `company.csv` — 公司登記基本資料。原始資料來源：經濟部商業司
