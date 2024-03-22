@@ -1,5 +1,6 @@
 const fs = require('fs')
 const path = require('path')
+const zlib = require('zlib')
 const { get } = require('lodash')
 const CsvReadableStream = require('csv-reader')
 const AutoDetectDecoderStream = require('autodetect-decoder-stream')
@@ -102,7 +103,8 @@ function extractAirPollution () {
   const annualSum = {}
   return new Promise((resolve, reject) => {
     fs
-      .createReadStream(path.join(DATA_DIR, 'ems_p_08.csv'))
+      .createReadStream(path.join(DATA_DIR, 'ems_p_08.csv.gz'))
+      .pipe(zlib.createGunzip())
       .pipe(new AutoDetectDecoderStream())
       .pipe(new CsvReadableStream({ asObject: true }))
       .on('data', (data) => {
@@ -178,19 +180,20 @@ async function extractPenalty () {
 
   return new Promise((resolve, reject) => {
     fs
-      .createReadStream(path.join(DATA_DIR, 'ems_p_46_20211015.csv'))
+      .createReadStream(path.join(DATA_DIR, 'ems_p_46.csv.gz'))
+      .pipe(zlib.createGunzip())
       .pipe(new AutoDetectDecoderStream())
       .pipe(new CsvReadableStream({ asObject: true }))
       .on('data', (data) => {
-        const company = companyMap.findByEmsId(data.EMS_NO)
+        const company = companyMap.findByEmsId(data.ems_no)
         if (!company) {
           return
         }
 
-        const year = (new Date(data.PENALTY_DATE)).getFullYear()
-        const penalty = Number.parseFloat(data.PENALTY_MONEY)
+        const year = (new Date(data.penalty_date)).getFullYear()
+        const penalty = Number.parseFloat(data.penalty_money)
 
-        const reason = data.TRANSGRESS_LAW
+        const reason = data.transgress_law
         let penaltyType = 'misc'
         // let's do O(m*n) for now XD
         // as this is the simplest way to match reason

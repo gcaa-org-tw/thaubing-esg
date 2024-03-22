@@ -7,6 +7,7 @@
   - 原始資料來源：政府資料開放平台；[上市公司基本資料](https://data.gov.tw/dataset/18419)、[上櫃公司基本資料](https://data.gov.tw/dataset/25036)、[興櫃公司基本資料](https://data.gov.tw/dataset/28568)、[公開發行公司基本資料](https://data.gov.tw/dataset/28567)
   - 是否需要再整理：是，僅保留所需欄位
   - 手動更新頻率：每季
+  - 整理後，一併更新至[線上試算表](https://docs.google.com/spreadsheets/d/1MlHvku53sILjjP9asTQSm8f7zsome0FpqiKx9BEXlzQ/edit#gid=0)，供相關網站使用
 - `ems_s_01.csv` － 環境保護許可管理系統(暨解除列管)對象基本資料。
   - 原始資料來源：環境資料開放平臺；[環境保護許可管理系統(暨解除列管)對象基本資料](https://data.moenv.gov.tw/dataset/detail/EMS_S_01)
   - 是否需要再整理：否
