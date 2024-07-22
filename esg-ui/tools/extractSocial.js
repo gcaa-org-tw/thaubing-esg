@@ -2,7 +2,7 @@ const fs = require('fs')
 const path = require('path')
 const CsvReadableStream = require('csv-reader')
 const AutoDetectDecoderStream = require('autodetect-decoder-stream')
-const { companyMap, mergeCompanyReportStream } = require('./utils')
+const { companyMap, mergeCompanyReportStream, ANNUAL_REPORT_MAP, cs2v } = require('./utils')
 const { appendToBoth, finished } = require('./csvLogger')
 
 const DATA_DIR = path.join(__dirname, '../../data')
@@ -13,14 +13,15 @@ function extractWorkInjury () {
       { id: '1315041422', industry: '塑膠' },
       { id: '748457616', industry: '化學' },
       { id: '748457616', industry: '水泥鋼鐵半導體' },
-      { id: '624140339', industry: '金融保險' }
+      { id: '624140339', industry: '金融保險' },
+      ...ANNUAL_REPORT_MAP.get('二零二一')
     ],
     (data) => {
       const company = companyMap.findByStock(data.證券代號)
       if (!company) {
         return
       }
-      const year = data.報告書年度
+      const year = cs2v(data, '報告書年度', '年份')
 
       const ctx = {
         esgCategory: 'S',
@@ -54,14 +55,15 @@ function extractCrew () {
       { id: '1069906267', industry: '塑膠' },
       { id: '572772205', industry: '化學' },
       { id: '572772205', industry: '水泥鋼鐵半導體' },
-      { id: '624140339', industry: '金融保險' }
+      { id: '624140339', industry: '金融保險' },
+      ...ANNUAL_REPORT_MAP.get('二零二一')
     ],
     (data) => {
       const company = companyMap.findByStock(data.證券代號)
       if (!company) {
         return
       }
-      const year = data.報告書年度
+      const year = cs2v(data, '報告書年度', '年份')
       const total = data['總人數\n（前兩項加總）']
 
       const ctx = {

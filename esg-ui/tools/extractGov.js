@@ -2,7 +2,7 @@ const fs = require('fs')
 const path = require('path')
 const CsvReadableStream = require('csv-reader')
 const AutoDetectDecoderStream = require('autodetect-decoder-stream')
-const { companyMap, createCompanyReportStream, mergeCompanyReportStream } = require('./utils')
+const { companyMap, createCompanyReportStream, mergeCompanyReportStream, ANNUAL_REPORT_MAP, cs2v } = require('./utils')
 const { appendToBoth, finished, appendIndustry } = require('./csvLogger')
 
 const DATA_DIR = path.join(__dirname, '../../data')
@@ -15,7 +15,7 @@ async function extractEsgIndexFromCom () {
         if (!company) {
           return
         }
-        const year = data.報告書年度
+        const year = cs2v(data, '報告書年度', '年份')
         const indexList = [
           '中國信託臺灣ESG永續關鍵半導體ETF基金',
           '元大臺灣ESG永續ETF基金',
@@ -53,14 +53,15 @@ function extractISOFromCom () {
       { id: '1256605170', industry: '塑膠' },
       { id: '1680588036', industry: '化學' },
       { id: '1680588036', industry: '水泥鋼鐵半導體' },
-      { id: '2033120021', industry: '金融保險' }
+      { id: '2033120021', industry: '金融保險' },
+      ...ANNUAL_REPORT_MAP.get('二零二一')
     ],
     (data) => {
       const company = companyMap.findByStock(data.證券代號)
       if (!company) {
         return
       }
-      const year = data.報告書年度
+      const year = cs2v(data, '報告書年度', '年份')
 
       const ctx = {
         esgCategory: 'G',
@@ -94,15 +95,22 @@ function extractHasCsrFromCom () {
       { id: '1762045206', industry: '塑膠' },
       { id: '567687738', industry: '化學' },
       { id: '967180348', industry: '水泥鋼鐵半導體' },
-      { id: '0', industry: '金融保險' }
+      { id: '0', industry: '金融保險' },
+      ...ANNUAL_REPORT_MAP.get('二零二一')
     ],
     (data) => {
       const company = companyMap.findByStock(data.證券代號)
       if (!company) {
         return
       }
-      const year = data.報告書年度
-      const value = data.是否編撰報告書
+      const year = cs2v(data, '報告書年度', '年份')
+      let value = cs2v(data, '是否編撰報告書', '是否依循ISO 14064盤查')
+
+      if (year >= '2021') {
+        // since 2021, we only collect 有報告書的公司
+        // if we find a company from spreadsheet, it has CSR report
+        value = '是'
+      }
 
       appendToBoth(company, {
         esgCategory: 'G',
@@ -122,14 +130,15 @@ function extractTransparencyFromCom () {
       { id: '721116469', industry: '塑膠' },
       { id: '1634361752', industry: '化學' },
       { id: '1634361752', industry: '水泥鋼鐵半導體' },
-      { id: '2033120021', industry: '金融保險' }
+      { id: '2033120021', industry: '金融保險' },
+      ...ANNUAL_REPORT_MAP.get('二零二一')
     ],
     (data) => {
       const company = companyMap.findByStock(data.證券代號)
       if (!company) {
         return
       }
-      const year = data.報告書年度
+      const year = cs2v(data, '報告書年度', '年份')
 
       const ctx = {
         esgCategory: 'G',

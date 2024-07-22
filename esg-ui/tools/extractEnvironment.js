@@ -4,7 +4,7 @@ const zlib = require('zlib')
 const { get } = require('lodash')
 const CsvReadableStream = require('csv-reader')
 const AutoDetectDecoderStream = require('autodetect-decoder-stream')
-const { companyMap, mergeCompanyReportStream } = require('./utils')
+const { companyMap, mergeCompanyReportStream, cs2v, ANNUAL_REPORT_MAP } = require('./utils')
 const { appendToBoth, finished, appendCompany, appendIndustry } = require('./csvLogger')
 const { extractFinance } = require('./extractGov')
 
@@ -18,7 +18,8 @@ function extractWasteFromCom () {
       { id: '410840005', industry: '塑膠' },
       { id: '30305318', industry: '化學' },
       { id: '30305318', industry: '水泥鋼鐵半導體' },
-      { id: '982518729', industry: '金融保險' }
+      { id: '982518729', industry: '金融保險' },
+      ...ANNUAL_REPORT_MAP.get('二零二一')
     ],
     (data) => {
       const company = companyMap.findByStock(data.證券代號)
@@ -26,7 +27,7 @@ function extractWasteFromCom () {
         console.warn('company not found:', data)
         return
       }
-      const year = data.報告書年度
+      const year = cs2v(data, '報告書年度', '年份')
       const fieldList = ['一般事業廢棄物', '有害事業廢棄物', '資源化再利用'].map((name) => {
         return {
           name,
@@ -281,14 +282,15 @@ function extractWaterUsageFromCom () {
       { id: '903558775', industry: '塑膠' },
       { id: '137179509', industry: '化學' },
       { id: '137179509', industry: '水泥鋼鐵半導體' },
-      { id: '982518729', industry: '金融保險' }
+      { id: '982518729', industry: '金融保險' },
+      ...ANNUAL_REPORT_MAP.get('二零二一')
     ],
     (data) => {
       const company = companyMap.findByStock(data.證券代號)
       if (!company) {
         return
       }
-      const year = data.報告書年度
+      const year = cs2v(data, '報告書年度', '年份')
       const fieldList = ['總取水量', '回收水量', '耗用水量', '排放水量'].map((name) => {
         return {
           name: name.replace(/（.*）/g, ''),
@@ -324,19 +326,20 @@ function extractPowerUsageFromCom (incomeMap) {
       { id: '1196916811', industry: '塑膠' },
       { id: '1218075634', industry: '化學' },
       { id: '1218075634', industry: '水泥鋼鐵半導體' },
-      { id: '982518729', industry: '金融保險' }
+      { id: '982518729', industry: '金融保險' },
+      ...ANNUAL_REPORT_MAP.get('二零二一')
     ],
     (data) => {
       const company = companyMap.findByStock(data.證券代號)
       if (!company) {
         return
       }
-      const year = data.報告書年度
+      const year = cs2v(data, '報告書年度', '年份')
       const total = data['年度總用電量']
       const fieldList = [
-        { name: '總用電量', value: total, unit: data['用電量單位'] },
-        { name: '再生能源設置量', value: data['再生能源裝置容量'], unit: data['裝置容量單位'] },
-        { name: '再生能源發電量', value: data['再生能源發電量'], unit: data['發電量單位'] }
+        { name: '總用電量', value: total, unit: cs2v(data, '用電量單位', '年度總用電量-單位') },
+        { name: '再生能源設置量', value: data['再生能源裝置容量'], unit: cs2v(data, '裝置容量單位', '再生能源裝置容量-單位') },
+        { name: '再生能源發電量', value: data['再生能源發電量'], unit: cs2v(data, '發電量單位', '再生能源發電量-單位') }
       ]
 
       const ctx = {
@@ -377,14 +380,15 @@ function extractGhGasFromCom (incomeMap) {
       { id: '440421747', industry: '塑膠' },
       { id: '842330154', industry: '化學' },
       { id: '842330154', industry: '水泥鋼鐵半導體' },
-      { id: '982518729', industry: '金融保險' }
+      { id: '982518729', industry: '金融保險' },
+      ...ANNUAL_REPORT_MAP.get('二零二一')
     ],
     (data) => {
       const company = companyMap.findByStock(data.證券代號)
       if (!company) {
         return
       }
-      const year = data.報告書年度
+      const year = cs2v(data, '報告書年度', '年份')
       const totList = [
         { name: '範疇一直接排放', value: data['範疇一（值）'] },
         { name: '範疇二間接排放', value: data['範疇二（值）'] },
