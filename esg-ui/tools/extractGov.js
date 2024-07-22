@@ -54,7 +54,8 @@ function extractISOFromCom () {
       { id: '1680588036', industry: '化學' },
       { id: '1680588036', industry: '水泥鋼鐵半導體' },
       { id: '2033120021', industry: '金融保險' },
-      ...ANNUAL_REPORT_MAP.get('二零二一')
+      ...ANNUAL_REPORT_MAP.get('二零二一'),
+      ...ANNUAL_REPORT_MAP.get('二零二二')
     ],
     (data) => {
       const company = companyMap.findByStock(data.證券代號)
@@ -96,7 +97,8 @@ function extractHasCsrFromCom () {
       { id: '567687738', industry: '化學' },
       { id: '967180348', industry: '水泥鋼鐵半導體' },
       { id: '0', industry: '金融保險' },
-      ...ANNUAL_REPORT_MAP.get('二零二一')
+      ...ANNUAL_REPORT_MAP.get('二零二一'),
+      ...ANNUAL_REPORT_MAP.get('二零二二')
     ],
     (data) => {
       const company = companyMap.findByStock(data.證券代號)
@@ -131,7 +133,8 @@ function extractTransparencyFromCom () {
       { id: '1634361752', industry: '化學' },
       { id: '1634361752', industry: '水泥鋼鐵半導體' },
       { id: '2033120021', industry: '金融保險' },
-      ...ANNUAL_REPORT_MAP.get('二零二一')
+      ...ANNUAL_REPORT_MAP.get('二零二一'),
+      ...ANNUAL_REPORT_MAP.get('二零二二')
     ],
     (data) => {
       const company = companyMap.findByStock(data.證券代號)

@@ -19,7 +19,8 @@ function extractWasteFromCom () {
       { id: '30305318', industry: '化學' },
       { id: '30305318', industry: '水泥鋼鐵半導體' },
       { id: '982518729', industry: '金融保險' },
-      ...ANNUAL_REPORT_MAP.get('二零二一')
+      ...ANNUAL_REPORT_MAP.get('二零二一'),
+      ...ANNUAL_REPORT_MAP.get('二零二二')
     ],
     (data) => {
       const company = companyMap.findByStock(data.證券代號)
@@ -283,7 +284,8 @@ function extractWaterUsageFromCom () {
       { id: '137179509', industry: '化學' },
       { id: '137179509', industry: '水泥鋼鐵半導體' },
       { id: '982518729', industry: '金融保險' },
-      ...ANNUAL_REPORT_MAP.get('二零二一')
+      ...ANNUAL_REPORT_MAP.get('二零二一'),
+      ...ANNUAL_REPORT_MAP.get('二零二二')
     ],
     (data) => {
       const company = companyMap.findByStock(data.證券代號)
@@ -327,7 +329,8 @@ function extractPowerUsageFromCom (incomeMap) {
       { id: '1218075634', industry: '化學' },
       { id: '1218075634', industry: '水泥鋼鐵半導體' },
       { id: '982518729', industry: '金融保險' },
-      ...ANNUAL_REPORT_MAP.get('二零二一')
+      ...ANNUAL_REPORT_MAP.get('二零二一'),
+      ...ANNUAL_REPORT_MAP.get('二零二二')
     ],
     (data) => {
       const company = companyMap.findByStock(data.證券代號)
@@ -381,7 +384,8 @@ function extractGhGasFromCom (incomeMap) {
       { id: '842330154', industry: '化學' },
       { id: '842330154', industry: '水泥鋼鐵半導體' },
       { id: '982518729', industry: '金融保險' },
-      ...ANNUAL_REPORT_MAP.get('二零二一')
+      ...ANNUAL_REPORT_MAP.get('二零二一'),
+      ...ANNUAL_REPORT_MAP.get('二零二二')
     ],
     (data) => {
       const company = companyMap.findByStock(data.證券代號)

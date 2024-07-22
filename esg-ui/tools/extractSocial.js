@@ -14,7 +14,8 @@ function extractWorkInjury () {
       { id: '748457616', industry: '化學' },
       { id: '748457616', industry: '水泥鋼鐵半導體' },
       { id: '624140339', industry: '金融保險' },
-      ...ANNUAL_REPORT_MAP.get('二零二一')
+      ...ANNUAL_REPORT_MAP.get('二零二一'),
+      ...ANNUAL_REPORT_MAP.get('二零二二')
     ],
     (data) => {
       const company = companyMap.findByStock(data.證券代號)
@@ -56,7 +57,8 @@ function extractCrew () {
       { id: '572772205', industry: '化學' },
       { id: '572772205', industry: '水泥鋼鐵半導體' },
       { id: '624140339', industry: '金融保險' },
-      ...ANNUAL_REPORT_MAP.get('二零二一')
+      ...ANNUAL_REPORT_MAP.get('二零二一'),
+      ...ANNUAL_REPORT_MAP.get('二零二二')
     ],
     (data) => {
       const company = companyMap.findByStock(data.證券代號)
