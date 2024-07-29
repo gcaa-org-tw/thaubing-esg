@@ -67,7 +67,7 @@ export default {
       return industry || industries[0]
     },
     year () {
-      return this.$route.query.year || '2020'
+      return this.$route.query.year || '2022'
     },
     yearList () {
       return [...new Set(this.stats.body.map(stat => stat.年份))]
