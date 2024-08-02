@@ -9,6 +9,8 @@ const environment = [
   { subCat: '溫室氣體排放', measure: '範疇三其他排放', isSelfReport: true, unit: '公噸CO2e', toFixed: 2 },
   { subCat: '溫室氣體排放', measure: '直接＋間接排放', isSelfReport: true, unit: '公噸CO2e', toFixed: 2 },
   { subCat: '溫室氣體排放', measure: '碳密集度', isSelfReport: true, unit: '公噸CO2e/億元', toFixed: 2 },
+  { subCat: '溫室氣體排放', measure: '溫室氣體減量目標說明', unit: '' },
+  { subCat: '溫室氣體排放', measure: '溫室氣體減量承諾', unit: '' },
   { subCat: '溫室氣體排放', measure: '碳定價', isSelfReport: true, isFake: true },
   { subCat: '能源使用狀況', measure: '總用電量', unit: '度', isSelfReport: true },
   { subCat: '能源使用狀況', measure: '再生能源設置量', unit: 'KW', isSelfReport: true },

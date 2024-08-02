@@ -2,7 +2,7 @@ const fs = require('fs')
 const path = require('path')
 const CsvReadableStream = require('csv-reader')
 const AutoDetectDecoderStream = require('autodetect-decoder-stream')
-const { companyMap, createCompanyReportStream, mergeCompanyReportStream } = require('./utils')
+const { companyMap, createCompanyReportStream, mergeCompanyReportStream, ANNUAL_REPORT_MAP, cs2v } = require('./utils')
 const { appendToBoth, finished, appendIndustry } = require('./csvLogger')
 
 const DATA_DIR = path.join(__dirname, '../../data')
@@ -15,7 +15,7 @@ async function extractEsgIndexFromCom () {
         if (!company) {
           return
         }
-        const year = data.報告書年度
+        const year = cs2v(data, '報告書年度', '年份')
         const indexList = [
           '中國信託臺灣ESG永續關鍵半導體ETF基金',
           '元大臺灣ESG永續ETF基金',
@@ -52,14 +52,17 @@ function extractISOFromCom () {
     [
       { id: '1256605170', industry: '塑膠' },
       { id: '1680588036', industry: '化學' },
-      { id: '1680588036', industry: '水泥鋼鐵半導體' }
+      { id: '1680588036', industry: '水泥鋼鐵半導體' },
+      { id: '2033120021', industry: '金融保險' },
+      ...ANNUAL_REPORT_MAP.get('二零二一'),
+      ...ANNUAL_REPORT_MAP.get('二零二二')
     ],
     (data) => {
       const company = companyMap.findByStock(data.證券代號)
       if (!company) {
         return
       }
-      const year = data.報告書年度
+      const year = cs2v(data, '報告書年度', '年份')
 
       const ctx = {
         esgCategory: 'G',
@@ -92,15 +95,24 @@ function extractHasCsrFromCom () {
     [
       { id: '1762045206', industry: '塑膠' },
       { id: '567687738', industry: '化學' },
-      { id: '967180348', industry: '水泥鋼鐵半導體' }
+      { id: '967180348', industry: '水泥鋼鐵半導體' },
+      { id: '0', industry: '金融保險' },
+      ...ANNUAL_REPORT_MAP.get('二零二一'),
+      ...ANNUAL_REPORT_MAP.get('二零二二')
     ],
     (data) => {
       const company = companyMap.findByStock(data.證券代號)
       if (!company) {
         return
       }
-      const year = data.報告書年度
-      const value = data.是否編撰報告書
+      const year = cs2v(data, '報告書年度', '年份')
+      let value = cs2v(data, '是否編撰報告書', '是否依循ISO 14064盤查')
+
+      if (year >= '2021') {
+        // since 2021, we only collect 有報告書的公司
+        // if we find a company from spreadsheet, it has CSR report
+        value = '是'
+      }
 
       appendToBoth(company, {
         esgCategory: 'G',
@@ -119,14 +131,17 @@ function extractTransparencyFromCom () {
     [
       { id: '721116469', industry: '塑膠' },
       { id: '1634361752', industry: '化學' },
-      { id: '1634361752', industry: '水泥鋼鐵半導體' }
+      { id: '1634361752', industry: '水泥鋼鐵半導體' },
+      { id: '2033120021', industry: '金融保險' },
+      ...ANNUAL_REPORT_MAP.get('二零二一'),
+      ...ANNUAL_REPORT_MAP.get('二零二二')
     ],
     (data) => {
       const company = companyMap.findByStock(data.證券代號)
       if (!company) {
         return
       }
-      const year = data.報告書年度
+      const year = cs2v(data, '報告書年度', '年份')
 
       const ctx = {
         esgCategory: 'G',
@@ -205,10 +220,10 @@ function extractFinance (toFile = true) {
         }
         const year = Number.parseInt(data.year)
         const measures = [
-          { measure: '營業收入', value: Number.parseFloat(data.total_operating_revenue) },
-          { measure: '營業成本', value: Number.parseFloat(data.total_operating_costs) },
-          { measure: '營業費用', value: Number.parseFloat(data.total_operating_expenses) },
-          { measure: '淨利', value: Number.parseFloat(data.profit_or_loss) }
+          { measure: '營業收入', field: 'total_operating_revenue', parser: Number.parseFloat },
+          { measure: '營業成本', field: 'total_operating_costs', parser: Number.parseFloat },
+          { measure: '營業費用', field: 'total_operating_expenses', parser: Number.parseFloat },
+          { measure: '淨利', field: 'profit_or_loss', parser: Number.parseFloat }
         ]
         // check 公開資訊觀測站 for example data & unit
         // https://mops.twse.com.tw/mops/web/t146sb05
@@ -219,18 +234,24 @@ function extractFinance (toFile = true) {
           year
         }
         measures.forEach((item) => {
-          const data = {
+          const value = item.parser(data[item.field])
+          const existed = item.field in data && data[item.field] !== ''
+          const measureData = {
             ...ctx,
-            ...item
+            measure: item.measure,
+            value
           }
           if (toFile) {
-            if (Number.isNaN(data.value)) {
-              console.warn(`Field "${item.measure}" = NaN on ${company.公司名稱} / ${year}`)
+            if (Number.isNaN(value)) {
+              if (existed) {
+                // only log invalid number
+                console.warn(`Field "${item.measure}" = NaN on ${company.公司名稱} / ${year}`)
+              }
             } else {
-              appendToBoth(company, data)
+              appendToBoth(company, measureData)
             }
           } else {
-            stats.push({ company, data })
+            stats.push({ company, data: measureData })
           }
         })
       })

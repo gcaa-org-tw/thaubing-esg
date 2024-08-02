@@ -1,9 +1,10 @@
 const fs = require('fs')
 const path = require('path')
+const zlib = require('zlib')
 const { get } = require('lodash')
 const CsvReadableStream = require('csv-reader')
 const AutoDetectDecoderStream = require('autodetect-decoder-stream')
-const { companyMap, mergeCompanyReportStream } = require('./utils')
+const { companyMap, mergeCompanyReportStream, cs2v, ANNUAL_REPORT_MAP } = require('./utils')
 const { appendToBoth, finished, appendCompany, appendIndustry } = require('./csvLogger')
 const { extractFinance } = require('./extractGov')
 
@@ -16,7 +17,10 @@ function extractWasteFromCom () {
     [
       { id: '410840005', industry: '塑膠' },
       { id: '30305318', industry: '化學' },
-      { id: '30305318', industry: '水泥鋼鐵半導體' }
+      { id: '30305318', industry: '水泥鋼鐵半導體' },
+      { id: '982518729', industry: '金融保險' },
+      ...ANNUAL_REPORT_MAP.get('二零二一'),
+      ...ANNUAL_REPORT_MAP.get('二零二二')
     ],
     (data) => {
       const company = companyMap.findByStock(data.證券代號)
@@ -24,7 +28,7 @@ function extractWasteFromCom () {
         console.warn('company not found:', data)
         return
       }
-      const year = data.報告書年度
+      const year = cs2v(data, '報告書年度', '年份')
       const fieldList = ['一般事業廢棄物', '有害事業廢棄物', '資源化再利用'].map((name) => {
         return {
           name,
@@ -54,6 +58,45 @@ function extractWasteFromCom () {
   )
 }
 
+function extractCarbonCommitment () {
+  return mergeCompanyReportStream(
+    [
+      { id: '0', industry: '上櫃溫室氣體' },
+      { id: '0', industry: '上市溫室氣體' }
+    ],
+    (data) => {
+      const company = companyMap.findByStock(data.公司代號)
+      if (!company) {
+        console.warn('company not found:', data)
+        return
+      }
+      const year = Number.parseInt(data.報告年度) + 1911
+      const fieldList = ['溫室氣體減量目標說明', '溫室氣體減量承諾'].map((name) => {
+        return {
+          name,
+          value: data[name]
+        }
+      })
+
+      const ctx = {
+        esgCategory: 'E',
+        category: '溫室氣體排放',
+        year
+      }
+
+      fieldList.forEach((row) => {
+        if (row.value !== '') {
+          appendToBoth(company, {
+            ...ctx,
+            measure: row.name,
+            value: row.value
+          })
+        }
+      })
+    }
+  )
+}
+
 function extractAirPollution () {
   // 空氣污染物申報
   //   空氣污染物 data/ems_p_08.csv
@@ -62,7 +105,8 @@ function extractAirPollution () {
   const annualSum = {}
   return new Promise((resolve, reject) => {
     fs
-      .createReadStream(path.join(DATA_DIR, 'ems_p_08.csv'))
+      .createReadStream(path.join(DATA_DIR, 'ems_p_08.csv.gz'))
+      .pipe(zlib.createGunzip())
       .pipe(new AutoDetectDecoderStream())
       .pipe(new CsvReadableStream({ asObject: true }))
       .on('data', (data) => {
@@ -138,19 +182,20 @@ async function extractPenalty () {
 
   return new Promise((resolve, reject) => {
     fs
-      .createReadStream(path.join(DATA_DIR, 'ems_p_46_20211015.csv'))
+      .createReadStream(path.join(DATA_DIR, 'ems_p_46.csv.gz'))
+      .pipe(zlib.createGunzip())
       .pipe(new AutoDetectDecoderStream())
       .pipe(new CsvReadableStream({ asObject: true }))
       .on('data', (data) => {
-        const company = companyMap.findByEmsId(data.EMS_NO)
+        const company = companyMap.findByEmsId(data.ems_no)
         if (!company) {
           return
         }
 
-        const year = (new Date(data.PENALTY_DATE)).getFullYear()
-        const penalty = Number.parseFloat(data.PENALTY_MONEY)
+        const year = (new Date(data.penalty_date)).getFullYear()
+        const penalty = Number.parseFloat(data.penalty_money)
 
-        const reason = data.TRANSGRESS_LAW
+        const reason = data.transgress_law
         let penaltyType = 'misc'
         // let's do O(m*n) for now XD
         // as this is the simplest way to match reason
@@ -237,14 +282,17 @@ function extractWaterUsageFromCom () {
     [
       { id: '903558775', industry: '塑膠' },
       { id: '137179509', industry: '化學' },
-      { id: '137179509', industry: '水泥鋼鐵半導體' }
+      { id: '137179509', industry: '水泥鋼鐵半導體' },
+      { id: '982518729', industry: '金融保險' },
+      ...ANNUAL_REPORT_MAP.get('二零二一'),
+      ...ANNUAL_REPORT_MAP.get('二零二二')
     ],
     (data) => {
       const company = companyMap.findByStock(data.證券代號)
       if (!company) {
         return
       }
-      const year = data.報告書年度
+      const year = cs2v(data, '報告書年度', '年份')
       const fieldList = ['總取水量', '回收水量', '耗用水量', '排放水量'].map((name) => {
         return {
           name: name.replace(/（.*）/g, ''),
@@ -279,19 +327,22 @@ function extractPowerUsageFromCom (incomeMap) {
     [
       { id: '1196916811', industry: '塑膠' },
       { id: '1218075634', industry: '化學' },
-      { id: '1218075634', industry: '水泥鋼鐵半導體' }
+      { id: '1218075634', industry: '水泥鋼鐵半導體' },
+      { id: '982518729', industry: '金融保險' },
+      ...ANNUAL_REPORT_MAP.get('二零二一'),
+      ...ANNUAL_REPORT_MAP.get('二零二二')
     ],
     (data) => {
       const company = companyMap.findByStock(data.證券代號)
       if (!company) {
         return
       }
-      const year = data.報告書年度
+      const year = cs2v(data, '報告書年度', '年份')
       const total = data['年度總用電量']
       const fieldList = [
-        { name: '總用電量', value: total, unit: data['用電量單位'] },
-        { name: '再生能源設置量', value: data['再生能源裝置容量'], unit: data['裝置容量單位'] },
-        { name: '再生能源發電量', value: data['再生能源發電量'], unit: data['發電量單位'] }
+        { name: '總用電量', value: total, unit: cs2v(data, '用電量單位', '年度總用電量-單位') },
+        { name: '再生能源設置量', value: data['再生能源裝置容量'], unit: cs2v(data, '裝置容量單位', '再生能源裝置容量-單位') },
+        { name: '再生能源發電量', value: data['再生能源發電量'], unit: cs2v(data, '發電量單位', '再生能源發電量-單位') }
       ]
 
       const ctx = {
@@ -331,14 +382,17 @@ function extractGhGasFromCom (incomeMap) {
     [
       { id: '440421747', industry: '塑膠' },
       { id: '842330154', industry: '化學' },
-      { id: '842330154', industry: '水泥鋼鐵半導體' }
+      { id: '842330154', industry: '水泥鋼鐵半導體' },
+      { id: '982518729', industry: '金融保險' },
+      ...ANNUAL_REPORT_MAP.get('二零二一'),
+      ...ANNUAL_REPORT_MAP.get('二零二二')
     ],
     (data) => {
       const company = companyMap.findByStock(data.證券代號)
       if (!company) {
         return
       }
-      const year = data.報告書年度
+      const year = cs2v(data, '報告書年度', '年份')
       const totList = [
         { name: '範疇一直接排放', value: data['範疇一（值）'] },
         { name: '範疇二間接排放', value: data['範疇二（值）'] },
@@ -495,6 +549,8 @@ async function main () {
   //   總用電量
   //   再生能源用電量
   await extractPowerUsageFromCom(incomeMap)
+  // 淨零承諾
+  await extractCarbonCommitment()
   // 水資源
   await extractWaterUsageFromCom()
   // 廢棄物管理

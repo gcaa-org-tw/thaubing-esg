@@ -12,7 +12,12 @@
 <script>
 // import QuartileCell from './QuartileCell'
 import LongCell from './LongCell'
+import MainSiteCell from './MainSiteCell'
 // import { MAJOR_MEASURE_LIST } from '~/assets/defs'
+
+const PURE_TEXT_COLUMNS = new Set(['工安意外', '溫室氣體減量目標說明', '溫室氣體減量承諾'])
+
+const MAIN_SITE_COLUMNS = new Set(['違反環境法規金額', '違反環境法規次數'])
 
 export default {
   props: {
@@ -36,8 +41,10 @@ export default {
       // if (this.columnMeta.isSelfReport && majorMeasureList.includes(this.columnMeta.measure)) {
       //   return QuartileCell
       // } else
-      if (this.columnMeta.measure === '工安意外') {
+      if (PURE_TEXT_COLUMNS.has(this.columnMeta.measure)) {
         return LongCell
+      } else if (MAIN_SITE_COLUMNS.has(this.columnMeta.measure)) {
+        return MainSiteCell
       } else {
         return 'span'
       }
@@ -50,7 +57,7 @@ export default {
         return '-'
       }
       const field = this.row.stats[this.columnMeta.key]
-      if (!Number.isNaN(field.value)) {
+      if (!PURE_TEXT_COLUMNS.has(this.columnMeta.measure) && !Number.isNaN(field.value)) {
         const toFixed = 10 ** (this.columnMeta.toFixed || 0)
         const value = Math.round(field.value * toFixed) / toFixed
         return value.toLocaleString()

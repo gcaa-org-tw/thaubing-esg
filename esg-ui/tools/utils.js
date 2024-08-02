@@ -8,8 +8,24 @@ const AutoDetectDecoderStream = require('autodetect-decoder-stream')
 const COMPANY_REPORT_URI = {
   塑膠: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRcO4BFSZGI6GGQExiWs__Y2tBu8Rs4GVTCdv6J-GDLx0CcdqD7jZMDKtDHK5nQ3A/pub?',
   化學: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQH2ytKMQE2RipT0rL4iYcNosbOs41XnSg5RRd4lwKcdgsDZfiSavBWvIqma-lIjxnWNQhb0MmVy6nx/pub?',
-  水泥鋼鐵半導體: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTQuA2j68_8X9Ywsb8uYYgkFdvIfsVbo-OWOGyxOvVAuU4X7SyWx1iW_9qwA-EGrcXj9FflHpKOgAWo/pub?'
+  水泥鋼鐵半導體: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTQuA2j68_8X9Ywsb8uYYgkFdvIfsVbo-OWOGyxOvVAuU4X7SyWx1iW_9qwA-EGrcXj9FflHpKOgAWo/pub?',
+  金融保險: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ5z5I4NiYF-5Dp8ASTgJm6ffVr_8hP1KW2Or6LoyaLMZepJcZ8Nr3gm3H2aOjrY89yb00elQEMNdP-/pub?',
+  上櫃溫室氣體: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4z2S6J6CfMoafmp_OjyVvfxWnyMoyyEnYiER0Uom-tV-zu7DpVOQ-OvzllvunsY0ZWjFn0OqqTOYF/pub?',
+  上市溫室氣體: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT73UOexkLGUOrXm9IrUvcdmUGXg4AxnnG3mKXfTGj2Y4a6bSvKgEOyC5jsEDa7ce56MQILPI1JmYsK/pub?',
+  二零二一: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSMAEZJkJDu6O5mKgv0-otYXdctz9TXmjwBuqL-QPbQYmAE1ZP6Go8Ba_ceRIuy17KxoPxRAOedRrRz/pub?',
+  二零二二: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRpL_n2PkuM3JHZNNA-3e-yMVPyz25ijy9pO0QYlwqYj3P7q8S--yi58ror6KKzQjsqFcqQlQ7vyxm3/pub?'
 }
+
+const ANNUAL_REPORT_MAP = new Map([
+  [
+    '二零二一',
+    [1619780292, 944009336, 469468341, 335035328, 971750723, 726271039, 125777543].map(id => ({ id, industry: '二零二一' }))
+  ],
+  [
+    '二零二二',
+    [639017897, 224370356, 963811152, 1217727816, 2031131799, 1162537800, 827829518].map(id => ({ id, industry: '二零二二' }))
+  ]
+])
 
 class CompanyMap {
   constructor () {
@@ -123,8 +139,22 @@ function createCompanyReportStream (sheetId, apiBase) {
 
 const companyMap = new CompanyMap()
 
+/**
+ * get value from multiple columns, return the first non-empty value
+ */
+function cs2v (data, ...columns) {
+  for (const column of columns) {
+    if (column in data) {
+      return data[column]
+    }
+  }
+  return undefined
+}
+
 module.exports = {
+  ANNUAL_REPORT_MAP,
   companyMap,
+  cs2v,
   createCompanyReportStream,
   mergeCompanyReportStream
 }
