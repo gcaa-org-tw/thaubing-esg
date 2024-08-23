@@ -6,6 +6,7 @@ class CompanyTwseSpider(CSVFeedSpider):
     name = 'company_twse'
     start_urls = [
         'https://mopsfin.twse.com.tw/opendata/t187ap03_L.csv', # 上市公司 https://data.gov.tw/dataset/18419
+        'https://mopsfin.twse.com.tw/opendata/t187ap03_O.csv', # 上櫃公司 https://data.gov.tw/dataset/25036
         'https://mopsfin.twse.com.tw/opendata/t187ap03_R.csv', # 興櫃公司 https://data.gov.tw/dataset/28568
         'https://mopsfin.twse.com.tw/opendata/t187ap03_P.csv', # 公開發行公司 https://data.gov.tw/dataset/28567
     ]
@@ -29,6 +30,7 @@ class CompanyTwseSpider(CSVFeedSpider):
     def _parse_company_type(self, response_url):
         switcher = {
             't187ap03_L': '上市公司',
+            't187ap03_O': '上櫃公司',
             't187ap03_R': '興櫃公司',
             't187ap03_P': '公開發行公司',
         }
