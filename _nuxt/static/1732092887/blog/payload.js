@@ -1,0 +1,1 @@
+__NUXT_JSONP__("/blog", (function(a){return {data:[{articles:[{slug:"gov-accelerates-industrial-energy-saving-to-net-zero",title:"趕上國際淨零腳步，政府要加速工業節能轉型！",coverImage:"\u002Fcontent-img\u002Fesg-db-screenshot.png",creationDate:"2022-12-25T16:35:52.000Z",tags:[a]}],tagDefs:[{tagEn:"Net Zero",tagZh:"淨零"},{tagEn:a,tagZh:"能源轉型"}]}],fetch:{},mutations:[]}}("Energy Transition")));
