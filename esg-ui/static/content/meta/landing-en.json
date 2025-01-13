@@ -1,8 +1,8 @@
 {
   "TITLE": "ESG detector [Sustainable Data Platform]",
-  "DESP": "「ESG檢測儀」是一項用來檢視企業減碳與永續發展的工具。過去，企業的永續相關資料分散於不同網站，隱藏在篇幅冗長的永續報告書中，使得分析和比較變得困難，甚至需要付費才能取得部分資訊。現在，「ESG檢測儀」提供了一個免費、公開且透明的資料庫，讓所有關心永續議題的人都能輕鬆掌握企業在各項 ESG 指標上的真實表現，促進企業間的良性競爭，推動永續發展。",
-  "ESG_DB_CTA": "瀏覽資料庫",
-  "NET_ZERO_CTA": "了解淨零趨勢",
-  "NET_ZERO_DESP": "以環境部的溫室氣體盤查資料為基礎，並依據 IPCC 的基準年（2019），推估企業在「未採取任何溫室氣體減量行動」情境下的排放變化。同時，結合企業已設定的減碳階段性目標與淨零排放計畫，以圖表形式直觀呈現企業的減碳努力及與目標之間的差距。",
-  "ESG_DB_DESP": "綠盟彙整了來自政府與企業的 E（環境）、S（社會）、G（治理）永續相關資料，包括環保署碳排放大戶的碳盤查資料、環境裁罰紀錄，以及金管會要求上市櫃公司提交的永續報告書等。指標涵蓋超過 60 項，包括溫室氣體排放、能源使用、用水量、環境違規紀錄，以及公司營運狀況、違反勞基法紀錄、職業災害與工安事故、ISO 認證取得情況、稅務透明度等。這是台灣首個公開且完全免費的 ESG 資料庫，透過公開透明的數據，讓大眾了解企業的真實永續表現。"
+  "DESP": "The ESG detector is a platform designed to evaluate corporate carbon reduction and sustainability practices. Previously, sustainability data from companies was fragmented across multiple platforms and often concealed within voluminous sustainability reports, hindering comparative analysis and frequently requiring a fee for access. The ESG detector offers a complimentary, open-access, and transparent database that empowers stakeholders to assess a company's actual performance across a comprehensive set of ESG indicators, thereby stimulating constructive competition and advancing sustainability goals.",
+  "ESG_DB_CTA": "Explore Our Data-Driven Platform",
+  "NET_ZERO_CTA": "Uncover Net-Zero Insights",
+  "NET_ZERO_DESP": "Based on the Ministry of Environmental Protection's greenhouse gas inventory data and using the IPCC's base year (2019), the ESG detector estimates the emission changes of companies under a \"business-as-usual\" scenario, where no greenhouse gas reduction measures are taken. It also visualizes a company's carbon reduction efforts and the gap between its actual performance and its set targets through charts, providing insights into its net-zero emission plans.",
+  "ESG_DB_DESP": "The Green Citizens' Action Alliance has compiled E (environmental), S (social), and G (governance) sustainability data from government and corporate sources, including the Environmental Protection Administration's carbon emissions data for major emitters, environmental violation records, and sustainability reports submitted by listed companies as required by the Financial Supervisory Commission. The database covers over 60 indicators, such as greenhouse gas emissions, energy consumption, water usage, environmental violations, company operations, labor law violations, occupational and industrial accidents, ISO certifications, and tax transparency. This is Taiwan's first public and completely free ESG database, promoting transparency and public understanding of companies' actual sustainability performance."
 }
