@@ -29,22 +29,23 @@ class FinancialSpider(Spider):
         # create directory for the year if not exists
         self._make_webpage_dir_for_year(self.year)
 
-        if stock_code is not None:
-            self.logger.info('Start scraping financial data for stock_code=%s, year=%d...', stock_code, self.year)
-            yield Request(
-                url=self._gen_request_url(stock_code, year=self.year),
-                meta={'stock_code': stock_code, 'year': self.year, 'report_id': 'C'},
-                callback=self.parse,
-            )
-
-        else:
-            self.logger.info('Start scraping financial data for year=%d...', self.year)
-            for stock_code in self.stock_codes:
+        if self._check_financial_webpage_exist(stock_code, self.year)==False:
+            if stock_code is not None:
+                self.logger.info('Start scraping financial data for stock_code=%s, year=%d...', stock_code, self.year)
                 yield Request(
                     url=self._gen_request_url(stock_code, year=self.year),
                     meta={'stock_code': stock_code, 'year': self.year, 'report_id': 'C'},
                     callback=self.parse,
                 )
+
+            else:
+                self.logger.info('Start scraping financial data for year=%d...', self.year)
+                for stock_code in self.stock_codes:
+                    yield Request(
+                        url=self._gen_request_url(stock_code, year=self.year),
+                        meta={'stock_code': stock_code, 'year': self.year, 'report_id': 'C'},
+                        callback=self.parse,
+                    )
 
     def _make_webpage_dir_for_year(self, year: int):
         dir_year = os.path.join(os.path.dirname(__file__), '../../../data/financial/webpages/{}'.format(year))
@@ -125,3 +126,11 @@ class FinancialSpider(Spider):
         [status] = [0] if len(status) == 0 else status
 
         return status
+
+    def _check_financial_webpage_exist(self, stock_code: str, year: int):
+        filename = '{}.html'.format(stock_code)
+        filepath = os.path.join(os.path.dirname(__file__), '../../../data/financial/webpages/{}/{}'.format(year, filename))
+        if os.path.exists(filepath):
+            return True
+        else:
+            return False

@@ -60,7 +60,7 @@ class CompanySpider(CSVFeedSpider):
             row['行業代號2'],
             row['行業代號3']
         ]
-        return [str(code) for code in industrial_classification_codes if code]
+        return [str(code) for code in industrial_classification_codes if code.isdigit()] #fix for 生命導航企業股份有限公司 with '[10' industry code
 
 
 class PrerunZipfileDownloader:

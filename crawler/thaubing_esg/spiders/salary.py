@@ -102,7 +102,10 @@ class SalarySpider(Spider):
                 item[key] = None
             else:
                 raw_value = ''.join(tds[value['id'][key_id]].css('*::text').getall())
-                item[key] = self._parse_scraped_value(value['dtype'], raw_value.strip())
+                if "合計" in str(raw_value): #撇除全體合計的部分
+                    break
+                else:
+                    item[key] = self._parse_scraped_value(value['dtype'], raw_value.strip())
         return item
 
     def _gen_webpage_filepath(self, year: int, typek: str) -> str:
